@@ -1,0 +1,25 @@
+.row.naming {
+  background-color: #002f6c !important;
+}
+
+.row.investigation {
+  background-color: #560027 !important;
+}
+
+.notLookedInto {
+  background-color: rgba(255, 0, 0, 0.7) !important;
+}
+
+.row > td {
+  padding: 3px;
+}
+
+.blankRow {
+  background-color: transparent;
+}
+
+.blankRow > td {
+  border: none;
+  height: 24px;
+  padding: 0;
+}

@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'My Site',
@@ -7,8 +9,8 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'icogn', // Usually your GitHub org/user name.
+  projectName: 'tp-docs', // Usually your repo name.
   themeConfig: {
     navbar: {
       title: 'My Site',
@@ -23,7 +25,7 @@ module.exports = {
           position: 'left',
           label: 'Tutorial',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/facebook/docusaurus',
           label: 'GitHub',
@@ -95,6 +97,16 @@ module.exports = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+      },
+    ],
+  ],
+  plugins: [
+    [
+      'docusaurus-plugin-module-alias',
+      {
+        alias: {
+          '@local': path.resolve(__dirname, './src/components'),
         },
       },
     ],
