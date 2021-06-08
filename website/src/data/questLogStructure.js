@@ -3,6 +3,10 @@ import { dataTypes } from './constants';
 const u8 = dataTypes.u8;
 const u8Array = dataTypes.u8Array;
 const u16 = dataTypes.u16;
+const u16Array = dataTypes.u16Array;
+const u32 = dataTypes.u32;
+const u32Array = dataTypes.u32Array;
+const u64 = dataTypes.u64;
 const float = dataTypes.float;
 const charArray = dataTypes.charArray;
 
@@ -15,6 +19,8 @@ const tags = {
 const naming = tags.naming;
 const investigation = tags.investigation;
 const notLookedInto = tags.notLookedInto;
+
+// First 0x1f0 are all accounted for. May need to adjust for bit ones.
 
 const questLogStructureByOffset = {
   0x0: {
@@ -109,22 +115,22 @@ const questLogStructureByOffset = {
   },
   0x15: {
     type: u8,
-    name: '???',
+    name: 'equipIndex2',
     tags: [notLookedInto],
   },
   0x16: {
     type: u8,
-    name: '???',
+    name: 'equipIndex3',
     tags: [notLookedInto],
   },
   0x17: {
     type: u8,
-    name: '???',
+    name: 'equipIndex4',
     tags: [notLookedInto],
   },
   0x18: {
     type: u8,
-    name: '???',
+    name: 'equipIndex5',
     tags: [notLookedInto],
   },
   0x19: {
@@ -169,10 +175,9 @@ const questLogStructureByOffset = {
     tags: [notLookedInto],
   },
   0x28: {
-    type: u8Array,
-    length: 8,
+    type: u64,
     name: 'mDateIpl',
-    shortDesc: 'Type said to be u64. IPL is gamecube start thing?',
+    shortDesc: 'IPL is gamecube start thing?',
     tags: [notLookedInto],
   },
   0x30: {
@@ -214,33 +219,35 @@ const questLogStructureByOffset = {
   },
   0x40: {
     type: float,
-    name: 'eponaPosX',
+    name: 'horsePosX',
   },
   0x44: {
     type: float,
-    name: 'eponaPosY',
+    name: 'horsePosY',
   },
   0x48: {
     type: float,
-    name: 'eponaPosZ',
+    name: 'horsePosZ',
   },
   0x4c: {
     type: u16,
-    name: 'eponaAngleY',
+    name: 'horseAngleY',
+    shortDesc: 'Use s16 for angles?',
+    tags: [investigation],
   },
   0x4e: {
     type: charArray,
     length: 8,
-    name: 'eponaStageName',
+    name: 'horseStageName',
   },
   0x56: {
     type: u8,
-    name: 'eponaSpawnId',
+    name: 'horseSpawnId',
     tags: [notLookedInto],
   },
   0x57: {
     type: u8,
-    name: 'eponaRoomNo',
+    name: 'horseRoomNo',
   },
   0x58: {
     type: charArray,
@@ -487,11 +494,20 @@ const questLogStructureByOffset = {
     name: 'itemSlotSlingshot',
     tags: [naming],
   },
-  // {
-  //   offset: 0xcc,
-  //   type:
-  // }
-
+  0xb4: {
+    type: u8Array,
+    length: 0x18,
+    name: 'itemWheelArray',
+    tags: [naming, investigation],
+  },
+  0xcc: {
+    type: u32Array,
+    length: 8,
+    name: 'gotItemBits',
+    shortDesc:
+      "What on Contents page? Don't name this and only name inner bits?",
+    tags: [naming, investigation],
+  },
   0xec: {
     type: u8,
     name: 'numArrows',
@@ -548,6 +564,240 @@ const questLogStructureByOffset = {
     type: u8,
     name: 'maxArrows',
     tags: [naming],
+  },
+  0xf9: {
+    type: u8Array,
+    length: 7,
+    name: 'moreMaxes???',
+    shortDesc: 'fill this out',
+    tags: [notLookedInto],
+  },
+  0x100: {
+    type: u8Array,
+    length: 8,
+    name: 'mItem',
+    tags: [notLookedInto],
+  },
+  0x108: {
+    type: u8,
+    name: 'unk108',
+    tags: [notLookedInto],
+  },
+  0x109: {
+    type: u8,
+    name: 'mCrystal',
+    tags: [notLookedInto],
+  },
+  0x10a: {
+    type: u8,
+    name: 'mMirror',
+    tags: [notLookedInto],
+  },
+  0x10b: {
+    type: u8,
+    name: 'unk110',
+    tags: [notLookedInto],
+  },
+  0x10c: {
+    type: u8,
+    name: 'numPoeSouls',
+    tags: [investigation],
+  },
+  0x10d: {
+    type: u8Array,
+    length: 3,
+    name: 'padding???',
+    tags: [notLookedInto],
+  },
+  0x110: {
+    type: u8Array,
+    length: 3,
+    name: 'unknown',
+    tags: [notLookedInto],
+  },
+  0x113: {
+    type: u8,
+    name: 'unk113',
+    tags: [notLookedInto],
+  },
+  0x114: {
+    type: u8Array,
+    length: 4,
+    name: 'mLightDropNum',
+    tags: [notLookedInto],
+  },
+  0x118: {
+    type: u8,
+    name: 'mLightDropGetFlag',
+    tags: [notLookedInto],
+  },
+  0x119: {
+    type: u8Array,
+    length: 3,
+    name: 'unk119',
+    tags: [notLookedInto],
+  },
+  0x11c: {
+    type: u32Array,
+    length: 2,
+    name: 'mLetterGetBitfields',
+    tags: [notLookedInto],
+  },
+  0x124: {
+    type: u32Array,
+    length: 2,
+    name: 'mLetterReadBitfields',
+    tags: [notLookedInto],
+  },
+  0x12c: {
+    type: u8Array,
+    length: 0x40,
+    name: 'unk12c',
+    shortDesc: 'is this padding?',
+    tags: [notLookedInto],
+  },
+  0x16c: {
+    type: u16Array,
+    length: 0x10,
+    name: 'mFishCount',
+    tags: [notLookedInto],
+  },
+  0x18c: {
+    type: u8Array,
+    length: 0x10,
+    name: 'mMaxSize',
+    tags: [notLookedInto],
+  },
+  0x19c: {
+    type: u8Array,
+    length: 4,
+    naming: 'padding???',
+    tags: [notLookedInto],
+  },
+  0x1a0: {
+    type: u32,
+    name: 'unk1a0',
+    tags: [notLookedInto],
+  },
+  0x1a4: {
+    type: u32,
+    name: 'unk1a4',
+    tags: [notLookedInto],
+  },
+  0x1a8: {
+    type: u64,
+    name: 'mTotalTime',
+    tags: [notLookedInto],
+  },
+  0x1b0: {
+    type: u16,
+    name: 'unk1b0',
+    tags: [notLookedInto],
+  },
+  0x1b2: {
+    type: u16,
+    name: 'mDeathCount',
+    tags: [notLookedInto],
+  },
+  0x1b4: {
+    type: charArray,
+    length: 0x10,
+    name: 'mPlayerName',
+    tags: [notLookedInto],
+  },
+  0x1c4: {
+    type: u8,
+    name: 'unk1c4',
+    tags: [notLookedInto],
+  },
+  0x1c5: {
+    type: charArray,
+    length: 0x10,
+    name: 'mHorseName',
+    tags: [notLookedInto],
+  },
+  0x1d5: {
+    type: u8,
+    name: 'unk1d5',
+    tags: [notLookedInto],
+  },
+  0x1d6: {
+    type: u8,
+    name: 'mClearCount',
+    tags: [notLookedInto],
+  },
+  0x1d7: {
+    type: u8Array,
+    length: 5,
+    name: 'unk1d7',
+    tags: [notLookedInto],
+  },
+  0x1dc: {
+    type: u8Array,
+    length: 4,
+    name: 'padding???',
+    tags: [notLookedInto],
+  },
+  0x1e0: {
+    type: u8,
+    name: 'unk1e0',
+    tags: [notLookedInto],
+  },
+  0x1e1: {
+    type: u8,
+    name: 'mSoundMode',
+    tags: [notLookedInto],
+  },
+  0x1e2: {
+    type: u8,
+    name: 'mAttentionType',
+    tags: [notLookedInto],
+  },
+  0x1e3: {
+    type: u8,
+    name: 'mVibration',
+    tags: [notLookedInto],
+  },
+  0x1e4: {
+    type: u8,
+    name: 'unk1e4',
+    tags: [notLookedInto],
+  },
+  0x1e5: {
+    type: u8,
+    name: 'unk1e5',
+    tags: [notLookedInto],
+  },
+  0x1e6: {
+    type: u16,
+    name: 'mCalibrateDist',
+    tags: [notLookedInto],
+  },
+  0x1e8: {
+    type: u8,
+    name: 'mCalValue',
+    tags: [notLookedInto],
+  },
+  0x1e9: {
+    type: u8,
+    name: 'mShortCut',
+    tags: [notLookedInto],
+  },
+  0x1ea: {
+    type: u8,
+    name: 'mCameraControl',
+    tags: [notLookedInto],
+  },
+  0x1eb: {
+    type: u8,
+    name: 'mPointer',
+    tags: [notLookedInto],
+  },
+  0x1ec: {
+    type: u8Array,
+    length: 4,
+    name: 'padding???',
+    tags: [notLookedInto],
   },
 };
 

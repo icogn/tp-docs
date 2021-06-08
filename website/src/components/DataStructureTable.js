@@ -4,6 +4,20 @@ import { sprintf } from 'sprintf-js';
 import { dataTypes } from '../data/constants';
 import styles from './DataStructureTable.module.css';
 
+const dataTypeToArrayText = {
+  [dataTypes.charArray]: 'char',
+  [dataTypes.u8Array]: 'u8',
+  [dataTypes.u16Array]: 'u16',
+  [dataTypes.u32Array]: 'u32',
+};
+
+function formatArrayText(text, number) {
+  if (number >= 0xa) {
+    return `${text}[${sprintf('0x%x', number)}]`;
+  }
+  return `${text}[${number}]`;
+}
+
 function renderRows(data) {
   console.log('data');
   console.log(data);
@@ -29,10 +43,8 @@ function renderRows(data) {
     }
 
     let displayType = type;
-    if (type === dataTypes.charArray) {
-      displayType = `char[${length}]`;
-    } else if (type === dataTypes.u8Array) {
-      displayType = `u8[${length}]`;
+    if (dataTypeToArrayText[type]) {
+      displayType = formatArrayText(dataTypeToArrayText[type], length);
     }
 
     ret.push(
