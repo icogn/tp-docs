@@ -799,6 +799,43 @@ const questLogStructureByOffset = {
     name: 'padding???',
     tags: [notLookedInto],
   },
+  0x1f0: {
+    type: u8Array,
+    length: 0x400,
+    name: 'regionBitsNaming',
+    shortDesc:
+      'Naming. Figure out how to show as well. 0x20 array of 0x20 length each (0x18 + 0x2 padding/garbage)',
+    tags: [naming, investigation],
+  },
+  0x5f0: {
+    type: u8Array,
+    length: 0x200,
+    name: 'tSomethingElse',
+    shortDesc:
+      'Naming. Figure out how to show as well. 0x40 array of 0x8 length each.',
+    tags: [naming, investigation],
+  },
+  0x7f0: {
+    type: u8Array,
+    length: 0x100,
+    name: 'tEventBits',
+    shortDesc: 'Naming. Figure out how to show as well. 0x100 bytes of bits.',
+    tags: [naming, investigation],
+  },
+  0x8f0: {
+    type: u8Array,
+    length: 0x50,
+    name: 'tPostEventBitsGarbage',
+    shortDesc: 'padding?',
+    tags: [naming, investigation],
+  },
+  0x940: {
+    type: u8Array,
+    length: 0x18,
+    name: 'tMinigameStuff',
+    shortDesc: 'Not just straight bytes I think. Look into.',
+    tags: [naming, investigation],
+  },
 };
 
 Object.keys(questLogStructureByOffset).forEach((offset) => {

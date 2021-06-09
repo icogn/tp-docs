@@ -20,6 +20,11 @@ const sections = [
   { name: 'fishingInfo', start: 0x16c },
   { name: 'playerInfo', start: 0x1a0 },
   { name: 'playerConfig', start: 0x1e0 },
+  { name: 'tRegionStuff', start: 0x1f0 },
+  { name: 't5f0Stuff', start: 0x5f0 },
+  { name: 'tEventBitStuff', start: 0x7f0 },
+  { name: 'tPostEventBitGarbage', start: 0x8f0 },
+  { name: 'tMinigameStuff', start: 0x940 },
 ];
 
 const tableRowArr = [];
