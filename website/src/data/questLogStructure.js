@@ -177,7 +177,8 @@ const questLogStructureByOffset = {
   0x28: {
     type: u64,
     name: 'mDateIpl',
-    shortDesc: 'IPL is gamecube start thing?',
+    shortDesc:
+      'IPL is gamecube start thing? Used to in picking default Quest Log to highlight on quest log screen.',
     tags: [notLookedInto],
   },
   0x30: {

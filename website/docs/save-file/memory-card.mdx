@@ -19,7 +19,8 @@ Memory card data consists of "blocks" which are each 0x2000 bytes. The first 5 b
 
 A game's save data will consist of a certain number of blocks which are located somewhere after the first 5 filesystem blocks.
 
-For example, TP's save data is 4 blocks long, so these blocks might be located at offsets 0xa000, 0xc000, 0xe000, 0x10000 on a fresh memory card, but they could also be at 0x22000, 0x24000, 0x26000, and 0x28000.<br/>
+For example, TP's save data is 4 blocks long, so these blocks might be located at offsets 0xa000, 0xc000, 0xe000, and 0x10000 on a fresh memory card, but they could also be at 0x22000, 0x24000, 0x26000, and 0x28000.
+
 The blocks do not necessarily have to be contiguous, but in practice they usually are, and it may be easier to think of them that way.
 
 :::tip
@@ -33,7 +34,7 @@ The official memory card types are Memory Card 59, Memory Card 251, and Memory C
 
 The special Directory filesystem block contains an array of Directory Entries which are each 0x40 bytes long.
 
-In addition to its 4 blocks (0x8000 bytes), TP also specifies some `(all?)` of the data which is written to its DirectoryEntry. We will talk more about the DirectoryEntry later after covering the Block data.
+In addition to its 4 blocks (0x8000 bytes), TP also specifies some `(all?)` of the data which is written to its DirectoryEntry. We will talk more about the DirectoryEntry after covering the Block data.
 
 ## Twilight Princess Save Data Overview
 
@@ -42,19 +43,205 @@ In addition to its 4 blocks (0x8000 bytes), TP also specifies some `(all?)` of t
 | 0x40   | DirectoryEntry |
 | 0x8000 | 4 Blocks       |
 
-You can think above as the above as the TP save data which is on the memory card.
+You can think of the above as the TP save data which is on the memory card.
 
 :::tip
 
-A `GCI` file is exactly these two things back to back as shown above.
+A Twilight Princess `GCI` file is exactly these two things back-to-back as shown above.
 
 :::
 
 ## Blocks
 
-// Add more here
+TP save data has 4 blocks:
 
-// References (not finalized):<br/>
-// http://hitmen.c02.at/files/yagcd/yagcd/chap12.html<br/>
-// https://github.com/dolphin-emu/dolphin/blob/5513d5f4f732fb1e436765ab87e7d60ba02b1ad6/Source/Core/Core/HW/GCMemcard/GCMemcard.h<br/>
+| BlockNo | Description             |
+| ------: | ----------------------- |
+|       1 | Header                  |
+|       2 | Header (continued)      |
+|       3 | Quest Log Data          |
+|       4 | Quest Log Data (backup) |
+
+### Header Blocks
+
+The Header spills over into the second block, so those two blocks will be treated as a chunk of 0x4000 bytes for discussion purposes. Remember that the two blocks may not actually be back-to-back on the memory card.
+
+| Offset |   Size | Description            |
+| -----: | -----: | ---------------------- |
+| 0x0000 |  0xc00 | Banner pixel data      |
+| 0x0c00 |  0x200 | Banner palette data    |
+| 0x0e00 |  0x400 | Icon pixel data        |
+| 0x1200 |  0x400 | Icon pixel data (copy) |
+| 0x1600 |  0x400 | Icon pixel data (copy) |
+| 0x1a00 |  0x400 | Icon pixel data (copy) |
+| 0x1e00 |  0x400 | Icon pixel data (copy) |
+| 0x2200 |  0x200 | Icon palette data      |
+| 0x2400 |   0x20 | Comment 1              |
+| 0x2420 |   0x20 | Comment 2              |
+| 0x2440 | 0x1bc0 | Unused/garbage         |
+
+#### Banner
+
+<img
+  src={require('@site/static/img/savefile/zelda2_gc_banner.bti.png').default}
+  alt="zelda2_gc_banner.bti"
+/>
+
+A GameCube game's (optional) banner always has dimensions 0x60 by 0x20 pixels (96 x 32 decimal).
+
+TP's banner is in CI8 format which means it uses one byte per pixel (0x60 \* 0x20 is 0xc00).
+
+CI8 format also means that the 0x200 bytes following the 0xc00 pixel data will be the palette data. Each palette entry is 2 bytes long, meaning a CI8 banner may use up to 0x100 unique palette entries. TP's banner actually only makes use of the first 0x160 bytes of the palette data space.
+
+#### Icons
+
+<img
+  src={require('@site/static/img/savefile/zelda2_gc_icon.bti.png').default}
+  alt="zelda2_gc_banner.bti"
+/>
+
+A GameCube game's (optional) icon always has dimensions 0x20 by 0x20 pixels (32 x 32 decimal). It may be composed of multiple icons which it animates between.
+
+TP specifies in its DirectoryEntry that each icon is in CI8 format with a shared color palette following all of the pixel data, and it also specifies that it has 5 icons.
+
+As with the banner, CI8 format means that each pixel of an icon takes one byte. Since each icon has dimensions 0x20 by 0x20, each icon is 0x400 bytes long.
+
+Also as with the banner, the palette data must fit in the 0x200 bytes following the end of the pixel data. For its icons, TP makes use of the full 0x200 bytes.
+
+:::info
+
+The zelda2_gc_banner.bti and zelda2_gc_icon.bti are located in the Yaz0-encoded `/res/CardIcon/cardicon.arc`. "Card" here is short for Memory Card.
+
+:::
+
+#### Comments 1 and 2
+
+Each comment is a null-terminated string which can use up to 0x20 bytes.
+
+These bytes (in addition to the banner and icon) are visible when managing memory card data on your GameCube.
+
+For the US GameCube version of TP, the first comment is always "Zelda: Twilight Princess", and the second comment is something like "6/4 Save Data" (which is Month/Day).
+
+#### Unused/Garbage
+
+The last 0x1bc0 of Block 2 is not used for anything.
+
+If you inspect memory card data for TP in a hex editor, you may see what appears to be quest log data in this space. This is a side-effect of the game only using `memset` to zero out the buffer it writes blocks to (before they are copied to the memory card) before writing the Header there in certain cases. If you edit any of these 0x1bc0 bytes in your memory card before loading up the game, you will not see any effect.
+
+Other bytes which may contain garbage in the first two TP Blocks are as follows:
+
+- The last 0x40 bytes of the banner's palette data (starting at offset 0xd60).
+- In each Comment (offsets 0x2400 and 0x2420), the bytes which follow the null termination character of the Comment.
+
+### Quest Log Blocks
+
+Blocks 3 contains the data for the 3 Quest Logs. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
+
+The Quest Log Block structure is as follows:
+
+| Offset |  Size | Description       |
+| -----: | ----: | ----------------- |
+| 0x0000 |   0x8 | 00000000 00000006 |
+| 0x0008 | 0xa94 | Quest Log 1 Data  |
+| 0x0a9c | 0xa94 | Quest Log 2 Data  |
+| 0x1530 | 0xa94 | Quest Log 3 Data  |
+| 0x1fc4 |  0x34 | Unused/garbage    |
+| 0x1ff8 |   0x8 | Checksum          |
+
+#### First 8 Bytes
+
+The first eight bytes are always set to:<br/>
+00 00 00 00<span style={{display:'inline-block',height:1,width:16}}></span>00 00 00 06
+
+My guess is that this is a version number for the quest log structure which was incremented during development, and they ended on 6.
+
+#### Quest Log Data
+
+Each Quest Log's data is the same structure. The structure is rather complex, so it will be covered on a different page.
+
+#### Unused/Garbage
+
+- ahsdfiosdhfi
+
+Note that each of the 0xa94 Quest Log Data sections contain unused/garbage bytes as well, but that will be covered on a separate page.
+
+#### Checksum
+
+- asdhfos
+
+## DirectoryEntry
+
+- adhfio
+
+## Other Formats
+
+### GCIs
+
+A Twilight Princess GCI file is 0x8040 bytes long and is simply the DirectoryEntry (0x40 bytes) followed by the 4 Blocks (0x8000 bytes).
+
+Think of a GCI as a portable version of a game's data on a memory card.
+
+- ashdifoh Other info about DirectoryEntry things that don't matter in the context of a GCI file (if any).
+
+### Wii
+
+- TBD
+
+### Nvidia Shield
+
+The Shield's save data is 0x4000 bytes long. It is composed of Blocks 3 and 4, which are the Quest Log data block and its backup.
+
+It does not need the DirectoryEntry or Header blocks since those are specifically designed to work with the GameCube.
+
+## Closing Thoughts
+
+Here we only covered as much as was necessary to talk about the memory card in the context of TP. If you would like to read more about the structure of data on the memory card, check out these links:
+
+- <Link to="http://hitmen.c02.at/files/yagcd/yagcd/chap12.html">
+    Yet Another Gamecube Documentation (YAGCD) Ch. 12
+  </Link>
+- <Link to="https://github.com/dolphin-emu/dolphin/blob/5513d5f4f732fb1e436765ab87e7d60ba02b1ad6/Source/Core/Core/HW/GCMemcard/GCMemcard.h">
+    GCMemcard.h in Dolphin
+  </Link>
+
+Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to check the Dolphin source code about that one.
+
+### Why 5 identical icons?
+
+You might have noticed that 87% of block 2 is unused and that we could easily fit the Header on a single block if we did not store 5 copies of the same icon data.
+
+Unfortunately, I do not have an answer for why this is the case.
+
+My best guess is that they were planning to use an animated icon but ran out of time or decided against it, and they never went back to update the code. Evidence in support of this is that they do go out of their way to set the IconAnimation bit in the DirectoryEntry to 1 (which indicates to use a ping-pong pattern rather than a loop).
+
+But I am open to other interpretations. Let me know if you think there is a better explanation.
+
+### Default selection on the file select screen?
+
+You might expect there to be some metadata outside of the quest logs which keeps track of which one to default to on the file selection screen, but this is not the case.
+
+The default is picked this way:
+
+- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the QuestLog which has the greatest value returned from calculating `timestamp / 40,500,000`.
+- In the case of a tie, Quest Log 1 has the highest priority and Quest Log 3 has the lowest priority.
+
+:::info
+
+Quest Logs which fail their checksum test say "This Quest Log is corrupted."
+
+:::
+
+<!-- This is the case even when the quest log says "This Quest Log is corrupted." or "New Quest Log". It is possible for one of these quest logs to be selected. -->
+
+## References
+
+// References (not finalized):
+
+- <Link to="http://hitmen.c02.at/files/yagcd/yagcd/chap12.html">
+    Yet Another Gamecube Documentation (YAGCD) Ch. 12
+  </Link>
+- <Link to="https://github.com/dolphin-emu/dolphin/blob/5513d5f4f732fb1e436765ab87e7d60ba02b1ad6/Source/Core/Core/HW/GCMemcard/GCMemcard.h">
+    GCMemcard.h in Dolphin
+  </Link>
+
 // https://github.com/devkitPro/libogc/blob/master/gc/ogc/card.h
