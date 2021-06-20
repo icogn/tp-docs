@@ -176,10 +176,10 @@ const questLogStructureByOffset = {
   },
   0x28: {
     type: u64,
-    name: 'mDateIpl',
+    name: 'timestamp',
     shortDesc:
-      'IPL is gamecube start thing? Used to in picking default Quest Log to highlight on quest log screen.',
-    tags: [notLookedInto],
+      'OSTicks since 2000/01/01T00:00. Used to pick default Quest Log to highlight on quest log screen. Maybe other uses as well. Not sure if signed or unsigned.',
+    tags: [naming, investigation],
   },
   0x30: {
     type: u8,
@@ -204,12 +204,15 @@ const questLogStructureByOffset = {
   0x34: {
     type: float,
     name: 'dayTime',
+    shortDesc:
+      'Might use "time" instead. dayTime came from a function I think.',
     tags: [naming],
   },
   0x38: {
     type: u16,
-    name: 'dayOfWeek',
-    shortDesc: 'date and not dayOfWeek? dayOfWeek is derived from date?',
+    name: 'day',
+    shortDesc:
+      'day and not dayOfWeek? dayOfWeek is derived from day? Prefer day over date since it is a day count and not a date',
     tags: [naming, investigation],
   },
   0x3a: {

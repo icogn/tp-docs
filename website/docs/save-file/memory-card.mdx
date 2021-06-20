@@ -222,7 +222,7 @@ You might expect there to be some metadata outside of the quest logs which keeps
 
 The default is picked this way:
 
-- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the QuestLog which has the greatest value returned from calculating `timestamp / 40,500,000`.
+- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the QuestLog which is the latest down to the seconds level.
 - In the case of a tie, Quest Log 1 has the highest priority and Quest Log 3 has the lowest priority.
 
 :::info
