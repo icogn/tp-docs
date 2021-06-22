@@ -171,7 +171,35 @@ Note that each of the 0xa94 Quest Log Data sections contain unused/garbage bytes
 
 ## DirectoryEntry
 
-- adhfio
+These 0x40 bytes contain metadata about the Twilight Princess save data on the memory card. They live in a special Directory block, hence the name. These are also the first 0x40 bytes of a GCI file.
+
+| Offset | Type     | Description  | Status (temp column) |
+| -----: | -------- | ------------ | -------------------- |
+|   0x00 | u8[4]    |              |                      |
+|   0x04 | u8[2]    |              |                      |
+|   0x06 | u8       |              |                      |
+|   0x07 | u8       |              |                      |
+|   0x08 | u8[0x20] |              |                      |
+|   0x28 | u32      | lastModified | done?                |
+|   0x2c | u16      |              |                      |
+|   0x2e | u16      |              |                      |
+|   0x30 | u16      |              |                      |
+|   0x32 | u16      |              |                      |
+|   0x34 | u16      |              |                      |
+|   0x36 | u16      |              |                      |
+|   0x38 | u16      |              |                      |
+|   0x3c | u32      |              |                      |
+
+### Last Modified
+
+The last time this DirectoryEntry was modified represented by the number of seconds since 2000/01/01 00:00.
+
+This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
+
+Other thoughts:
+
+- A time of 2136/02/07 06:28:15 would give 0xffffffff seconds after 2000/01/01 00:00. I think the only way to get your Gamecube's date this high is to [set it to 2099 and wait 30+ years](https://www.reddit.com/r/Gamecube/comments/kqnhdj/gamecube_calendar_year_past_2099_has_anyone_seen/). Even then, it is possible that the OSTick count returned from OSGetTime is based on a fixed clock and is not adjusted with any changes you make in the IPL (this could be tested). In any case, the clock battery would probably die before this became an issue.
+- The 64 bit OSTicks count wouldn't get its sign bit set until around Sep 18, 9216 at 15:12:36.908044, so this is not worth thinking about.
 
 ## Other Formats
 
@@ -203,8 +231,11 @@ Here we only covered as much as was necessary to talk about the memory card in t
 - <Link to="https://github.com/dolphin-emu/dolphin/blob/5513d5f4f732fb1e436765ab87e7d60ba02b1ad6/Source/Core/Core/HW/GCMemcard/GCMemcard.h">
     GCMemcard.h in Dolphin
   </Link>
+- <Link to="https://github.com/devkitPro/libogc/blob/master/gc/ogc/card.h">
+    libogc/card.h
+  </Link>
 
-Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to check the Dolphin source code about that one.
+Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to check the Dolphin source code for that one.
 
 ### Why 5 identical icons?
 
@@ -231,11 +262,21 @@ Quest Logs which fail their checksum test say "This Quest Log is corrupted."
 
 :::
 
-<!-- This is the case even when the quest log says "This Quest Log is corrupted." or "New Quest Log". It is possible for one of these quest logs to be selected. -->
+## Naming
+
+### DirectoryEntry
+
+This DirectoryEntry data is written as an entry on the Directory Block, hence the name DirectoryEntry.
+We are using this name for a couple of reasons:
+
+- Variations of "directory entry" (such as 'DEntry' and '\_card_direntry') are what you will see in other places.
+- We can afford to be more descriptive with the name since this is only documentation and not source code.
+
+Based on the OS function names `CARDGetStatus` and `CARDSetStatus` which handle reading and writing this data, it is possible that this data could also be called something like "Status". TP itself has funtions `m_Do_MemCardRWmng::mDoMemCdRWm_SetCardStat` and `m_Do_MemCardRWmng::mDoMemCdRWm_CheckCardStat` which call the OS functions internally. They bring to mind the Linux command `stat` which is said to "display file or file system status". The data in this 0x40 byte chunk is essentially what you would see if you could run that command on a memory card (metadata about some data stored in the filesystem).
+
+The term "Directory Block" is supported by the OS function `card::__CARDGetDirBlock`.
 
 ## References
-
-// References (not finalized):
 
 - <Link to="http://hitmen.c02.at/files/yagcd/yagcd/chap12.html">
     Yet Another Gamecube Documentation (YAGCD) Ch. 12
@@ -243,5 +284,6 @@ Quest Logs which fail their checksum test say "This Quest Log is corrupted."
 - <Link to="https://github.com/dolphin-emu/dolphin/blob/5513d5f4f732fb1e436765ab87e7d60ba02b1ad6/Source/Core/Core/HW/GCMemcard/GCMemcard.h">
     GCMemcard.h in Dolphin
   </Link>
-
-// https://github.com/devkitPro/libogc/blob/master/gc/ogc/card.h
+- <Link to="https://github.com/devkitPro/libogc/blob/master/gc/ogc/card.h">
+    libogc/card.h
+  </Link>
