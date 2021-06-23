@@ -173,28 +173,74 @@ Note that each of the 0xa94 Quest Log Data sections contain unused/garbage bytes
 
 These 0x40 bytes contain metadata about the Twilight Princess save data on the memory card. They live in a special Directory block, hence the name. These are also the first 0x40 bytes of a GCI file.
 
-| Offset | Type     | Description  | Status (temp column) |
-| -----: | -------- | ------------ | -------------------- |
-|   0x00 | u8[4]    |              |                      |
-|   0x04 | u8[2]    |              |                      |
-|   0x06 | u8       |              |                      |
-|   0x07 | u8       |              |                      |
-|   0x08 | u8[0x20] |              |                      |
-|   0x28 | u32      | lastModified | done?                |
-|   0x2c | u16      |              |                      |
-|   0x2e | u16      |              |                      |
-|   0x30 | u16      |              |                      |
-|   0x32 | u16      |              |                      |
-|   0x34 | u16      |              |                      |
-|   0x36 | u16      |              |                      |
-|   0x38 | u16      |              |                      |
-|   0x3c | u32      |              |                      |
+| Offset | Type     | Description         | Status (temp column) |
+| -----: | -------- | ------------------- | -------------------- |
+|   0x00 | u8[4]    | gameCode            |                      |
+|   0x04 | u8[2]    | publisherCode       |                      |
+|   0x06 | u8       | padding06           |                      |
+|   0x07 | u8       | bannerAndIconFlags  |                      |
+|   0x08 | u8[0x20] | filename            |                      |
+|   0x28 | u32      | lastModified        | done?                |
+|   0x2c | u32      | imageDataOffset     |                      |
+|   0x30 | u16      | iconFormats         |                      |
+|   0x32 | u16      | iconAnimationSpeeds |                      |
+|   0x34 | u8       | permissions         |                      |
+|   0x35 | u8       | copyCounter         |                      |
+|   0x36 | u16      | firstBlockIndex     |                      |
+|   0x38 | u16      | padding38           |                      |
+|   0x3c | u32      | commentsOffset      |                      |
+
+### gameCode
+
+gameCode will be one of the following depending on the game region:
+
+| gameCode | Region                                         |
+| -------- | ---------------------------------------------- |
+| GZ2E     | USA                                            |
+| GZ2J     | Japan                                          |
+| GZ2P     | Europe and other PAL regions such as Australia |
+
+G is for Gamecube, Z2 is the title code for Twilight Princess, and the last character is dependent on the region as shown above.<br/>
+Read more about it here: [GameIDs - Dolphin Emulator Wiki](https://wiki.dolphin-emu.org/index.php?title=GameIDs)
+
+These bytes are available at address 0x80000000 which is where they are copied from when creating the DirectoryEntry.
+
+### publisherCode
+
+publisherCode will always be 0x01 which is the publisherCode for Nintendo.
+
+These bytes are available at address 0x80000004 which is where they are copied from when creating the DirectoryEntry.
+
+### padding06
+
+Unused byte which will always be 0xff under normal conditions.
+
+#### Why 0xff?
+
+An formatted memory card's directory blocks will start out as the following:
+
+| Offset | Size   | Description   |
+| ------ | ------ | ------------- |
+| 0x0000 | 0x1ffa | 0xff bytes    |
+| 0x1ffa | 0x0002 | updateCounter |
+| 0x1ffc | 0x0002 | checksum1     |
+| 0x1ffe | 0x0002 | checksum2     |
+
+That is to say, all bytes are 0xff except the last 6.
+
+These directory blocks are read into RAM shortly after the game starts up (basically when the WARNING-HEALTH AND SAFETY screen shows). When you tell the game to create TP save data on the memory card, it determines a spot within the directory block data to write the DirectoryEntry before copying it back to the memory card. The padding bytes within the 0x40 byte chunk which is picked to write the TP DirectoryEntry to are never overwritten since there is nothing to put there, so they maintain the value which they had on the memory card.
+
+You can test this by modifying the padding bytes (and adjusting the checksums) before you create TP save data on the memory card. When you create the save data, the padding bytes will be unaffected.
+
+So essentially, their value is unimportant but will always be 0xff under normal circumstances. This also applies to the unused bytes at offset 0x3a of the DirectoryEntry.
 
 ### Last Modified
 
 The last time this DirectoryEntry was modified represented by the number of seconds since 2000/01/01 00:00.
 
 This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
+
+// ADD CONVERTER COMPONENT HERE (takes hex seconds value and outputs info)
 
 Other thoughts:
 
@@ -286,4 +332,7 @@ The term "Directory Block" is supported by the OS function `card::__CARDGetDirBl
   </Link>
 - <Link to="https://github.com/devkitPro/libogc/blob/master/gc/ogc/card.h">
     libogc/card.h
+  </Link>
+- <Link to="https://wiki.dolphin-emu.org/index.php?title=GameIDs">
+    GameIDs - Dolphin Emulator Wiki
   </Link>
