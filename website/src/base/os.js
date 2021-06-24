@@ -172,4 +172,64 @@ function getDates(dayOffset, osCalendar) {
 // const a = osTicksToCalendarTime('00615b390fb0dcef');
 // console.log(a);
 
+const a = [];
+for (let i = 0; i < 0xffd; i++) {
+  // if (i === 3) {
+  //   a.push(0xaaff);
+  // } else if (i === 29) {
+  //   a.push(0xaaaa);
+  // } else {
+  //   a.push(0xffff);
+  // }
+
+  if (i > 0 && i < 0x20) {
+    a.push(0xaaaa);
+  } else {
+    a.push(0xffff);
+  }
+}
+
+// for (let i = 0; i < 0x1d; i++) {
+//   a.push(0xffff);
+// }
+a.push(0);
+window.a = a;
+
+console.log(`a.length: ${a.length}`);
+
+// posChecksum: 'A002'
+// negChecksum: '5000'
+
+// First 4 bytes as 0xff:
+// pos: '4AAC'
+// neg: 'A556'
+
+// First 4 0xff, rest 0xaa, except last part
+// pos: 'F54D'
+// neg: 'FAB5'
+
+// Only offset 0x6 to 0xaa
+// pos: '9B03'
+// neg: '54FF'
+
+// Start with 0xffff. Then rest of 0x40 start is 0xaaaa.
+// pos: '9AB8'
+// neg: '554A'
+
+window.b = function () {
+  let posSum = 0;
+  let negSum = 0;
+
+  for (let i = 0; i < 0xffe; i++) {
+    const val = a[i];
+    posSum += val;
+    negSum += ~val;
+  }
+
+  return {
+    posSum,
+    negSum,
+  };
+};
+
 export { osTicksToCalendarTime };

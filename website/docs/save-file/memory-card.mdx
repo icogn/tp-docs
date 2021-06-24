@@ -177,7 +177,7 @@ These 0x40 bytes contain metadata about the Twilight Princess save data on the m
 | -----: | -------- | ------------------- | -------------------- |
 |   0x00 | u8[4]    | gameCode            |                      |
 |   0x04 | u8[2]    | publisherCode       |                      |
-|   0x06 | u8       | padding06           |                      |
+|   0x06 | u8       | padding_06          |                      |
 |   0x07 | u8       | bannerAndIconFlags  |                      |
 |   0x08 | u8[0x20] | filename            |                      |
 |   0x28 | u32      | lastModified        | done?                |
@@ -187,7 +187,8 @@ These 0x40 bytes contain metadata about the Twilight Princess save data on the m
 |   0x34 | u8       | permissions         |                      |
 |   0x35 | u8       | copyCounter         |                      |
 |   0x36 | u16      | firstBlockIndex     |                      |
-|   0x38 | u16      | padding38           |                      |
+|   0x38 | u16      | numBlocks           |                      |
+|   0x3a | u8[2]    | padding_38          |                      |
 |   0x3c | u32      | commentsOffset      |                      |
 
 ### gameCode
@@ -207,17 +208,82 @@ These bytes are available at address 0x80000000 which is where they are copied f
 
 ### publisherCode
 
-publisherCode will always be 0x01 which is the publisherCode for Nintendo.
+publisherCode will always be "01" (0x3031) which is the publisherCode for Nintendo.
 
 These bytes are available at address 0x80000004 which is where they are copied from when creating the DirectoryEntry.
 
-### padding06
+### padding_06
 
-Unused byte which will always be 0xff under normal conditions.
+Unused byte which will always be 0xff under normal conditions.<br/>
+See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
-#### Why 0xff?
+### bannerAndIconFlags
 
-An formatted memory card's directory blocks will start out as the following:
+sdhafioashdfo
+
+### filename
+
+asdhfidohsf
+
+### lastModified
+
+The last time this DirectoryEntry was modified represented by the number of seconds since 2000/01/01 00:00.
+
+----- Better phrasing. True about directory entry, but mainly is referring to the file (which is made up of the 4 blocks).
+
+This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
+
+// ADD CONVERTER COMPONENT HERE (takes hex seconds value and outputs info)
+
+### imageDataOffset
+
+// ashdfio
+
+### iconFormats
+
+// ashdfio
+
+### iconAnimationSpeeds
+
+// ashdfio
+
+### permissions
+
+// ashdfio
+
+### copyCounter
+
+// ashdfio
+
+### firstBlockIndex
+
+// ashdfio
+
+### numBlocks
+
+// ashdfio
+
+### padding_38
+
+Two unused bytes which will both be 0xff under normal conditions.<br/>
+See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
+
+### commentsOffset
+
+// ashdfio
+
+## DirectoryEntry Follow-up
+
+### Why is the padding 0xff? {#why-0xff}
+
+Short version:
+
+- The padding bytes are set to 0xff when the memory card is formatted.
+- They are never changed after that point.
+
+Longer version:
+
+When a memory card is formatted, its Directory blocks are mostly filled with 0xff:
 
 | Offset | Size   | Description   |
 | ------ | ------ | ------------- |
@@ -228,24 +294,38 @@ An formatted memory card's directory blocks will start out as the following:
 
 That is to say, all bytes are 0xff except the last 6.
 
-These directory blocks are read into RAM shortly after the game starts up (basically when the WARNING-HEALTH AND SAFETY screen shows). When you tell the game to create TP save data on the memory card, it determines a spot within the directory block data to write the DirectoryEntry before copying it back to the memory card. The padding bytes within the 0x40 byte chunk which is picked to write the TP DirectoryEntry to are never overwritten since there is nothing to put there, so they maintain the value which they had on the memory card.
+Shortly after starting up the game (before the WARNING-HEALTH AND SAFETY screen shows), the two Directory blocks are read from the memory card into RAM. When you tell TP to create save data on the memory card, it overwrites a portion of this RAM with its DirectoryEntry data which is then copied back to the memory card.
 
-You can test this by modifying the padding bytes (and adjusting the checksums) before you create TP save data on the memory card. When you create the save data, the padding bytes will be unaffected.
+Within the 0x40 bytes in RAM into which the TP DirectoryEntry is written, the padding bytes are never overwritten since there is nothing which needs to be stored there. This means they maintain whatever value they had on the memory card. This value is expected to always be 0xff since the only time these bytes are modified is when the memory card is formatted.
 
-So essentially, their value is unimportant but will always be 0xff under normal circumstances. This also applies to the unused bytes at offset 0x3a of the DirectoryEntry.
+However, you can manually manipulate the memory card beforehand so that these bytes are a different value in order to see they they will not be changed. Below is a memory card raw image you can download which has had its first DirectoryEntry slot filled with 0xaa (other than the first byte which needs to be 0xff):
 
-### Last Modified
+<p>
+  <a target="_blank" href="/saveData/raw/mem59_dirEntryAaBytes.USA.raw">
+    Download mem59_dirEntryAaBytes.USA.raw
+  </a>
+</p>
 
-The last time this DirectoryEntry was modified represented by the number of seconds since 2000/01/01 00:00.
+If you open TP with that data written to your memory card then say you want to create TP save data on the memory card, you will see that the padding bytes will never change from 0xaa.
 
-This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
+Note that this applies to the padding at offset 0x06 and at offset 0x3a.
 
-// ADD CONVERTER COMPONENT HERE (takes hex seconds value and outputs info)
+### Thoughts on lastModified
 
-Other thoughts:
-
-- A time of 2136/02/07 06:28:15 would give 0xffffffff seconds after 2000/01/01 00:00. I think the only way to get your Gamecube's date this high is to [set it to 2099 and wait 30+ years](https://www.reddit.com/r/Gamecube/comments/kqnhdj/gamecube_calendar_year_past_2099_has_anyone_seen/). Even then, it is possible that the OSTick count returned from OSGetTime is based on a fixed clock and is not adjusted with any changes you make in the IPL (this could be tested). In any case, the clock battery would probably die before this became an issue.
+- A time of 2136/02/07 06:28:15 would give 0xffffffff seconds after 2000/01/01 00:00. I think the only way to get your Gamecube's date this high is to set it to 2099 and wait 30+ years. Even then, it is possible that the OSTick count returned from OSGetTime is based on a fixed clock and is not adjusted with any changes you make in the IPL (this could be tested). In any case, the clock battery would probably die before this became an issue.
 - The 64 bit OSTicks count wouldn't get its sign bit set until around Sep 18, 9216 at 15:12:36.908044, so this is not worth thinking about.
+
+### CheckCardStat
+
+When restoring data from the memory card, one of the things TP does is run a function called `m_Do_MemCardRWmng::mDoMemCdRWm_CheckCardStat`. This runs a few checks on the loaded DirectoryEntry data. If any of these fail it is considered a fatal error, and the game will act as if you don't have any save data on the memory card (meaning it will ask you to create save data).
+
+Here are the checks which must always pass:
+
+- imageDataOffset is 0x00000000
+- commentsOffset is 0x00002400
+- imageAndBannerFlags: the least signficant 3 bits are 0b101
+- iconFormats is 0x0155
+- iconAnimationSpeeds is 0x0155
 
 ## Other Formats
 
@@ -285,6 +365,8 @@ Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to ch
 
 ### Why 5 identical icons?
 
+----- Can test with 1 icon and make an example memory card raw image for this. Should work the same on the IPL since that is what the header blocks are for anyway.
+
 You might have noticed that 87% of block 2 is unused and that we could easily fit the Header on a single block if we did not store 5 copies of the same icon data.
 
 Unfortunately, I do not have an answer for why this is the case.
@@ -311,6 +393,8 @@ Quest Logs which fail their checksum test say "This Quest Log is corrupted."
 ## Naming
 
 ### DirectoryEntry
+
+------- Mention cardStat stuff. cardStat is a more verbose version of the directory entry data I think.
 
 This DirectoryEntry data is written as an entry on the Directory Block, hence the name DirectoryEntry.
 We are using this name for a couple of reasons:
