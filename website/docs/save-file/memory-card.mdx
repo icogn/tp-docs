@@ -5,9 +5,13 @@ import Link from '@docusaurus/Link';
 Here we discuss the Twilight Princess save data structure on the memory card at a high level.
 If you are interested in things like rupees and poe souls, please see the <Link to="/docs/save-file/quest-log/introduction">Quest Log</Link>.
 
-## Blocks Overview
+## Overview
 
-Memory card data consists of "blocks" which are each 0x2000 bytes. The first 5 blocks of a memory card are allotted to manage the filesystem.
+### Blocks
+
+You can think of a memory card as a file system. Each file on the memory card is composed of a number of "blocks", and each block is 0x2000 bytes long.
+
+The first 5 blocks of a memory card are used to manage the filesystem:
 
 | Offset | Size   | Description                   |
 | ------ | ------ | ----------------------------- |
@@ -21,7 +25,7 @@ A game's save data will consist of a certain number of blocks which are located 
 
 For example, TP's save data is 4 blocks long, so these blocks might be located at offsets 0xa000, 0xc000, 0xe000, and 0x10000 on a fresh memory card, but they could also be at 0x22000, 0x24000, 0x26000, and 0x28000.
 
-The blocks do not necessarily have to be contiguous, but in practice they usually are, and it may be easier to think of them that way.
+The blocks do not have to be contiguous, so the save data could also be in the blocks at offsets 0x36000, 0x20000, 0x28000, and 0x44000, but it is fine to think of them as contiguous in most cases.
 
 :::tip
 
@@ -30,20 +34,18 @@ The official memory card types are Memory Card 59, Memory Card 251, and Memory C
 
 :::
 
-## DirectoryEntry Overview
+### DirectoryEntry
 
-The special Directory filesystem block contains an array of Directory Entries which are each 0x40 bytes long.
+The special Directory filesystem block contains a number of Directory Entries which are each 0x40 bytes long. You can think of a DirectoryEntry as metadata about a file on the memory card.
 
-In addition to its 4 blocks (0x8000 bytes), TP also specifies some `(all?)` of the data which is written to its DirectoryEntry. We will talk more about the DirectoryEntry after covering the Block data.
-
-## Twilight Princess Save Data Overview
+### Twilight Princess Save Data
 
 | Size   | Description    |
 | ------ | -------------- |
 | 0x40   | DirectoryEntry |
 | 0x8000 | 4 Blocks       |
 
-You can think of the above as the TP save data which is on the memory card.
+You can think of the above as all of the TP data which is on the memory card.
 
 :::tip
 
@@ -91,7 +93,7 @@ A GameCube game's (optional) banner always has dimensions 0x60 by 0x20 pixels (9
 
 TP's banner is in CI8 format which means it uses one byte per pixel (0x60 \* 0x20 is 0xc00).
 
-CI8 format also means that the 0x200 bytes following the 0xc00 pixel data will be the palette data. Each palette entry is 2 bytes long, meaning a CI8 banner may use up to 0x100 unique palette entries. TP's banner actually only makes use of the first 0x160 bytes of the palette data space.
+CI8 format also means that the 0x200 bytes following the 0xc00 pixel data will be the palette data. Each palette entry is 2 bytes long, meaning a CI8 banner may use up to 0x100 unique palette entries. TP's banner only makes use of the first 0x160 bytes of the palette data space.
 
 #### Icons
 
@@ -135,7 +137,7 @@ Other bytes which may contain garbage in the first two TP Blocks are as follows:
 
 ### Quest Log Blocks
 
-Blocks 3 contains the data for the 3 Quest Logs. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
+Block 3 contains the data for the 3 Quest Logs. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
 
 The Quest Log Block structure is as follows:
 
@@ -157,7 +159,7 @@ My guess is that this is a version number for the quest log structure which was 
 
 #### Quest Log Data
 
-Each Quest Log's data is the same structure. The structure is rather complex, so it will be covered on a different page.
+Each Quest Log's data has the same structure. The structure is rather complex, so it is covered on a different page.
 
 #### Unused/Garbage
 
@@ -193,7 +195,7 @@ These 0x40 bytes contain metadata about the Twilight Princess save data on the m
 
 ### gameCode
 
-gameCode will be one of the following depending on the game region:
+`gameCode` will be one of the following depending on the game region:
 
 | gameCode | Region                                         |
 | -------- | ---------------------------------------------- |
@@ -208,13 +210,13 @@ These bytes are available at address 0x80000000 which is where they are copied f
 
 ### publisherCode
 
-publisherCode will always be "01" (0x3031) which is the publisherCode for Nintendo.
+`publisherCode` will always be "01" (0x3031) which is the publisherCode for Nintendo.
 
 These bytes are available at address 0x80000004 which is where they are copied from when creating the DirectoryEntry.
 
 ### padding_06
 
-Unused byte which will always be 0xff under normal conditions.<br/>
+Unused byte which is always 0xff under normal conditions.<br/>
 See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
 ### bannerAndIconFlags
@@ -241,11 +243,47 @@ This value is calculated by dividing the OSTicks which are returned from `OSGetT
 
 ### iconFormats
 
-// ashdfio
+The icon formats are stored as 8 groups of 2 bits which amounts to 2 bytes total (16 bits). Each 2-bit group indicates an icon's format as follows:
+
+| bits | Description                                                      |
+| ---- | ---------------------------------------------------------------- |
+| 00   | No icon                                                          |
+| 01   | CI8 with a shared color palette after the last icon's pixel data |
+| 10   | RGB5A3                                                           |
+| 11   | CI8 with its own palette following its pixel data                |
+
+For TP `iconFormats` must always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
+
+| Index | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Value | 01  | 01  | 01  | 01  | 01  | 00  | 00  | 00  |
+
+Therefore TP has 5 icons which all share palette data after the 5th icon's pixel data.
 
 ### iconAnimationSpeeds
 
-// ashdfio
+The icon animation speeds are stored as 8 groups of 2 bits which amounts to 2 bytes total (16 bits). Each 2-bit group indicates how many frames an icon displays during the animation.
+
+| bits | Description |
+| ---- | ----------- |
+| 00   | No icon     |
+| 01   | 4 frames    |
+| 10   | 8 frames    |
+| 11   | 12 frames   |
+
+For TP `iconAnimationSpeeds` must always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
+
+| Index | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Value | 01  | 01  | 01  | 01  | 01  | 00  | 00  | 00  |
+
+Therefore TP has 5 icons which each display for 4 frames before the next one is shown in the animation.
+
+:::note
+
+Each icon has identical pixel and palette data. This gives the appearance of a single icon, but there are actually 5.
+
+:::
 
 ### permissions
 
@@ -257,15 +295,17 @@ This value is calculated by dividing the OSTicks which are returned from `OSGetT
 
 ### firstBlockIndex
 
-// ashdfio
+The index of the first TP save data block on the memory card. This value should always be at least 0x0005 since the first 5 blocks are used to manage the filesystem.
+
+For a GCI file, the value here is unimportant since a GCI file only contains blocks for a single game, and the blocks are always in order.
 
 ### numBlocks
 
-// ashdfio
+The number of blocks a game uses. For TP this value is always 0x0004.
 
 ### padding_38
 
-Two unused bytes which will both be 0xff under normal conditions.<br/>
+Two unused bytes which are both 0xff under normal conditions.<br/>
 See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
 ### commentsOffset
@@ -419,4 +459,7 @@ The term "Directory Block" is supported by the OS function `card::__CARDGetDirBl
   </Link>
 - <Link to="https://wiki.dolphin-emu.org/index.php?title=GameIDs">
     GameIDs - Dolphin Emulator Wiki
+  </Link>
+- <Link to="https://github.com/suloku/gcmm/blob/master/source/gci.h">
+    gci.h in gcmm
   </Link>
