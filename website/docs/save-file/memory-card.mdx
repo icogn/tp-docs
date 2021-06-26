@@ -180,7 +180,7 @@ These 0x40 bytes contain metadata about the Twilight Princess save data on the m
 |   0x00 | u8[4]    | gameCode            |                      |
 |   0x04 | u8[2]    | publisherCode       |                      |
 |   0x06 | u8       | padding_06          |                      |
-|   0x07 | u8       | bannerAndIconFlags  |                      |
+|   0x07 | u8       | imageFlags          |                      |
 |   0x08 | u8[0x20] | filename            |                      |
 |   0x28 | u32      | lastModified        | done?                |
 |   0x2c | u32      | imageDataOffset     |                      |
@@ -219,9 +219,31 @@ These bytes are available at address 0x80000004 which is where they are copied f
 Unused byte which is always 0xff under normal conditions.<br/>
 See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
-### bannerAndIconFlags
+### imageFlags
 
-sdhafioashdfo
+`imageFlags` is always 0x05 under normal conditions.
+
+The image flags are the least significant 3 bits of the byte at offset 0x07. Bits 0 and 1 are used to indicate the banner format:
+
+| bannerFormat | Region                                                |
+| ------------ | ----------------------------------------------------- |
+| 00           | No banner                                             |
+| 01           | 8 bits per pixel, 16 bits per palette entry in RGB5A3 |
+| 10           | Direct color, 16 bits per pixel in RGB5A3             |
+| 11           | No banner                                             |
+
+For TP, this value must always be 01, meaning the banner's palette data immediately follows its pixel data.
+
+The third bit (bit 2) indicates the icon animation order.
+
+| iconAnimPattern | Region             |
+| --------------- | ------------------ |
+| 0               | Loop (abcabcabc)   |
+| 1               | Bounce (abcbabcba) |
+
+For TP, this value must always be 1.
+
+Putting these values on top of a 0x00 byte, we get 0b00000101 or 0x05.
 
 ### filename
 
@@ -295,7 +317,7 @@ Each icon has identical pixel and palette data. This gives the appearance of a s
 
 ### firstBlockIndex
 
-The index of the first TP save data block on the memory card. This value should always be at least 0x0005 since the first 5 blocks are used to manage the filesystem.
+The index of the first TP save data block on the memory card. This value must always be at least 0x0005 since the first 5 blocks are used to manage the filesystem.
 
 For a GCI file, the value here is unimportant since a GCI file only contains blocks for a single game, and the blocks are always in order.
 
@@ -334,11 +356,13 @@ When a memory card is formatted, its Directory blocks are mostly filled with 0xf
 
 That is to say, all bytes are 0xff except the last 6.
 
-Shortly after starting up the game (before the WARNING-HEALTH AND SAFETY screen shows), the two Directory blocks are read from the memory card into RAM. When you tell TP to create save data on the memory card, it overwrites a portion of this RAM with its DirectoryEntry data which is then copied back to the memory card.
+Shortly after starting up the game (before the WARNING-HEALTH AND SAFETY screen shows), the two Directory blocks are read from the memory card into RAM. When you tell TP to create save data on the memory card, a portion of this RAM is overwritten with TP DirectoryEntry data which is then copied back to the memory card.
 
 Within the 0x40 bytes in RAM into which the TP DirectoryEntry is written, the padding bytes are never overwritten since there is nothing which needs to be stored there. This means they maintain whatever value they had on the memory card. This value is expected to always be 0xff since the only time these bytes are modified is when the memory card is formatted.
 
-However, you can manually manipulate the memory card beforehand so that these bytes are a different value in order to see they they will not be changed. Below is a memory card raw image you can download which has had its first DirectoryEntry slot filled with 0xaa (other than the first byte which needs to be 0xff):
+However, you can manually manipulate the memory card beforehand so that these bytes are a different value. When you create a save file, you will see that the padding bytes are not modified from whatever value they had.
+
+Below is a memory card raw image you can download which has had its first DirectoryEntry slot filled with 0xaa (other than the first byte which needs to be 0xff):
 
 <p>
   <a target="_blank" href="/saveData/raw/mem59_dirEntryAaBytes.USA.raw">
@@ -363,19 +387,89 @@ Here are the checks which must always pass:
 
 - imageDataOffset is 0x00000000
 - commentsOffset is 0x00002400
-- imageAndBannerFlags: the least signficant 3 bits are 0b101
+- imageFlags: the least signficant 3 bits are 0b101
 - iconFormats is 0x0155
 - iconAnimationSpeeds is 0x0155
+
+### Room for custom data?
+
+As discussed in <Link to="#why-0xff">Why is the padding 0xff?</Link>, we can manipulate the padding bytes to any value and their value will persist between saves. Are there any other places like this in the DirectoryEntry?
+
+In <Link to="#checkcardstat">CheckCardStat</Link>, we determined some things that we can't change without upsetting the game. Ignoring those, we are left with the following:
+
+gameCode, publisherCode, padding_06, upper 5 bits of imageFlags, filename, lastModified, permissions, copyCounter, firstBlockIndex, numBlocks, padding_38
+
+As we already know, the paddings are free real estate.
+
+#### gameCode, publisherCode, filename
+
+gameCode, publisherCode, and the filename contents up to and including the first 0x00 byte are used to find the data on the memory card, so these cannot be changed. (looks to be correct by stepping through code, verify by changing). However, since the filename string comparison stops when it hits the first null byte, we can put whatever we want in the remaining 0x17 bytes.
+
+#### imageFlags
+
+After the very first write, the DirectoryEntry looks like the following:
+
+`47 5A 32 45 30 31 FF 00 67 63 7A 65 6C 64 61 32`<br/>
+`00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00`<br/>
+`00 00 00 00 00 00 00 00 28 69 BB 43 FF FF FF FF`<br/>
+`00 00 00 01 04 00 00 05 00 04 FF FF FF FF FF FF`
+
+Most of the values are filled with defaults. This is quickly overwritten with TP-specific values:
+
+`47 5A 32 45 30 31 FF 05 67 63 7A 65 6C 64 61 32`<br/>
+`00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00`<br/>
+`00 00 00 00 00 00 00 00 28 69 BB 43 00 00 00 00`<br/>
+`01 55 01 55 04 00 00 05 00 04 FF FF 00 00 24 00`
+
+Initially, the imageFlags byte is set to a default value of 0. It is during the 2nd write that TP fills in the 3 important bits.
+
+We know that the least significant 3 bits must be 0b101 for TP to accept the save file as valid. However, the top 5 bits are never checked, and they are only overwritten when they are initialized to 0. This means that we can set those 5 bits to whatever we want and they will maintain their value.
+
+#### lastModifed
+
+lastModifed gets updated every time the save file is updated, so any data you put here will be lost.
+
+#### permissions
+
+permissions is set to 0x04 (public) during the initial DirectoryEntry creation. For TP, the permissions are never changed after this point. Since only 3 of the bits on the permissions byte carry any meaning, we can do as we please with the other 5 bits as with the imageFlags.
+
+#### copyCounter
+
+This will be incremented when copying between memory cards, so there is not much point in putting anything here.
+
+#### firstBlockIndex, numBlocks
+
+These are critical metadata which must not be changed.
+
+For a GCI file, firstBlockIndex is irrelevant so it can be changed, but its value will be lost if it gets imported to a memory card.
+
+#### Summary
+
+We can put whatever data we want at the following locations with no adverse effects:
+
+- padding_06 which is 1 byte
+- Unused 5 bits in imageFlags
+- 0x17 (23 decimal) bytes following the filename's null termination byte
+- Unused 5 bits in permissions
+- padding_3a which is 2 bytes
+
+These gives us a total of 26 bytes and 10 bits.
+
+- memcard download here
+
+Note that you will lose some of the data if you transfer it between memory cards using the Gamecube IPL:
+
+- Padding bytes are not copied
+- Any bytes in the filename after the null termination byte will be lost
 
 ## Other Formats
 
 ### GCIs
 
-A Twilight Princess GCI file is 0x8040 bytes long and is simply the DirectoryEntry (0x40 bytes) followed by the 4 Blocks (0x8000 bytes).
+You can think of a GCI as a portable version of a game's data on a memory card.
 
-Think of a GCI as a portable version of a game's data on a memory card.
-
-- ashdifoh Other info about DirectoryEntry things that don't matter in the context of a GCI file (if any).
+- A Twilight Princess GCI file is 0x8040 bytes long and is simply the DirectoryEntry (0x40 bytes) followed by the 4 Blocks (0x8000 bytes).
+- The value of the DirectoryEntry's firstBlockIndex is not important in a GCI file.
 
 ### Wii
 
@@ -385,7 +479,8 @@ Think of a GCI as a portable version of a game's data on a memory card.
 
 The Shield's save data is 0x4000 bytes long. It is composed of Blocks 3 and 4, which are the Quest Log data block and its backup.
 
-It does not need the DirectoryEntry or Header blocks since those are specifically designed to work with the GameCube.
+- The Header blocks are not important since their only purpose is to provide banner, icon, and comments data to the Gamecube IPL.
+- The DirectoryEntry is not important since it only provides metadata about the Header blocks and other values which are specific to the memory card (such as firstBlockIndex).
 
 ## Closing Thoughts
 
@@ -405,15 +500,62 @@ Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to ch
 
 ### Why 5 identical icons?
 
------ Can test with 1 icon and make an example memory card raw image for this. Should work the same on the IPL since that is what the header blocks are for anyway.
-
 You might have noticed that 87% of block 2 is unused and that we could easily fit the Header on a single block if we did not store 5 copies of the same icon data.
 
-Unfortunately, I do not have an answer for why this is the case.
+In short, the Header could have been a single block making the game 3 total blocks instead of 4. An animated icon was probably planned at some point but never came to fruition. Below is a detailed explanation.
 
-My best guess is that they were planning to use an animated icon but ran out of time or decided against it, and they never went back to update the code. Evidence in support of this is that they do go out of their way to set the IconAnimation bit in the DirectoryEntry to 1 (which indicates to use a ping-pong pattern rather than a loop).
+Icon metadata for some games which do not have an animated icon:
 
-But I am open to other interpretations. Let me know if you think there is a better explanation.
+| Game                                        | iconFormats | iconAnimationSpeeds | iconAnimPattern bit |
+| ------------------------------------------- | ----------- | ------------------- | ------------------- |
+| Metroid Prime                               | 0x0001      | 0x0002              | 0                   |
+| Resident Evil 0                             | 0x0002      | 0x0002              | 0                   |
+| Resident Evil 4                             | 0x0001      | 0x0003              | 1                   |
+| Super Smash Bros. Melee                     | 0x0001      | 0x0003              | 0                   |
+| Tales of Symphonia                          | 0x0002      | 0x0003              | 0                   |
+| The Legend of Zelda: Four Swords Adventures | 0x0001      | 0x0003              | 0                   |
+| The Legend of Zelda: The Wind Waker         | 0x0001      | 0x0003              | 0                   |
+
+You can see that all of these games indicate that they have a single icon in the `iconFormats` field.
+
+Icon metadata for some games with an animated icon:
+
+| Game                                              | iconFormats | iconAnimationSpeeds | iconAnimPattern bit |
+| ------------------------------------------------- | ----------- | ------------------- | ------------------- |
+| Fire Emblem: Path of Radiance                     | 0x0015      | 0x003b              | 1                   |
+| Kirby Air Ride                                    | 0x5555      | 0xef55              | 0                   |
+| Luigi's Mansion                                   | 0x4041      | 0xffff              | 1                   |
+| Mario Kart: Double Dash!!                         | 0x0015      | 0x002a              | 0                   |
+| Sonic Adventure 2 Battle                          | 0x000a      | 0x000f              | 1                   |
+| Soulcalibur II                                    | 0x5555      | 0xaaaf              | 1                   |
+| Super Mario Sunshine                              | 0x0005      | 0x000f              | 0                   |
+| The Legend of Zelda: Ocarina of Time Master Quest | 0x002a      | 0x002a              | 1                   |
+| The Legend of Zelda: Twilight Princess            | 0x0155      | 0x0155              | 1                   |
+
+These games which have animated icons indicate multiple icons in their `iconFormats` field. It it clear that Twilight Princess's icon metadata (bottom row of table) matches the pattern of the animated icons.
+
+Another other important thing to note is that The Wind Waker only has a single icon, and its metadata lines up with what you would expect (see the bottom row of the first table). It would not make sense for the developers to take something which was already working and make it worse for no reason.
+
+Additionally, an animated icon is the only valid use case for storing multiple icons in a file on the memory card.
+
+For these reasons, I think it is pretty evident that the developers had plans for an animated icon. I suspect that they either ran out of time or decided against it, and they never went back to update the code. Either way, what we end up with is a game with save data which takes 4 blocks when it could have easily taken 3.
+
+Below is a modified memory card which contains TP data which has been adjusted to take only 3 blocks. You can download it and view it in a Gamecube IPL or Dolphin's Memory Card Manager to see that it only uses 3 blocks yet provides the same icon, banner, and comments metadata.
+
+<p>
+  <a target="_blank" href="/saveData/raw/mem59_tp3Blocks.USA.raw">
+    Download mem59_tp3Blocks.USA.raw
+  </a>
+</p>
+
+Note that the data will not work with the Twilight Princess game since TP expects its save data to be 4 blocks, and it verifies that the metadata (DirectoryEntry) matches certain values. The above file is just to demonstrate that the Header blocks (which exist purely for the IPL's sake) could have been a single block and been functionally indistinguishable from the normal 2 block header.
+
+For your convenience, below is an image of what this would look like. The image is taken from a Gamecube IPL running in Dolphin.
+
+<img
+  src={require('@site/static/img/savefile/gcIplTp3Blocks.png').default}
+  alt="zelda2_gc_banner.bti"
+/>
 
 ### Default selection on the file select screen?
 
