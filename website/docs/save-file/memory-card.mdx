@@ -8,6 +8,7 @@
   - Include converter tool there.
 
 import Link from '@docusaurus/Link';
+import TimestampConverter from '@local/TimestampConverter';
 
 Here we discuss the Twilight Princess save data structure on the memory card at a high level.
 If you are interested in things like rupees and poe souls, please see the <Link to="/docs/save-file/quest-log/introduction">Quest Log</Link>.
@@ -300,10 +301,9 @@ There are 0x20 bytes allocated for a filename, and under normal conditions any l
 
 This is the last time the file which the DirectoryEntry points to was modified. This value is stored as the number of seconds since 2000/01/01 00:00.
 
-This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
+This value is calculated by dividing the OSTicks returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
 
-// TODO:
-// ADD CONVERTER COMPONENT HERE (takes hex seconds value and outputs info)
+<TimestampConverter useSeconds title="LastModified to Time Converter" />
 
 ### imageDataOffset
 
@@ -562,7 +562,7 @@ Here we only covered as much as was necessary to talk about the memory card in t
     libogc/card.h
   </Link>
 
-Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to check the Dolphin source code for that one.
+Note that YAGCD is wrong about `imageFlags` in the DirectoryEntry, so be sure to check the Dolphin source code for that one.
 
 ### Why 5 identical icons?
 
