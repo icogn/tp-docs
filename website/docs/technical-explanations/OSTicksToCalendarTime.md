@@ -1,5 +1,6 @@
 # OSTicksToCalendarTime
 
+import Link from '@docusaurus/Link';
 import TimestampConverter from '@local/TimestampConverter';
 
 This page explains the calculations behind converting a timestamp such as `00615b390fb0dcef` to something like `2021/06/10 07:48`.
@@ -10,9 +11,14 @@ This page explains the calculations behind converting a timestamp such as `00615
 
 A timestamp is a 64 bit integer which counts the number of OSTicks since 2000/01/01 at 00:00.
 
-OSTicks increase at a rate of exactly 40,500,000 per second. This is 1/12 of the 486 MHz clockrate of the Gekko CPU. It is also 1/4 of 162,000,000, an important value stored as a word at address 800000f8 and which is loaded and right-shifted by 2 frequently during calculations involving the timestamp.
+OSTicks increase at a rate of exactly 40,500,000 per second. This is 1/12 of the 486 MHz clockrate of the Gekko CPU. It is also 1/4 of 162,000,000, which is an important value stored as a word at address 800000f8. The value at this address is frequently loaded and right-shifted by 2 during calculations involving the timestamp.
 
-The function `OSTicksToCalendarTime` takes as parameters the timestamp and an object to write results to. The data which is pulled out of the timestamp is as follows:
+The function `OSTicksToCalendarTime` takes 2 parameters:
+
+- The timestamp (something like `00615b390fb0dcef`)
+- An `OSCalendarTime` object to write results to.
+
+Time information is generated from the timestamp and written to the `OSCalendarTime` object which has the following structure:
 
 | Offset | Type | Description             |
 | ------ | ---- | ----------------------- |
@@ -27,20 +33,25 @@ The function `OSTicksToCalendarTime` takes as parameters the timestamp and an ob
 | 0x20   | s32  | milliseconds (0-999)    |
 | 0x24   | s32  | microseconds (0-999)    |
 
-## Fractional Seconds
+### Sample Code and Organization
 
-This and the following sections will roughly follow the order the calculations actually run in the code.<br/>
-Some parts will be simplified or skipped such as calculations which lead to the same constant every time.
+- All of the sample code on this page is written in JavaScript. The logic behind the conversion component at the top of this page was essentially copy-pasted from here.
+- The 'n' characters at the end of the numbers make them BigInts. This is necessary to handle the large numbers we are working with in these calculations. You can ignore them as you read the code.
+
+The following sections will roughly follow the order the calculations actually run in the code.<br/>
+Some parts will be simplified or skipped, such as calculations which lead to the same constant every time.
+
+## Fractional Seconds
 
 The first things we determine are the microseconds and milliseconds.
 
 ```js
-const TICKS_PER_SECOND = 40,500,000n;
-const TICKS_PER_MS = 40,500n;
+const TICKS_PER_SECOND = 40500000n;
+const TICKS_PER_MS = 40500n;
 
 const fractionalSecondTicks = timestamp % TICKS_PER_SECOND;
 
-let microseconds = fractionalSecondTicks * 8n / 324n; // divide by 40.5 for microseconds
+let microseconds = (fractionalSecondTicks * 8n) / 324n; // divide by 40.5 for microseconds
 microseconds = microseconds % 1000n;
 // Store microseconds at offset 0x24.
 
@@ -49,12 +60,19 @@ milliseconds = milliseconds % 1000n; // Not strictly necessary, but done nonethe
 // Store milliseconds at offset 0x20.
 ```
 
-The next thing we do is determine the `dayOffset` which we will pass to `GetDates`.
+Next, we determine the `dayOffset` which we will pass to `GetDates`.<br/>
+The `dayOffset` is how many days after Jan 1, 0000 the day the timestamp refers to is.
+
+Day offset examples:
+
+- Jan 1, 0000 has a day offset of 0.
+- Jan 2, 0000 has a day offset of 1.
+- Jan 8, 0000 has a day offset of 7.
 
 ```js
 // ...
-const SECONDS_PER_DAY = 86,400n; // 60 s/min * 60 min/hr * 24 hr/day
-const YEAR_2K_JAN_FIRST_DAY_OFFSET = 730,485n; // relative to Jan 1, year 0
+const SECONDS_PER_DAY = 86400n; // 60 s/min * 60 min/hr * 24 hr/day
+const YEAR_2K_JAN_FIRST_DAY_OFFSET = 730485n; // relative to Jan 1, year 0
 
 const secondTicks = timestamp - fractionalSecondTicks;
 const numSeconds = secondTicks / TICKS_PER_SECOND;
@@ -64,26 +82,30 @@ const dayOffset = numDays + YEAR_2K_JAN_FIRST_DAY_OFFSET; // numDays since Jan 1
 // dayOffset is used as a parameter to GetDates
 ```
 
-#### Where does 730,485 come from?
+### Where does 730,485 come from?
 
-This is number of days after Jan 1, 0000 that Jan 1, 2000 is.
+Jan 1, 2000 is 730,485 days after Jan 1, 0000.
 
-_Year 0 does not exist for certain calendars, but we treat is as the year before year 1 for the sake of these calculations._
+The difference between Jan 1, 2000 and Jan 1, 0000 is 2000 years.<br/>
+We can approximate how many days this is with following naive calculation:
 
-The difference between Jan 1, 2000 and Jan 1, 0000 is 2000 years. We can get close to the number of days between the two dates with the following naive calculation:
+- If we assume a leap year occurs every 4 years, then every 4 years contains 366 + (365 \* 3) => 1461 days.
+- 1461 days/4-year-group \* 500 4-year-groups => 730,500 days which is pretty close to the correct value.
 
-If we assume a leap year every 4 years, then every 4 years contains 366 + (365 \* 3) => 1461 days.
-
-1461 days/4-year-group \* 500 4-year-groups => 730,500 days which is pretty close.
-
-The thing to remember is that leap years only occur on years which are divisible by 100 if they are also divisible by 400. The years which we should not have counted as having leap days are 100, 200, 300, 500, 600, 700, 900, 1000, 1100, 1300, 1400, 1500, 1700, 1800, and 1900 which is 15 total.
+The thing to remember is that leap years only occur on years which are divisible by 100 if they are also divisible by 400.<br/>
+The years which we shouldn't have counted are 100, 200, 300, 500, 600, 700, 900, 1000, 1100, 1300, 1400, 1500, 1700, 1800, and 1900 (15 total).
 
 730,500 days - 15 days => 730,485 days which is the day offset of Jan 1, 2000 relative to Jan 1, 0000.<br/>
-_Note: Jan 2, 0000 would have a day offset of 1, and Jan 8, 0000 would have a day offset of 7._
+
+:::note
+
+Year 0 does not exist for certain calendars, but we treat is as the year before year 1 for the sake of these calculations.
+
+:::
 
 ## GetDates
 
-This function is called from within `os:OSTicksToCalendarTime` and determines the following:
+`os::GetDates` is called from within `os::OSTicksToCalendarTime`, and it determines the following:
 
 - day of the week
 - year
@@ -94,15 +116,15 @@ This function is called from within `os:OSTicksToCalendarTime` and determines th
 We pass the function two parameters:
 
 - `dayOffset` (which was calculated above)
-- An object into which we will write the date information which we determine.
+- The `OSCalendarTime` object which was passed as the 2nd parameter to `OSTicksToCalendarTime`.
 
-## Day of the Week
+## Day of the Week {#day-of-the-week}
 
 Given that Jan 1, 0000 is a Saturday, we know that any day offset which is divisible by 7 is also a Saturday.
 
-We find the lowest day offset which is a multiple of 7 and is greater than or equal to our `dayOffset` parameter. Since that day will always be a Saturday, we can look at the difference between it and our `dayOffset` to determine which day ours is.
+We find the lowest day offset which is a multiple of 7 and is greater than or equal to `dayOffset` parameter. Since that day will always be a Saturday, we can look at the difference between it and `dayOffset` to determine which day ours is.
 
-For example, if the multiple-of-7 offset is 2 greater than our dayOffset, we know that `dayOffset` is a Thursday which is represented by the value 4.
+For example, if the calculated multiple-of-7 day offset (a Saturday) is 2 greater than `dayOffset`, we know that `dayOffset` is a Thursday.
 
 Our final result will be one of the following values:
 
@@ -141,19 +163,21 @@ The straightforward way to do the calculation would be as follows:
   - This will always give a multiple of 7 which is at most `dayOffset` + 6 and at least `dayOffset`.
 - Compare the product with `dayOffset` to determine the day of the week.
 
-We want to avoid dividing by 7 since it takes significantly more clock cycles than doing a right-shift. We would prefer to handle the division using a right-shift which means we need to convert `dayOffset` to something which we can divide by a power of 2.
+We want to avoid dividing by 7 since it takes significantly more clock cycles than doing a right-shift. To handle the division using a right-shift, we need to convert `dayOffset` to something which we can divide by a power of 2.
 
 We can use 4/7 of (`dayOffset` + 6) then right-shift by 2 to get 1/7. But how do we get four sevenths without dividing by 7? We will get negative three sevenths and add it to (`dayOffset` + 6). But how do we get negative three sevenths without dividing by 7? This is where the `mulhw` assembly instruction comes into play.
 
-The `mulhw` (Multiply High Word) instruction computes the most significant 32 bits of the 64-bit product of two 32-bit integers. You could think of this as multiplying two 32-bit integers then right-shifting the result by 32. How can we use this instruction to divide by 7?
+The `mulhw` (Multiply High Word) instruction calculates the most significant 32 bits of the 64-bit product of two 32-bit integers. You could think of this as multiplying two 32-bit integers then right-shifting the result by 32. How can we use this instruction to divide by 7?
 
-Right-shifting by 32 is like dividing by 2 to the power of 32 which is 4,294,967,296. We want dividing by this give us to give us -3/7 of a value, so we can represent that as the following ratio:
+Right-shifting by 32 is like dividing by 2 to the power of 32 which is 4,294,967,296. We want dividing by 4,294,967,296 to give us -3/7 of a value. We can represent this with the following ratio:
 
 `X/4,294,967,296` is equal to `-3/7`
 
 Solving for X, we get -3 \* 4,294,967,296 / 7 which is -1,840,700,269. This is the constant above which we called MULHW_NEG_3_OVER_7. Now is a good time to review the code block above.
 
-Some final notes on computing the day of the week:
+---
+
+Some final notes on calculating the day of the week:
 
 Right-shifting a negative number rounds away from zero. When we add this to a larger positive number, the result will be rounded toward 0. When we right-shift a positive number, the result will also be rounded toward 0.
 
@@ -171,25 +195,29 @@ const dayOfWeek = dayPlus6 - nextSeventhDayOffset;
 // ^ result is between 0 and 6 inclusive
 ```
 
-`nextSeventhDayOffset` will be at most `dayPlus6` at least `dayPlus6` - 6. This means that the resulting `dayOfWeek` will be at least 0 and at most 6, which lines up with the values we want to return.
+`nextSeventhDayOffset` will be at most `dayPlus6` and at least `dayPlus6` - 6. This means that the resulting `dayOfWeek` will be at least 0 and at most 6, which lines up with the values we want to return.
 
 Examples:
 
-- If `dayPlus6` is 0 days after a multiple of 7, then it is a Saturday. This means that our `dayOffset` is 6 days before a Saturday which is a Sunday which is value 0.
-- If `dayPlus6` is 1 day after a multiple of 7, then it is a Sunday. This means that our `dayOffset` is 6 days before a Sunday which is a Monday which is value 1.
-- If `dayPlus6` is 2 days after a multiple of 7, then it is a Monday. This means that our `dayOffset` is 6 days before a Monday which is a Tuesday which is value 2.
+- If `dayPlus6` is 0 days after a multiple of 7, then it is a Saturday. This means that `dayOffset` is 6 days before a Saturday which is a Sunday which is value 0.
+- If `dayPlus6` is 1 day after a multiple of 7, then it is a Sunday. This means that `dayOffset` is 6 days before a Sunday which is a Monday which is value 1.
+- If `dayPlus6` is 2 days after a multiple of 7, then it is a Monday. This means that `dayOffset` is 6 days before a Monday which is a Tuesday which is value 2.
 
-As you can see, the difference between `dayPlus6` and `nextSeventhDayOffset` is equal to the value we should return for day of the week.
+As you can see, the difference between `dayPlus6` and `nextSeventhDayOffset` is equal to the value we should return for the day of the week.
 
 ## Year and Day of the Year
 
-Determining the year and day of the year is a little more challenging that the day of the week since we need to handle leap years. We can approximate the current year with the following calculations:
+Determining the year and day of the year is a little more challenging since we need to handle leap years. We can approximate the current year with the following calculations:
 
 `dayOffset` / 365 (truncated)
 
-This counts the number of 365 day periods which fit into our `dayOffset`. In reality, the number of years might be less, but it will not be greater. We have determined the upper bound for the year.
+This counts the number of 365 day periods which fit into `dayOffset`. In reality, the number of years might be less, but it will not be greater. This means we can determine the upper bound for the year.
 
-> For example, 738,316 is the `dayOffset` for June 10, 2021. If we do `738316 / 365` , we get 2022 which is our upper bound.
+:::tip
+
+738,316 is the `dayOffset` for June 10, 2021. If we do `738316 / 365` , we get 2022 which is our upper bound.
+
+:::
 
 We can use the folling algorithm to determine the year:
 
@@ -211,7 +239,7 @@ Examples of years which are not leap years:
 
 - 1, 7, 100, 200, 300, 500, 600, 700, 900, 1097, 1883
 
-If the current year is 2000, then there have been 2000 completed years in the past (0, 1, 2 ... 1997, 1998, 1999).
+If the current year is 2000, then 2000 years have completed since year 0 (0, 1, 2 ... 1997, 1998, 1999).
 
 Here are some steps we can use to count the number of those years which were leap years:
 
@@ -222,14 +250,14 @@ Here are some steps we can use to count the number of those years which were lea
 
 So at this point, here is what we have:
 
-- Our `dayOffset`
+- `dayOffset`
 - The yearCandidate
 - The number of leap days which we need to take into account.
 
-We multiply the yearCandidate by 365 to get what would be the day offset of the yearCandidate if each year was 365 days. We then add our calculated number of leap years (which is equal to the number of leap days we need to add) to this value to get the true day offset of yearCandidate. We compare the day offset of the year candidate with our `dayOffset`.
+We multiply the yearCandidate by 365 to get what the day offset would be for the yearCandidate if each year was 365 days. We then add our calculated number of leap days to this value to get the true day offset of yearCandidate. We compare the day offset of the yearCandidate with `dayOffset`.
 
 - If the day offset of the yearCandidate is greater than `dayOffset`, then the yearCandidate is too high. We need to decrement it and retry.
-- If the day offset of the yearCandidate is less than or equal to `dayOffset`, then yearCandidate is the correct year (meaning our `dayOffset` represents a day which fall in that year).
+- If the day offset of the yearCandidate is less than or equal to `dayOffset`, then yearCandidate is the correct year (meaning `dayOffset` represents a day which fall in that year).
 
 Once we know the correct year, we can subtract its day offset from `dayOffset` to get the day of that year which `dayOffset` falls on. This will be a number with a minimum of 0 for Jan 1 and a maximum of 365 for December 31 on a leap year.
 
@@ -277,16 +305,11 @@ const dayOfTheYear = dayOffset - trueDayOffsetOfYear;
 // Store dayOfTheYear at offset 0x1c.
 ```
 
-The calculations using the MULHW constants are covered in Day of the Week (link). The short version is that using them in conjunction with right-shifts takes fewer clock cycles than divide instructions.
-
-> Interesting thing to note at this point is that both of the negative MULHW constants round toward zero such that when you add them to a positive number, the result rounds up, but the positive MULHW\*POINT32 constant rounds away from zero however since it is already positive.<br/>
-> (1 << 32) \* -3 / 7 is -1,840,700,269.714... => -1,840,700,269<br/>
-> (1 << 32) \* -109 / 365 is -1,282,606,671.956... => -1,282,606,671<br/>
-> (1 << 32) \* 32 / 100 is 1,374,389,534.72 => 1,373,489,535
+Calculations using the MULHW constants are covered in [Day of the Week](#day-of-the-week).
 
 Some of the calculations are done using the previous year because we don't want to count a leap day in the current year. The day offset in the current year will be the same whether it is a leap year or not.
 
-For example, assume the yearCandidate is 100. If we divide 100 by 100, we get 1. This would indicate that we counted an extra leap day which we shouldn't have, but this is not the case since we are leaving the current year (year 100) out of the calculations. This problem goes away if we subtract 1 before doing the calculations which divide by 100 and 400.
+For example, assume the yearCandidate is 100. If we divide 100 by 100, we get 1. This would indicate that we counted an extra leap day when we shouldn't have, but this is not the case since we are leaving the current year (year 100) out of the calculations. This problem goes away if we subtract 1 before doing the calculations which divide by 100 and 400.
 
 Similarly, we add 3 before calculating the number of leap years we have assuming every 4th year is a leap year. This is to handle the edge case for years near 0. If the current year is 2, then 2 / 4 is 0. This fails to account for year 0 being a leap year. If we add 3 first, then 5 / 4 gives 1 which correctly accounts for year 0.
 
@@ -315,18 +338,26 @@ Note that each month only has 2 possible day offsets depending on if the year is
 | 10    | 0x130           | 0x131     |
 | 11    | 0x14e           | 0x14f     |
 
-_These values are stored in 2 back-to-back arrays which are each 12 words long at address 803d1048 (US GC)._
+:::info
+
+These values are stored in 2 back-to-back arrays which are each 12 words long at address 803d1048 (US GC).
+
+:::
 
 Here is the algorithm we will use to determine the current month:
 
 1. Determine if the year is a leap year or not.
-2. Using the correct DayOffsetOfEachMonth array based on step 1, iterate through it backwards until we reach a month which has a day offset less than or equal to our dayOfTheYear. The array index at which this check passes is the month (0 to 11).
-3. Subtract the day offset of that month from our dayOfTheYear to get the dayOfTheMonth.
+2. Using the correct `DayOffsetOfMonths` array based on step 1, iterate through it backwards until we reach a month which has a day offset less than or equal to our dayOfTheYear. The array index at which this check passes is the month (0 to 11).
+3. Subtract the day offset of that month from our `dayOfTheYear` to get the `dayOfTheMonth`.
+
+:::tip
 
 The month will be between 0 for January and 11 for December.<br/>
 The day of the month will be between 1 and 31.
 
-Here is an approximation of how they are determined:
+:::
+
+Here is how `month` and `dayOfTheMonth` are determined:
 
 ```js
 const MULHW_POINT32 = 1374389535n; // 0x51eb851f
@@ -385,9 +416,9 @@ const dayOfTheMonth = dayOffsetOfTheMonth + 1;
 // Store dayOfTheMonth (between 1 and 31) at offset 0xc.
 ```
 
-The calculations using the MULHW constants are covered in Day of the Week (link). The short version is that using them in conjunction with right-shifts takes fewer clock cycles than divide instructions.
+Calculations using the MULHW constants are covered in [Day of the Week](#day-of-the-week).
 
-This ends the `os:GetDates` function which determined the following:
+This ends the `os::GetDates` function which determined the following:
 
 - day of the week
 - year
@@ -397,7 +428,9 @@ This ends the `os:GetDates` function which determined the following:
 
 ## Hours, Minutes, Seconds
 
-These ones should be pretty straightforward at this point. Once again, the calculations using the MULHW constants are covered in Day of the Week (link). The short version is that using them in conjunction with right-shifts takes fewer clock cycles than divide instructions.
+These ones should be pretty straightforward at this point. Once again, calculations using the MULHW constants are covered in [Day of the Week](#day-of-the-week).
+
+We are back in the `OSTicksToCalendarTime` function after finishing `GetDates`.
 
 ```js
 const TICKS_PER_SECOND = 40500000n;
@@ -432,3 +465,17 @@ const minutes = minutesOfDay - minutesFromHours;
 const seconds = secondsOfDay - secondsFromMinutes;
 // Store seconds (0-59) at offset 0x0.
 ```
+
+## Closing Thoughts
+
+On this page, we didn't go over what happens when the sign bit gets set. From my testing, this function doesn't really handle it that well.
+
+In any case, the sign bit won't get set until sometime in the year 9216. Going into any more detail would clutter the page and provide no practical value.
+
+_(Have higher priority things to work on so we only cover the happy path here which is thankfully good enough for the next 7000+ years. - isaac)_
+
+## References
+
+- <Link to="https://github.com/zeldaret/tp/blob/8c2a3ae7eac3483764ccd42f890a1de9cf768538/include/dolphin/os/OS.h#L78">
+    TP decomp - OSCalendarTime struct
+  </Link>

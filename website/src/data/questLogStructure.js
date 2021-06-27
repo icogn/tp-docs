@@ -420,7 +420,8 @@ const questLogStructureByOffset = {
   },
   0xa3: {
     type: u8,
-    name: '???',
+    name: 'itemSlotUnused',
+    shortDesc: 'Pick a name',
     tags: [naming, investigation],
   },
   0xa4: {

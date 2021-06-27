@@ -4,11 +4,37 @@ sidebar_label: Contents
 
 # Quest Log Contents
 
-// TODO: Add disclaimer here
+import Link from '@docusaurus/Link';
+import QuestLogTable from '@local/QuestLogTable';
+
+⚠️ The Quest Log section is in the early research stages.
+
+Here are some references you can use instead:
+
+- <Link to="https://docs.google.com/spreadsheets/d/19lL-hkuLMl9pmbeuQZj7CtjsLqkSADxu627LYiCCnnU/edit#gid=167913551">
+    Twilight Editor (Documentation)
+  </Link>
+- <Link to="https://docs.google.com/spreadsheets/d/1OvlqH_OG_svcLZfuSDBjCLHFivcsBGpOD25o-_6vblA/edit#gid=1361364641">
+    Region Flags (Area Nodes)
+  </Link>
+
+<p>
+  <b style={{ fontSize: 20 }}>
+    Please don't open Github issues for anything with a colored row.
+  </b>
+</p>
+
+This is really only public since it would be a pain to hide.
+
+Naming:
+
+- Everything will be assigned a unique identifier which should make sense in a vacuum.
+- Explanations about the naming will be located on details pages for each section.
+- The names are in no way meant to line up with the decomp variable names.
+
+Notes:
 
 - Custom within-page search at the top maybe. What was the idea behind this?
 - Column which displays absolute address in RAM based on selected game version, and ability to use a custom address.
-
-import QuestLogTable from '@local/QuestLogTable';
 
 <QuestLogTable />

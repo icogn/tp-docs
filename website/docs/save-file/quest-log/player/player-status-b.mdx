@@ -1,0 +1,37 @@
+---
+sidebar_label: Player Status B
+---
+
+# Player Status B
+
+import Link from '@docusaurus/Link';
+import TimestampConverter from '@local/TimestampConverter';
+
+This is the content of Player Status B.
+
+## 0x028 timestamp
+
+This value is the number of OSTicks since 2000/01/01 at 00:00.
+
+<p>
+  <TimestampConverter sourceName="Timestamp" />
+</p>
+
+For more info about converting a timestamp to a human readable time, see <Link to="/docs/technical-explanations/ostickstocalendartime">OSTicksToCalendarTime</Link>.
+
+### Selecting the default Quest Log
+
+The default quest log on the file select screen is picked this way:
+
+- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the Quest Log which has the latest timestamp (compared at the seconds level).
+- In the case of a tie, Quest Log 1 has the highest priority and Quest Log 3 has the lowest priority.
+
+:::info
+
+Quest Logs which fail their checksum test say "This Quest Log is corrupted."
+
+:::
+
+### Naming
+
+- The timestamp is passed to `OS::OSTicksToCalendarTime` which is where the term OSTicks comes from.
