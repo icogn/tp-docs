@@ -7,6 +7,7 @@ const u16Array = dataTypes.u16Array;
 const u32 = dataTypes.u32;
 const u32Array = dataTypes.u32Array;
 const u64 = dataTypes.u64;
+const s64 = dataTypes.s64;
 const float = dataTypes.float;
 const charArray = dataTypes.charArray;
 
@@ -136,6 +137,8 @@ const questLogStructureByOffset = {
   0x19: {
     type: u8,
     name: 'wallet',
+    shortDesc: 'Display valid values here.',
+    tags: [investigation],
   },
   0x1a: {
     type: u8,
@@ -150,6 +153,7 @@ const questLogStructureByOffset = {
   0x1c: {
     type: u8,
     name: 'mMagicFlag',
+    shortDesc: 'Not looked into. Indicates have/not have, or maybe levels?',
     tags: [notLookedInto],
   },
   0x1d: {
@@ -175,11 +179,11 @@ const questLogStructureByOffset = {
     tags: [notLookedInto],
   },
   0x28: {
-    type: u64,
+    type: s64,
     name: 'timestamp',
     shortDesc:
-      'OSTicks since 2000/01/01T00:00. Used to pick default Quest Log to highlight on quest log screen. Maybe other uses as well. Not sure if signed or unsigned.',
-    tags: [naming, investigation],
+      'OSTicks since 2000/01/01 00:00. Increases by 40,500,000 per second.',
+    tags: [investigation],
   },
   0x30: {
     type: u8,
@@ -311,7 +315,8 @@ const questLogStructureByOffset = {
   0x7c: {
     type: u8,
     name: '???',
-    shortDesc: 'Controls if update lastField info when changing stage.',
+    shortDesc:
+      'Controls if update lastField info when changing stage. Also controls if FMap syncs with current pos or lastField pos.',
     tags: [investigation],
   },
   0x7d: {
@@ -535,6 +540,7 @@ const questLogStructureByOffset = {
   0xf0: {
     type: u8,
     name: 'numLarvaBottle1',
+    shortDesc: 'Generic name with larva in desc here?',
     tags: [naming],
   },
   0xf1: {

@@ -6,6 +6,7 @@ const dataTypes = {
   u32: 'u32',
   u32Array: 'u32Array',
   u64: 'u64',
+  s64: 's64',
   float: 'float',
   charArray: 'charArray',
 };

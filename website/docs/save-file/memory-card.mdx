@@ -1,5 +1,12 @@
 # Memory Card
 
+// TODO: before public, the following checklist
+
+- Get OSTicks to where can remove needsInvestigation tag.
+- Add disclaimer to top of Quest Log Content, etc. pages
+- Make Contents timestamp row link to timestamp of detailed page
+  - Include converter tool there.
+
 import Link from '@docusaurus/Link';
 
 Here we discuss the Twilight Princess save data structure on the memory card at a high level.
@@ -9,7 +16,7 @@ If you are interested in things like rupees and poe souls, please see the <Link 
 
 ### Blocks
 
-You can think of a memory card as a file system. Each file on the memory card is composed of a number of "blocks", and each block is 0x2000 bytes long.
+You can think of a memory card as a filesystem. Each file on the memory card is composed of a number of "blocks", and each block is 0x2000 bytes long.
 
 The first 5 blocks of a memory card are used to manage the filesystem:
 
@@ -21,7 +28,7 @@ The first 5 blocks of a memory card are used to manage the filesystem:
 | 0x6000 | 0x2000 | Block Allocation Map          |
 | 0x8000 | 0x2000 | Block Allocation Map (backup) |
 
-A game's save data will consist of a certain number of blocks which are located somewhere after the first 5 filesystem blocks.
+A file on a memory card will consist of a certain number of blocks which are located somewhere after the first 5 filesystem blocks.
 
 For example, TP's save data is 4 blocks long, so these blocks might be located at offsets 0xa000, 0xc000, 0xe000, and 0x10000 on a fresh memory card, but they could also be at 0x22000, 0x24000, 0x26000, and 0x28000.
 
@@ -36,26 +43,24 @@ The official memory card types are Memory Card 59, Memory Card 251, and Memory C
 
 ### DirectoryEntry
 
-The special Directory filesystem block contains a number of Directory Entries which are each 0x40 bytes long. You can think of a DirectoryEntry as metadata about a file on the memory card.
+The Directory blocks contain a list of entries which are each 0x40 bytes long. Each of these entries is referred to as a DirectoryEntry.
+
+A DirectoryEntry contains metadata about a file on the memory card. Each DirectoryEntry points to one file, and each file is pointed to by one DirectoryEntry.
 
 ### Twilight Princess Save Data
+
+The Twilight Princess data on the memory card is a combination of a save file (which is 4 blocks long) and its metadata (a DirectoryEntry).
 
 | Size   | Description    |
 | ------ | -------------- |
 | 0x40   | DirectoryEntry |
 | 0x8000 | 4 Blocks       |
 
-You can think of the above as all of the TP data which is on the memory card.
-
-:::tip
-
-A Twilight Princess `GCI` file is exactly these two things back-to-back as shown above.
-
-:::
+Note that a GCI file is exactly these two things back-to-back as shown above.
 
 ## Blocks
 
-TP save data has 4 blocks:
+TP save data is composed of 4 blocks which are each 0x2000 bytes long:
 
 | BlockNo | Description             |
 | ------: | ----------------------- |
@@ -66,7 +71,7 @@ TP save data has 4 blocks:
 
 ### Header Blocks
 
-The Header spills over into the second block, so those two blocks will be treated as a chunk of 0x4000 bytes for discussion purposes. Remember that the two blocks may not actually be back-to-back on the memory card.
+The Header continues into the second block, so those two blocks will be treated as a chunk of 0x4000 bytes for discussion purposes. Remember that the two blocks may not actually be back-to-back on the memory card.
 
 | Offset |   Size | Description            |
 | -----: | -----: | ---------------------- |
@@ -89,11 +94,13 @@ The Header spills over into the second block, so those two blocks will be treate
   alt="zelda2_gc_banner.bti"
 />
 
-A GameCube game's (optional) banner always has dimensions 0x60 by 0x20 pixels (96 x 32 decimal).
+A file on the memory card can have a banner. The banner always has dimensions 0x60 by 0x20 pixels (96 x 32 decimal).
 
-TP's banner is in CI8 format which means it uses one byte per pixel (0x60 \* 0x20 is 0xc00).
+TP's banner is in CI8 format (indicated in the DirectoryEntry) which means it uses one byte per pixel. 0x60 width \* 0x20 height gives 0xc00 pixels total. At one byte per pixel, TP's banner is 0xc00 bytes long.
 
-CI8 format also means that the 0x200 bytes following the 0xc00 pixel data will be the palette data. Each palette entry is 2 bytes long, meaning a CI8 banner may use up to 0x100 unique palette entries. TP's banner only makes use of the first 0x160 bytes of the palette data space.
+If a banner is in CI8 format, the 0x200 bytes following the pixel data are allocated to store its palette data. Each palette entry is 2 bytes, meaning a CI8 banner can use up to 0x100 unique palette entries. Each byte in the pixel data has a value between 0x00 and 0xff which is an offset to an entry in the palette data.
+
+Note that TP's banner only makes use of the first 0x160 bytes of the palette data space.
 
 #### Icons
 
@@ -102,13 +109,11 @@ CI8 format also means that the 0x200 bytes following the 0xc00 pixel data will b
   alt="zelda2_gc_banner.bti"
 />
 
-A GameCube game's (optional) icon always has dimensions 0x20 by 0x20 pixels (32 x 32 decimal). It may be composed of multiple icons which it animates between.
+A file on the memory card can have between 0 and 8 icons. An icon always has dimensions 0x20 by 0x20 pixels (32 x 32 decimal). Multiple icons can be used to create an animated icon.
 
-TP specifies in its DirectoryEntry that each icon is in CI8 format with a shared color palette following all of the pixel data, and it also specifies that it has 5 icons.
+TP specifies in its DirectoryEntry that it has 5 icons and that each icon is in CI8 format with a shared color palette following all of the pixel data. CI8 format means each pixel takes one byte. Each icon has dimensions 0x20 by 0x20, so each icon is 0x400 bytes long.
 
-As with the banner, CI8 format means that each pixel of an icon takes one byte. Since each icon has dimensions 0x20 by 0x20, each icon is 0x400 bytes long.
-
-Also as with the banner, the palette data must fit in the 0x200 bytes following the end of the pixel data. For its icons, TP makes use of the full 0x200 bytes.
+As with the banner, the icon palette data must fit in the 0x200 bytes following the end of the pixel data. For its icons, TP makes use of the full 0x200 bytes of palette data.
 
 :::info
 
@@ -120,26 +125,41 @@ The zelda2_gc_banner.bti and zelda2_gc_icon.bti are located in the Yaz0-encoded 
 
 Each comment is a null-terminated string which can use up to 0x20 bytes.
 
-These bytes (in addition to the banner and icon) are visible when managing memory card data on your GameCube.
+The comments (in addition to the banner and icon) are visible when managing memory card data on your GameCube.
 
-For the US GameCube version of TP, the first comment is always "Zelda: Twilight Princess", and the second comment is something like "6/4 Save Data" (which is Month/Day).
+For the US GameCube version of TP, the first comment is always "Zelda: Twilight Princess", and the second comment is something like "6/26 Save Data" (which is Month/Day).
+
+Below is an image which shows the banner, icon, and comments in the Gamecube IPL.
+
+<img
+  src={require('@site/static/img/savefile/gcIplTpNormal.png').default}
+  alt="zelda2_gc_banner.bti"
+/>
 
 #### Unused/Garbage
 
 The last 0x1bc0 of Block 2 is not used for anything.
 
-If you inspect memory card data for TP in a hex editor, you may see what appears to be quest log data in this space. This is a side-effect of the game only using `memset` to zero out the buffer it writes blocks to (before they are copied to the memory card) before writing the Header there in certain cases. If you edit any of these 0x1bc0 bytes in your memory card before loading up the game, you will not see any effect.
+If you inspect memory card data for TP in a hex editor, you may see what appears to be quest log data in this space. This is a side effect of using a shared buffer for writing blocks to the memory card. The buffer is not `memset` with zeroes before constructing the Header blocks like it is before copying in Quest Log blocks.
 
-Other bytes which may contain garbage in the first two TP Blocks are as follows:
+- The buffer is zeroed out when you load the game.
+- If you tell the game to create a save file on the memory card, the buffer becomes dirty afterward.
+- When data is restored from the memory card for the File Select screen, the buffer becomes dirty.
 
-- The last 0x40 bytes of the banner's palette data (starting at offset 0xd60).
-- In each Comment (offsets 0x2400 and 0x2420), the bytes which follow the null termination character of the Comment.
+This means the only time you can save before the buffer becomes dirty is when you tell the game to create new Twilight Princess data on the memory card.
+
+#### Other garbage
+
+Other bytes which may contain garbage in the first two blocks are as follows:
+
+- The last 0x40 bytes of the banner's palette data (starting at offset 0xd60)
+- In each comment (offsets 0x2400 and 0x2420), the bytes which follow the null termination character of the comment
 
 ### Quest Log Blocks
 
-Block 3 contains the data for the 3 Quest Logs. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
+Block 3 contains the data for the 3 Quest Logs, which are the 3 files you pick between on the File Select screen. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
 
-The Quest Log Block structure is as follows:
+The Quest Log block structure is as follows:
 
 | Offset |  Size | Description       |
 | -----: | ----: | ----------------- |
@@ -147,51 +167,70 @@ The Quest Log Block structure is as follows:
 | 0x0008 | 0xa94 | Quest Log 1 Data  |
 | 0x0a9c | 0xa94 | Quest Log 2 Data  |
 | 0x1530 | 0xa94 | Quest Log 3 Data  |
-| 0x1fc4 |  0x34 | Unused/garbage    |
-| 0x1ff8 |   0x8 | Checksum          |
+| 0x1fc4 |  0x38 | Unused/garbage    |
+| 0x1ffc |   0x4 | Checksum          |
 
 #### First 8 Bytes
 
 The first eight bytes are always set to:<br/>
-00 00 00 00<span style={{display:'inline-block',height:1,width:16}}></span>00 00 00 06
+`00 00 00 00 00 00 00 06`
 
 My guess is that this is a version number for the quest log structure which was incremented during development, and they ended on 6.
 
 #### Quest Log Data
 
-Each Quest Log's data has the same structure. The structure is rather complex, so it is covered on a different page.
+Each Quest Log's data has the same structure. The structure is rather complex, so it is covered separately.
 
 #### Unused/Garbage
 
-- ahsdfiosdhfi
-
-Note that each of the 0xa94 Quest Log Data sections contain unused/garbage bytes as well, but that will be covered on a separate page.
+Note that each of the 0xa94 Quest Log Data sections contain unused/garbage bytes as well, but that is covered separately.
 
 #### Checksum
 
-- asdhfos
+The checksum function runs over the first 0x1ffc bytes of the Quest Log block. The generated checksum is 4 bytes long, and it is stored as the final 4 bytes of a Quest Log block.
+
+Here is the algorithm written in JavaScript:
+
+```js
+function questLogBlockChecksum(arrBuf, offset, len) {
+  const view = new DataView(arrBuf);
+  let sum = 0;
+  let negSum = 0;
+
+  let index = offset;
+  const iterations = len >> 1;
+  for (let i = 0; i < iterations; i++) {
+    const val = view.getUint16(index);
+    sum += val;
+    negSum += ~val;
+    negSum &= 0xffff;
+    index += 2;
+  }
+  return ((sum << 0x10) & 0xffff0000) + negSum;
+}
+```
 
 ## DirectoryEntry
 
-These 0x40 bytes contain metadata about the Twilight Princess save data on the memory card. They live in a special Directory block, hence the name. These are also the first 0x40 bytes of a GCI file.
+These 0x40 bytes contain metadata about the Twilight Princess save data on the memory card. They live in a Directory block, hence the name. These are also the first 0x40 bytes of a GCI file.
 
-| Offset | Type     | Description         | Status (temp column) |
-| -----: | -------- | ------------------- | -------------------- |
-|   0x00 | u8[4]    | gameCode            |                      |
-|   0x04 | u8[2]    | publisherCode       |                      |
-|   0x06 | u8       | padding_06          |                      |
-|   0x07 | u8       | imageFlags          |                      |
-|   0x08 | u8[0x20] | filename            |                      |
-|   0x28 | u32      | lastModified        | done?                |
-|   0x2c | u32      | imageDataOffset     |                      |
-|   0x30 | u16      | iconFormats         |                      |
-|   0x32 | u16      | iconAnimationSpeeds |                      |
-|   0x34 | u8       | permissions         |                      |
-|   0x35 | u8       | copyCounter         |                      |
-|   0x36 | u16      | firstBlockIndex     |                      |
-|   0x38 | u16      | numBlocks           |                      |
-|   0x3a | u8[2]    | padding_38          |                      |
-|   0x3c | u32      | commentsOffset      |                      |
+| Offset | Type     | Description         |
+| -----: | -------- | ------------------- |
+|   0x00 | u8[4]    | gameCode            |
+|   0x04 | u8[2]    | publisherCode       |
+|   0x06 | u8       | padding_06          |
+|   0x07 | u8       | imageFlags          |
+|   0x08 | u8[0x20] | filename            |
+|   0x28 | u32      | lastModified        |
+|   0x2c | u32      | imageDataOffset     |
+|   0x30 | u16      | iconFormats         |
+|   0x32 | u16      | iconAnimationSpeeds |
+|   0x34 | u8       | permissions         |
+|   0x35 | u8       | copyCounter         |
+|   0x36 | u16      | firstBlockIndex     |
+|   0x38 | u16      | numBlocks           |
+|   0x3a | u8[2]    | padding_38          |
+|   0x3c | u32      | commentsOffset      |
 
 ### gameCode
 
@@ -247,21 +286,30 @@ Putting these values on top of a 0x00 byte, we get 0b00000101 or 0x05.
 
 ### filename
 
-asdhfidohsf
+The filename for a TP save file is always "gczelda2", which is likely short for "Gamecube Zelda 2".
+
+There are 0x20 bytes allocated for a filename, and under normal conditions any leftover bytes are set to 0x00.
+
+:::info
+
+"gczelda" (without the 2 on the end) is the filename for The Legend of Zelda: The Wind Waker save data.
+
+:::
 
 ### lastModified
 
-The last time this DirectoryEntry was modified represented by the number of seconds since 2000/01/01 00:00.
-
------ Better phrasing. True about directory entry, but mainly is referring to the file (which is made up of the 4 blocks).
+This is the last time the file which the DirectoryEntry points to was modified. This value is stored as the number of seconds since 2000/01/01 00:00.
 
 This value is calculated by dividing the OSTicks which are returned from `OSGetTime` by 40,500,000 (OSTicks per second) then taking the lower 32 bits of the 64 bit result.
 
+// TODO:
 // ADD CONVERTER COMPONENT HERE (takes hex seconds value and outputs info)
 
 ### imageDataOffset
 
-// ashdfio
+Offset to the image data (banner and icons) relative to the start of the file.
+
+For TP, this value must always be 0 (the banner data starts at the very front of the first block).
 
 ### iconFormats
 
@@ -309,11 +357,21 @@ Each icon has identical pixel and palette data. This gives the appearance of a s
 
 ### permissions
 
-// ashdfio
+There are 3 permissions which are each 1 bit.
+
+| bit | Permission | Description                      |
+| --- | ---------- | -------------------------------- |
+| 4   | No move    | File cannot be moved by the IPL  |
+| 3   | No copy    | File cannot be copied by the IPL |
+| 2   | public     | File can be read by any game     |
+
+TP never changes this value from the default 0x04 meaning public (only bit 2 is set).
 
 ### copyCounter
 
-// ashdfio
+copyCounter indicates how many times the file has been copied to a different memory card.
+
+Starts at 0 and increments by 1.
 
 ### firstBlockIndex
 
@@ -332,7 +390,15 @@ See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
 ### commentsOffset
 
-// ashdfio
+Offset to the comments relative to the start of the file.
+
+For TP, this value must always be 0x00002400.
+
+:::info
+
+The 0x40 byte chunk for the comments must be contained within a single block.
+
+:::
 
 ## DirectoryEntry Follow-up
 
@@ -370,7 +436,7 @@ Below is a memory card raw image you can download which has had its first Direct
   </a>
 </p>
 
-If you open TP with that data written to your memory card then say you want to create TP save data on the memory card, you will see that the padding bytes will never change from 0xaa.
+If you create TP save data on a memory card with that image, you will see that the padding bytes never change from 0xaa.
 
 Note that this applies to the padding at offset 0x06 and at offset 0x3a.
 
@@ -395,13 +461,13 @@ Here are the checks which must always pass:
 
 As discussed in <Link to="#why-0xff">Why is the padding 0xff?</Link>, we can manipulate the padding bytes to any value and their value will persist between saves. Are there any other places like this in the DirectoryEntry?
 
-In <Link to="#checkcardstat">CheckCardStat</Link>, we determined some things that we can't change without upsetting the game. Ignoring those, we are left with the following:
+In <Link to="#checkcardstat">CheckCardStat</Link>, we determined some things that we can't change without upsetting the game. Skipping over those and the padding, we are left with the following:
 
-gameCode, publisherCode, padding_06, upper 5 bits of imageFlags, filename, lastModified, permissions, copyCounter, firstBlockIndex, numBlocks, padding_38
-
-As we already know, the paddings are free real estate.
+gameCode, publisherCode, upper 5 bits of imageFlags, filename, lastModified, certain permissions bits, copyCounter, firstBlockIndex, numBlocks
 
 #### gameCode, publisherCode, filename
+
+// TODO: check this. Read note in paragraph below
 
 gameCode, publisherCode, and the filename contents up to and including the first 0x00 byte are used to find the data on the memory card, so these cannot be changed. (looks to be correct by stepping through code, verify by changing). However, since the filename string comparison stops when it hits the first null byte, we can put whatever we want in the remaining 0x17 bytes.
 
@@ -421,7 +487,7 @@ Most of the values are filled with defaults. This is quickly overwritten with TP
 `00 00 00 00 00 00 00 00 28 69 BB 43 00 00 00 00`<br/>
 `01 55 01 55 04 00 00 05 00 04 FF FF 00 00 24 00`
 
-Initially, the imageFlags byte is set to a default value of 0. It is during the 2nd write that TP fills in the 3 important bits.
+Initially, the imageFlags byte (offset 0x07) is set to its default value of 0. It is during the 2nd write that TP fills in the 3 important bits.
 
 We know that the least significant 3 bits must be 0b101 for TP to accept the save file as valid. However, the top 5 bits are never checked, and they are only overwritten when they are initialized to 0. This means that we can set those 5 bits to whatever we want and they will maintain their value.
 
@@ -431,11 +497,11 @@ lastModifed gets updated every time the save file is updated, so any data you pu
 
 #### permissions
 
-permissions is set to 0x04 (public) during the initial DirectoryEntry creation. For TP, the permissions are never changed after this point. Since only 3 of the bits on the permissions byte carry any meaning, we can do as we please with the other 5 bits as with the imageFlags.
+permissions is set to 0x04 (public) during the initial DirectoryEntry creation. For TP, the permissions are never changed after this point. Since only 3 of the bits on the permissions byte carry any meaning, we can do as we please with the other 5 bits.
 
 #### copyCounter
 
-This will be incremented when copying between memory cards, so there is not much point in putting anything here.
+This is incremented when copying between memory cards, so there is not much point in putting anything here.
 
 #### firstBlockIndex, numBlocks
 
@@ -455,12 +521,12 @@ We can put whatever data we want at the following locations with no adverse effe
 
 These gives us a total of 26 bytes and 10 bits.
 
-- memcard download here
+// TODO: memcard with custom modified values here download
 
 Note that you will lose some of the data if you transfer it between memory cards using the Gamecube IPL:
 
 - Padding bytes are not copied
-- Any bytes in the filename after the null termination byte will be lost
+- Any bytes in the filename after the null termination byte are lost
 
 ## Other Formats
 
@@ -500,9 +566,9 @@ Note that YAGCD is wrong about byte 0x07 of the DirectoryEntry, so be sure to ch
 
 ### Why 5 identical icons?
 
-You might have noticed that 87% of block 2 is unused and that we could easily fit the Header on a single block if we did not store 5 copies of the same icon data.
+You might have noticed that 87% of block 2 is unused and that we could easily fit the Header on a single block if we did not store 5 copies of the same icon pixel data.
 
-In short, the Header could have been a single block making the game 3 total blocks instead of 4. An animated icon was probably planned at some point but never came to fruition. Below is a detailed explanation.
+In short, the Header could have been a single block making the game 3 total blocks instead of 4. An animated icon was probably planned at some point but never came to fruition. Below is the detailed explanation.
 
 Icon metadata for some games which do not have an animated icon:
 
@@ -516,7 +582,7 @@ Icon metadata for some games which do not have an animated icon:
 | The Legend of Zelda: Four Swords Adventures | 0x0001      | 0x0003              | 0                   |
 | The Legend of Zelda: The Wind Waker         | 0x0001      | 0x0003              | 0                   |
 
-You can see that all of these games indicate that they have a single icon in the `iconFormats` field.
+All of these games indicate that they have a single icon in the `iconFormats` field.
 
 Icon metadata for some games with an animated icon:
 
@@ -540,7 +606,7 @@ Additionally, an animated icon is the only valid use case for storing multiple i
 
 For these reasons, I think it is pretty evident that the developers had plans for an animated icon. I suspect that they either ran out of time or decided against it, and they never went back to update the code. Either way, what we end up with is a game with save data which takes 4 blocks when it could have easily taken 3.
 
-Below is a modified memory card which contains TP data which has been adjusted to take only 3 blocks. You can download it and view it in a Gamecube IPL or Dolphin's Memory Card Manager to see that it only uses 3 blocks yet provides the same icon, banner, and comments metadata.
+Below is a modified memory card which contains TP data which has been adjusted to take only 3 blocks. You can download it and view it in a Gamecube IPL or Dolphin's Memory Card Manager to see that it only uses 3 blocks yet provides the same icon, banner, and comments metadata. If you inspect it in a hex editor, you will see that it contains the 2 Quest Log blocks as well.
 
 <p>
   <a target="_blank" href="/saveData/raw/mem59_tp3Blocks.USA.raw">
@@ -559,11 +625,11 @@ For your convenience, below is an image of what this would look like. The image 
 
 ### Default selection on the file select screen?
 
-You might expect there to be some metadata outside of the quest logs which keeps track of which one to default to on the file selection screen, but this is not the case.
+You might expect there to be some metadata outside of the quest log data which indicates the quest log to default to on the file selection screen, but this is not the case.
 
 The default is picked this way:
 
-- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the QuestLog which is the latest down to the seconds level.
+- From the set which includes Quest Log 1 and any other Quest Logs which pass their checksum test, pick the Quest Log which has the latest timestamp (compared at the seconds level).
 - In the case of a tie, Quest Log 1 has the highest priority and Quest Log 3 has the lowest priority.
 
 :::info
@@ -576,7 +642,7 @@ Quest Logs which fail their checksum test say "This Quest Log is corrupted."
 
 ### DirectoryEntry
 
-------- Mention cardStat stuff. cardStat is a more verbose version of the directory entry data I think.
+// TODO: ------- Mention cardStat stuff. cardStat is a more verbose version of the directory entry data I think.
 
 This DirectoryEntry data is written as an entry on the Directory Block, hence the name DirectoryEntry.
 We are using this name for a couple of reasons:
