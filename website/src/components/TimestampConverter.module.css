@@ -1,5 +1,6 @@
 .outputText {
   padding-top: 8px;
+  padding-bottom: 8px;
   padding-left: 8px;
   white-space: pre-line;
   line-height: normal;
@@ -7,10 +8,20 @@
 
 .outputText.error {
   padding-top: 4px;
+  padding-bottom: 4px;
   color: #d93025;
   font-size: 14px;
 }
 
 .darkTheme .outputText.error {
   color: rgb(222, 69, 60);
+}
+
+.dateFormat {
+  font-size: 14px;
+}
+
+.swapButton {
+  display: block;
+  margin-top: 8px;
 }
