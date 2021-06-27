@@ -12,6 +12,9 @@ module.exports = {
   organizationName: 'icogn', // Usually your GitHub org/user name.
   projectName: 'tp-docs', // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+    },
     navbar: {
       title: 'My Site',
       logo: {
