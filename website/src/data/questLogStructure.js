@@ -183,7 +183,7 @@ const questLogStructureByOffset = {
     name: 'timestamp',
     shortDesc:
       'OSTicks since 2000/01/01 00:00. Increases by 40,500,000 per second.',
-    link: '/docs/save-file/quest-log/player/player-status-b#t-0x028',
+    link: '/docs/save-file/quest-log/player/player-status-b#offset-0x028',
   },
   0x30: {
     type: u8,
