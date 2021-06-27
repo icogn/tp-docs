@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { sprintf } from 'sprintf-js';
+import Link from '@docusaurus/Link';
 import { dataTypes } from '../data/constants';
 import styles from './DataStructureTable.module.css';
 
@@ -24,7 +25,7 @@ function renderRows(data) {
   const ret = [];
   let blankIndex = 0;
 
-  data.forEach(({ offset, type, name, length, shortDesc, tags }, i) => {
+  data.forEach(({ offset, type, name, length, shortDesc, tags, link }, i) => {
     if (type === 'class') {
       if (i > 0) {
         ret.push(
@@ -58,7 +59,8 @@ function renderRows(data) {
       >
         <td>{sprintf('0x%03x', offset)}</td>
         <td>{displayType}</td>
-        <td>{name}</td>
+        <td>{link ? <Link to={link}>{name}</Link> : name}</td>
+        <td></td>
         <td>{shortDesc}</td>
       </tr>
     );

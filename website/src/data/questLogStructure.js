@@ -183,7 +183,7 @@ const questLogStructureByOffset = {
     name: 'timestamp',
     shortDesc:
       'OSTicks since 2000/01/01 00:00. Increases by 40,500,000 per second.',
-    tags: [investigation],
+    link: '/docs/save-file/quest-log/player/player-status-b#t-0x028',
   },
   0x30: {
     type: u8,
@@ -250,7 +250,8 @@ const questLogStructureByOffset = {
   },
   0x56: {
     type: u8,
-    name: 'horseSpawnId',
+    name: 'horseEntranceId',
+    shortDesc: 'Naming for entrance id?',
     tags: [notLookedInto],
   },
   0x57: {
