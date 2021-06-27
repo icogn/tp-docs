@@ -4,7 +4,7 @@ import TimestampConverter from '@local/TimestampConverter';
 
 This page explains the calculations behind converting a timestamp such as `00615b390fb0dcef` to something like `2021/06/10 07:48`.
 
-<TimestampConverter />
+<TimestampConverter sourceName="Timestamp" />
 
 ## Introduction
 
