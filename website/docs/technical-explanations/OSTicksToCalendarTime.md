@@ -474,6 +474,11 @@ In any case, the sign bit won't get set until sometime in the year 9216. Going i
 
 _(Have higher priority things to work on so we only cover the happy path here which is thankfully good enough for the next 7000+ years. - isaac)_
 
+## Naming
+
+- OSTicks comes from the function name.
+- OSCalendarTime comes from the Referenced decomp page, and it is also supported by the function name.
+
 ## References
 
 - <Link to="https://github.com/zeldaret/tp/blob/8c2a3ae7eac3483764ccd42f890a1de9cf768538/include/dolphin/os/OS.h#L78">

@@ -3,6 +3,11 @@
 import Link from '@docusaurus/Link';
 import TimestampConverter from '@local/TimestampConverter';
 
+// TODO
+
+- Update save file introduction page
+- Update landing page for site
+
 Here we discuss the Twilight Princess save data structure on the memory card at a high level.
 If you are interested in things like rupees and poe souls, please see the <Link to="/docs/save-file/quest-log/introduction">Quest Log</Link>.
 
@@ -633,9 +638,19 @@ Quest Logs which fail their checksum test say "This Quest Log is corrupted."
 
 ## Naming
 
-### DirectoryEntry
+### General
 
-// TODO: ------- Mention cardStat stuff. cardStat is a more verbose version of the directory entry data I think.
+Names on this page were decided in this way:
+
+1. Pick the best name from a group of memory card references.
+1. Make adjustments with clarity, accuracy, and styling in mind.
+
+Some examples:
+
+- publisherCode is called makercode in some of the references, but it was changed here since publisher is more accurate. Using an example from YAGCD, Retro Studios developed Metroid Prime, but the publisherCode is still "01" for Nintendo.
+- "animation speed" was changed to "iconAnimationSpeeds" so you can quickly tell that it relates to icons and that the field stores multiple speeds.
+
+### DirectoryEntry
 
 This DirectoryEntry data is written as an entry on the Directory Block, hence the name DirectoryEntry.
 We are using this name for a couple of reasons:
@@ -643,7 +658,11 @@ We are using this name for a couple of reasons:
 - Variations of "directory entry" (such as 'DEntry' and '\_card_direntry') are what you will see in other places.
 - We can afford to be more descriptive with the name since this is only documentation and not source code.
 
-Based on the OS function names `CARDGetStatus` and `CARDSetStatus` which handle reading and writing this data, it is possible that this data could also be called something like "Status". TP itself has funtions `m_Do_MemCardRWmng::mDoMemCdRWm_SetCardStat` and `m_Do_MemCardRWmng::mDoMemCdRWm_CheckCardStat` which call the OS functions internally. They bring to mind the Linux command `stat` which is said to "display file or file system status". The data in this 0x40 byte chunk is essentially what you would see if you could run that command on a memory card (metadata about some data stored in the filesystem).
+The OS functions `CARDGetStatus` and `CARDSetStatus` handle reading and writing data to the DirectoryEntry through a similar object structure which might have been called `CARDStat`. libogc calls the structure `_card_stat`, and `frameworkF.map` mentions these functions as coming from `CARDStat.o`.
+
+TP also has funtions `m_Do_MemCardRWmng::mDoMemCdRWm_SetCardStat` and `m_Do_MemCardRWmng::mDoMemCdRWm_CheckCardStat` which call the OS functions internally.
+
+These function names bring to mind the Linux command `stat` which is said to "display file or file system status". The data in this 0x40 byte chunk is essentially what you would see if you could run that command on a memory card (metadata about a file stored in the filesystem).
 
 The term "Directory Block" is supported by the OS function `card::__CARDGetDirBlock`.
 
