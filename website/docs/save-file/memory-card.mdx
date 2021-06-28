@@ -143,7 +143,7 @@ If you inspect memory card data for TP in a hex editor, you may see what appears
 
 - The buffer is zeroed out when you load the game.
 - If you tell the game to create a save file on the memory card, the buffer becomes dirty afterward.
-- When data is restored from the memory card for the File Select screen, the buffer becomes dirty.
+- When data is restored from the memory card for the file select screen, the buffer becomes dirty.
 
 This means the only time you can save before the buffer becomes dirty is when you tell the game to create new Twilight Princess data on the memory card.
 
@@ -156,7 +156,7 @@ Other bytes which may contain garbage in the first two blocks are as follows:
 
 ### Quest Log Blocks
 
-Block 3 contains the data for the 3 Quest Logs, which are the 3 files you pick between on the File Select screen. Block 4 is a backup copy of Block 3, so its data should match Block 3's exactly (assuming nothing unexpected happened during any memory card writes).
+Block 3 contains the data for the 3 Quest Logs, which are the 3 files you pick between on the file select screen. Block 4 is a backup copy of block 3, so its data will normally match block 3's exactly (assuming nothing unexpected happened during any memory card writes).
 
 The Quest Log block structure is as follows:
 
@@ -459,15 +459,15 @@ Here are the checks which must always pass:
 
 As discussed in <Link to="#why-0xff">Why is the padding 0xff?</Link>, we can manipulate the padding bytes to any value and their value will persist between saves. Are there any other places like this in the DirectoryEntry?
 
-In <Link to="#checkcardstat">CheckCardStat</Link>, we determined some things that we can't change without upsetting the game. Skipping over those and the padding, we are left with the following:
+In <Link to="#checkcardstat">CheckCardStat</Link>, we determined some things which we can't change without upsetting the game. Skipping over those and the padding, we are left with the following:
 
 gameCode, publisherCode, upper 5 bits of imageFlags, filename, lastModified, certain permissions bits, copyCounter, firstBlockIndex, numBlocks
 
 #### gameCode, publisherCode, filename
 
-// TODO: check this. Read note in paragraph below
+gameCode, publisherCode, and the filename contents up to and including the first 0x00 byte are used to locate the TP save file on the memory card, so these cannot be changed.
 
-gameCode, publisherCode, and the filename contents up to and including the first 0x00 byte are used to find the data on the memory card, so these cannot be changed. (looks to be correct by stepping through code, verify by changing). However, since the filename string comparison stops when it hits the first null byte, we can put whatever we want in the remaining 0x17 bytes.
+However, since the filename string comparison stops when it hits the first null byte, we can put whatever we want in the remaining 0x17 bytes.
 
 #### imageFlags
 
@@ -519,12 +519,18 @@ We can put whatever data we want at the following locations with no adverse effe
 
 These gives us a total of 26 bytes and 10 bits.
 
-// TODO: memcard with custom modified values here download
+Below is a memory card raw image which has had these locations in the DirectoryEntry modified. TP will recognize the save file and everything will behave normally from a memory card perspective. The custom data in the DirectoryEntry will be maintained even if you save the game.
 
-Note that you will lose some of the data if you transfer it between memory cards using the Gamecube IPL:
+<p>
+  <a target="_blank" href="/saveData/raw/mem59_tpCustomDataDirEntry.raw">
+    Download mem59_tpCustomDataDirEntry.raw
+  </a>
+</p>
 
-- Padding bytes are not copied
-- Any bytes in the filename after the null termination byte are lost
+Note that you will lose some of the data if you transfer the TP save file between memory cards using the Gamecube IPL:
+
+- Padding bytes are not copied.
+- Any bytes in the filename after the null termination byte are lost.
 
 ## Other Formats
 
@@ -623,7 +629,7 @@ For your convenience, below is an image of what this would look like. The image 
 
 ### Default selection on the file select screen?
 
-You might expect there to be some metadata outside of the quest log data which indicates the quest log to default to on the file selection screen, but this is not the case.
+You might expect there to be some metadata outside of the quest log data which indicates the quest log to default to on the file select screen, but this is not the case.
 
 The default is picked this way:
 
