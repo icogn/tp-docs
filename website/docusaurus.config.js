@@ -4,13 +4,14 @@ const path = require('path');
 module.exports = {
   title: 'TP Docs',
   tagline: 'Twilight Princess at your fingertips',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://icogn.github.io',
+  baseUrl: '/tp-docs/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'icogn',
   projectName: 'tp-docs',
+  trailingSlash: false,
   themeConfig: {
     colorMode: {
       defaultMode: 'dark',
