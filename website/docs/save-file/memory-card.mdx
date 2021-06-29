@@ -3,12 +3,7 @@
 import Link from '@docusaurus/Link';
 import TimestampConverter from '@local/TimestampConverter';
 
-// TODO
-
-- Update save file introduction page
-- Update landing page for site
-
-Here we discuss the Twilight Princess save data structure on the memory card at a high level.
+Here we discuss the Twilight Princess save file structure on the memory card at a high level.
 If you are interested in things like rupees and poe souls, please see the <Link to="/docs/save-file/quest-log/introduction">Quest Log</Link>.
 
 ## Overview
@@ -270,7 +265,7 @@ The image flags are the least significant 3 bits of the byte at offset 0x07. Bit
 | 10           | Direct color, 16 bits per pixel in RGB5A3             |
 | 11           | No banner                                             |
 
-For TP, this value must always be 01, meaning the banner's palette data immediately follows its pixel data.
+For TP, this value will always be 01, meaning the banner's palette data immediately follows its pixel data.
 
 The third bit (bit 2) indicates the icon animation order.
 
@@ -279,7 +274,7 @@ The third bit (bit 2) indicates the icon animation order.
 | 0               | Loop (abcabcabc)   |
 | 1               | Bounce (abcbabcba) |
 
-For TP, this value must always be 1.
+For TP, this value will always be 1.
 
 Putting these values on top of a 0x00 byte, we get 0b00000101 or 0x05.
 
@@ -287,7 +282,7 @@ Putting these values on top of a 0x00 byte, we get 0b00000101 or 0x05.
 
 The filename for a TP save file is always "gczelda2", which is likely short for "Gamecube Zelda 2".
 
-There are 0x20 bytes allocated for a filename, and under normal conditions any leftover bytes are set to 0x00.
+There are 0x20 bytes allocated for the filename, and under normal conditions any leftover bytes are set to 0x00.
 
 :::info
 
@@ -307,7 +302,7 @@ This value is calculated by dividing the OSTicks returned from `OSGetTime` by 40
 
 Offset to the image data (banner and icons) relative to the start of the file.
 
-For TP, this value must always be 0 (the banner data starts at the very front of the first block).
+For TP this value is always 0 (the banner data starts at the very front of the first block).
 
 ### iconFormats
 
@@ -320,7 +315,7 @@ The icon formats are stored as 8 groups of 2 bits which amounts to 2 bytes total
 | 10   | RGB5A3                                                           |
 | 11   | CI8 with its own palette following its pixel data                |
 
-For TP `iconFormats` must always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
+For TP `iconFormats` will always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
 
 | Index | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
 | ----- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -339,7 +334,7 @@ The icon animation speeds are stored as 8 groups of 2 bits which amounts to 2 by
 | 10   | 8 frames    |
 | 11   | 12 frames   |
 
-For TP `iconAnimationSpeeds` must always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
+For TP `iconAnimationSpeeds` will always have the value 0x0155. If we convert this to binary, we get 0b0000000101010101. Grouping by 2 bits and starting from the least-significant (right) side, we get the following:
 
 | Index | 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   |
 | ----- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -367,7 +362,7 @@ TP never changes this value from the default 0x04 meaning public (only bit 2 is 
 
 ### copyCounter
 
-copyCounter indicates how many times the file has been copied to a different memory card.
+`copyCounter` indicates how many times the file has been copied to a different memory card.
 
 Starts at 0 and increments by 1.
 
@@ -390,7 +385,7 @@ See <Link to="#why-0xff">Why is the padding 0xff?</Link> for more info.
 
 Offset to the comments relative to the start of the file.
 
-For TP, this value must always be 0x00002400.
+For TP, this value will always be 0x00002400.
 
 :::info
 
@@ -489,9 +484,9 @@ Initially, the imageFlags byte (offset 0x07) is set to its default value of 0. I
 
 We know that the least significant 3 bits must be 0b101 for TP to accept the save file as valid. However, the top 5 bits are never checked, and they are only overwritten when they are initialized to 0. This means that we can set those 5 bits to whatever we want and they will maintain their value.
 
-#### lastModifed
+#### lastModified
 
-lastModifed gets updated every time the save file is updated, so any data you put here will be lost.
+lastModified gets updated every time the save file is updated, so any data you put here will be lost.
 
 #### permissions
 

@@ -60,7 +60,6 @@ function renderRows(data) {
         <td>{sprintf('0x%03x', offset)}</td>
         <td>{displayType}</td>
         <td>{link ? <Link to={link}>{name}</Link> : name}</td>
-        <td></td>
         <td>{shortDesc}</td>
       </tr>
     );

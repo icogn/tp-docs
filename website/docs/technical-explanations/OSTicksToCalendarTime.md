@@ -120,7 +120,7 @@ We pass the function two parameters:
 
 ## Day of the Week {#day-of-the-week}
 
-Given that Jan 1, 0000 is a Saturday, we know that any day offset which is divisible by 7 is also a Saturday.
+Since Jan 1, 0000 is a Saturday, we know that any day offset which is divisible by 7 is also a Saturday.
 
 We find the lowest day offset which is a multiple of 7 and is greater than or equal to `dayOffset` parameter. Since that day will always be a Saturday, we can look at the difference between it and `dayOffset` to determine which day ours is.
 

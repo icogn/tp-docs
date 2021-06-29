@@ -16,13 +16,8 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro"
-          >
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/save-file/introduction"
+            to="/docs/save-file/save-file-introduction"
+            style={{ marginRight: 16 }}
           >
             Save File
           </Link>
@@ -41,12 +36,23 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
-    >
+    <Layout description="Twilight Princess at your fingertips">
       <HomepageHeader />
       <main>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            boxSizing: 'border-box',
+            padding: '16px 32px',
+          }}
+        >
+          Not looking for PRs just yet. Select a button above to see some
+          documentation.
+          <br />
+          Plan to add more and more to this site over time.
+        </div>
         <HomepageFeatures />
       </main>
     </Layout>
