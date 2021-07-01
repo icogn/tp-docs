@@ -42,22 +42,30 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
 
-  // TODO: need to handle screen resizes
-  // TODO: clean styling and make sure works on different screen sizes,
-  // no video on mobile, also handle light and dark mode
-  // TODO: try different video file
+  // TODO: try different video file, cut weird pixels off edge(s)
+  // TODO: use first frame of video as image background behind video
+  // TODO: see if can make overlay really big so doesn't show on the edge when
+  // you resize
   useLayoutEffect(() => {
     // Prevent scrollbar from flashing if it isn't needed
     const htmlEl = window.document.documentElement;
     const docusaurusEl = document.querySelector('#__docusaurus');
     const docHeight = docusaurusEl ? docusaurusEl.offsetHeight : -1;
 
-    if (docHeight >= 0 || docHeight <= window.innerHeight) {
+    if (docHeight >= 0 && docHeight <= window.innerHeight) {
       htmlEl.style.overflowY = 'hidden';
     }
 
+    function handleResize() {
+      htmlEl.style.overflowY = '';
+      window.removeEventListener('resize', handleResize);
+    }
+
+    window.addEventListener('resize', handleResize);
+
     return () => {
       htmlEl.style.overflowY = '';
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
