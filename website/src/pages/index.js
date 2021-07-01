@@ -10,26 +10,25 @@ import vid from '@site/static/video/as500k.mp4';
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <header
-      className={clsx('hero hero--primary', styles.heroBanner)}
-      style={{
-        backgroundColor: 'transparent',
-        color: '#fff',
-      }}
-    >
+    <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
-            className="button button--secondary button--lg"
+            className={clsx(
+              'button button--secondary button--lg',
+              styles.button
+            )}
             to="/docs/save-file/save-file-introduction"
-            style={{ marginRight: 16 }}
           >
             Save File
           </Link>
           <Link
-            className="button button--secondary button--lg"
+            className={clsx(
+              'button button--secondary button--lg',
+              styles.button
+            )}
             to="/docs/technical-explanations/ostickstocalendartime"
           >
             Technical Explanations
@@ -50,11 +49,11 @@ export default function Home() {
   useLayoutEffect(() => {
     // Prevent scrollbar from flashing if it isn't needed
     const htmlEl = window.document.documentElement;
-    let docHeight = document.querySelector('#__docusaurus').offsetHeight;
-    htmlEl.style.overflowY = 'hidden';
+    const docusaurusEl = document.querySelector('#__docusaurus');
+    const docHeight = docusaurusEl ? docusaurusEl.offsetHeight : -1;
 
-    if (docHeight > window.innerHeight) {
-      htmlEl.style.overflowY = '';
+    if (docHeight >= 0 || docHeight <= window.innerHeight) {
+      htmlEl.style.overflowY = 'hidden';
     }
 
     return () => {
@@ -65,38 +64,12 @@ export default function Home() {
   return (
     <Layout
       description="Twilight Princess at your fingertips"
-      style={{
-        overflowY: 'hidden',
-      }}
+      wrapperClassName={styles.root}
     >
-      <video
-        autoPlay
-        muted
-        loop
-        style={{
-          position: 'fixed',
-          right: 0,
-          bottom: 0,
-          minWidth: '100%',
-          minHeight: '100%',
-          zIndex: -1,
-          pointerEvents: 'none',
-        }}
-      >
+      <video autoPlay muted loop className={styles.video}>
         <source src={vid} type="video/mp4" />
       </video>
-      <div
-        style={{
-          position: 'fixed',
-          right: 0,
-          bottom: 0,
-          minWidth: '100%',
-          minHeight: '100%',
-          zIndex: -1,
-          backgroundColor: 'rgba(0,0,0,0.35)',
-          // backgroundColor: 'rgba(0,0,0,0.4)',
-        }}
-      ></div>
+      <div className={styles.videoOverlay}></div>
       <div
         style={{
           // position: 'absolute',

@@ -10,6 +10,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  color: #000;
 }
 
 @media screen and (max-width: 966px) {
@@ -22,4 +23,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.button {
+  margin: 8px;
+}
+
+.video {
+  position: fixed;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.videoOverlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  background-color: rgba(0, 0, 0, 0.35);
+  /* background-color: rgba(0, 0, 0, 0.4); */
+}
+
+@media (max-width: 575.98px) {
+  .video,
+  .videoOverlay {
+    display: none;
+  }
+}
+
+@media (min-width: 576px) {
+  .root {
+    /* color used for data-theme='dark' */
+    color: var(--ifm-color-gray-100);
+  }
+
+  .heroBanner {
+    color: #fff;
+    background-color: transparent;
+  }
 }
