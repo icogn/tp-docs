@@ -5,7 +5,9 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
-import vid from '@site/static/video/as500k.mp4';
+import img from '@site/static/img/homeBgPot.png';
+import vid from '@site/static/video/homeBgPotCrf32g240.webm';
+import vidmp4 from '@site/static/video/homeBgPotCrf26.mp4';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -42,10 +44,6 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
 
-  // TODO: try different video file, cut weird pixels off edge(s)
-  // TODO: use first frame of video as image background behind video
-  // TODO: see if can make overlay really big so doesn't show on the edge when
-  // you resize
   useLayoutEffect(() => {
     // Prevent scrollbar from flashing if it isn't needed
     const htmlEl = window.document.documentElement;
@@ -74,10 +72,20 @@ export default function Home() {
       description="Twilight Princess at your fingertips"
       wrapperClassName={styles.root}
     >
-      <video autoPlay muted loop className={styles.video}>
-        <source src={vid} type="video/mp4" />
+      <div
+        className={clsx(styles.background, styles.bgImg)}
+        style={{ backgroundImage: `url("${img}")` }}
+      ></div>
+      <video
+        autoPlay
+        muted
+        loop
+        className={clsx(styles.background, styles.video)}
+      >
+        <source src={vid} type="video/webm" />
+        <source src={vidmp4} type="video/mp4" />
       </video>
-      <div className={styles.videoOverlay}></div>
+      <div className={clsx(styles.background, styles.videoOverlay)}></div>
       <div
         style={{
           // position: 'absolute',

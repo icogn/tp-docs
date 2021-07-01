@@ -30,30 +30,31 @@
   margin: 8px;
 }
 
-.video {
+.background {
   position: fixed;
   top: 0;
   right: 0;
   min-width: 100%;
   min-height: 100%;
   z-index: -1;
+}
+
+.bgImg {
+  background-size: cover;
+  background-position: top right;
+}
+
+.video {
   pointer-events: none;
 }
 
 .videoOverlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  min-width: 100%;
-  min-height: 100%;
-  z-index: -1;
   background-color: rgba(0, 0, 0, 0.35);
   /* background-color: rgba(0, 0, 0, 0.4); */
 }
 
 @media (max-width: 575.98px) {
-  .video,
-  .videoOverlay {
+  .background {
     display: none;
   }
 }
