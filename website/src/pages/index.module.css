@@ -30,27 +30,20 @@
   margin: 8px;
 }
 
-.background {
-  position: fixed;
-  top: 0;
-  right: 0;
-  min-width: 100%;
-  min-height: 100%;
-  z-index: -1;
-}
-
-.bgImg {
-  background-size: cover;
-  background-position: top right;
-}
-
-.videoWrapper {
+.bgWrapper {
   position: fixed;
   width: 100%;
   height: 100vh;
   overflow: hidden;
   z-index: -1;
   pointer-events: none;
+}
+
+.bgImg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: top right;
 }
 
 /* https://stackoverflow.com/a/29997746 */
@@ -63,14 +56,9 @@
   position: absolute;
   top: 0;
   right: 0;
-  /* display: none; */
 }
 
-.videoOverlay {
-  background-color: rgba(0, 0, 0, 0.35);
-}
-
-.overlay2 {
+.bgOverlay {
   background-color: rgba(0, 0, 0, 0.35);
   position: absolute;
   left: -9999px;
@@ -80,8 +68,7 @@
 }
 
 @media (max-width: 575.98px) {
-  .background,
-  .videoWrapper {
+  .bgWrapper {
     display: none;
   }
 }
