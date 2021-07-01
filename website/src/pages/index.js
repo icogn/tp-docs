@@ -71,19 +71,24 @@ export default function Home() {
       wrapperClassName={styles.root}
     >
       <div
-        className={clsx(styles.background, styles.bgImg)}
+        // className={clsx(styles.background, styles.bgImg)}
+        className={clsx(styles.videoWrapper, styles.bgImg)}
         style={{ backgroundImage: `url("${img}")` }}
       ></div>
-      <video
-        autoPlay
-        muted
-        loop
-        className={clsx(styles.background, styles.video)}
-      >
-        <source src={vid} type="video/webm" />
-        <source src={vidmp4} type="video/mp4" />
-      </video>
-      <div className={clsx(styles.background, styles.videoOverlay)}></div>
+      <div className={styles.videoWrapper}>
+        <video
+          autoPlay
+          muted
+          loop
+          // className={clsx(styles.background, styles.video)}
+          className={styles.video}
+        >
+          <source src={vid} type="video/webm" />
+          <source src={vidmp4} type="video/mp4" />
+        </video>
+        <div className={styles.overlay2}></div>
+      </div>
+      {/* <div className={clsx(styles.background, styles.videoOverlay)}></div> */}
       <HomepageHeader />
       <main>
         <div
