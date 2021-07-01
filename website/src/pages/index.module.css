@@ -30,32 +30,34 @@
   margin: 8px;
 }
 
+/* 101vh and -2px top are to account for bad rows of pixels at top and bottom
+from original Dolphin recording */
 .bgWrapper {
   position: fixed;
   width: 100%;
-  height: 100vh;
+  height: 101vh;
   overflow: hidden;
   z-index: -1;
   pointer-events: none;
 }
 
 .bgImg {
+  position: absolute;
+  top: -2px;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: top right;
 }
 
-/* https://stackoverflow.com/a/29997746 */
 .video {
-  pointer-events: none;
-  height: 100%;
-  width: 180.3571429vh; /* 100 * 1616 / 896 */
-  min-width: 100%;
-  min-height: 55.44554455vw; /* 100 * 896 / 1616 */
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -2px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top right;
+  pointer-events: none;
 }
 
 .bgOverlay {
@@ -82,5 +84,15 @@
   .heroBanner {
     color: #fff;
     background-color: transparent;
+  }
+}
+
+@media (min-width: 576px) and (min-height: 576px) {
+  /* For phones, we want the top of the background to start underneath the nav
+  bar (happens when top is not set). When the user scrolls up in their phone
+  browser, the address bar goes away, so we need the background to extend off
+  the bottom of the phone so nothing weird happens. */
+  .bgWrapper {
+    top: 0;
   }
 }
