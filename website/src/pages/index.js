@@ -42,8 +42,6 @@ function HomepageHeader() {
 }
 
 export default function Home() {
-  const { siteConfig } = useDocusaurusContext();
-
   useLayoutEffect(() => {
     // Prevent scrollbar from flashing if it isn't needed
     const htmlEl = window.document.documentElement;
@@ -86,34 +84,24 @@ export default function Home() {
         <source src={vidmp4} type="video/mp4" />
       </video>
       <div className={clsx(styles.background, styles.videoOverlay)}></div>
-      <div
-        style={{
-          // position: 'absolute',
-          left: 0,
-          width: '100%',
-          top: 0,
-          bottom: 0,
-        }}
-      >
-        <HomepageHeader />
-        <main>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              boxSizing: 'border-box',
-              padding: '16px 32px',
-            }}
-          >
-            Not looking for PRs just yet. Select a button above to see some
-            documentation.
-            <br />
-            Plan to add more and more to this site over time.
-          </div>
-          <HomepageFeatures />
-        </main>
-      </div>
+      <HomepageHeader />
+      <main>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            boxSizing: 'border-box',
+            padding: '16px 32px',
+          }}
+        >
+          Not looking for PRs just yet. Select a button above to see some
+          documentation.
+          <br />
+          Plan to add more and more to this site over time.
+        </div>
+        <HomepageFeatures />
+      </main>
     </Layout>
   );
 }
