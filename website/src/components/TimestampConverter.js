@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import clsx from 'clsx';
-import useThemeContext from '@theme/hooks/useThemeContext';
 import { osTicksToCalendarTime } from '../base/os';
 import styles from './TimestampConverter.module.css';
 
@@ -306,7 +305,6 @@ function TimestampConverter({ sourceName, useSeconds }) {
   const [fromTimestamp, setFromTimestamp] = useState(true);
   const [text, setText] = useState('');
   const [hasError, setHasError] = useState(false);
-  const { isDarkTheme } = useThemeContext();
 
   function handleClick() {
     if (!inputEl.current) {
@@ -351,7 +349,7 @@ function TimestampConverter({ sourceName, useSeconds }) {
   }
 
   return (
-    <div className={isDarkTheme ? styles.darkTheme : 0}>
+    <div>
       <div>
         {sourceName
           ? genTitle(sourceName, fromTimestamp)

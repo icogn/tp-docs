@@ -13,7 +13,7 @@
   font-size: 14px;
 }
 
-.darkTheme .outputText.error {
+:global(html[data-theme='dark']) .outputText.error {
   color: rgb(222, 69, 60);
 }
 

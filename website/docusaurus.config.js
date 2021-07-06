@@ -109,6 +109,7 @@ module.exports = {
     ],
   ],
   plugins: [
+    path.resolve(__dirname, 'plugins/webpack-provide-plugin'),
     [
       'docusaurus-plugin-module-alias',
       {

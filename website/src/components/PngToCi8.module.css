@@ -1,0 +1,10 @@
+.errorMsg {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: #d93025;
+  font-size: 14px;
+}
+
+:global(html[data-theme='dark']) .errorMsg {
+  color: rgb(222, 69, 60);
+}
