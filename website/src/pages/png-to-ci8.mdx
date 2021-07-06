@@ -1,0 +1,23 @@
+# PNG to BTI
+
+import PngToCi8 from '@local/PngToCi8';
+
+This page provides an easy way to convert PNGs to BTIs.
+
+The motivation for this page was to allow people to create memory efficient icons and banners for GCI files, so it currently only generates BTIs with the following configuration:
+
+- Image is CI8 format
+- Palette is RGB5A3 format
+
+:::caution
+
+The image can have a maximum of 0x100 (256 decimal) different pixel colors (rgba values). If you have GIMP, you can select Image > Mode > Indexed.
+Under "Colormap" in the popup, set the maximum number of colors to 256, then hit "Convert". Now you can export the file as a new PNG which will fit within the palette entry limit.
+
+:::
+
+## Converter
+
+Click the button below, then select a PNG file to convert to BTI format.
+
+<PngToCi8 />
