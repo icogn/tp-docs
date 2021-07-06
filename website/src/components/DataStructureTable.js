@@ -20,8 +20,8 @@ function formatArrayText(text, number) {
 }
 
 function renderRows(data) {
-  console.log('data');
-  console.log(data);
+  // console.log('data');
+  // console.log(data);
   const ret = [];
   let blankIndex = 0;
 

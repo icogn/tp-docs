@@ -1,8 +1,5 @@
 const path = require('path');
 
-console.log("path.resolve(__dirname, 'plugins/webpack-provide-plugin')");
-console.log(path.resolve(__dirname, 'plugins/webpack-provide-plugin'));
-
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'TP Docs',
@@ -113,7 +110,6 @@ module.exports = {
   ],
   plugins: [
     path.resolve(__dirname, 'plugins/webpack-provide-plugin'),
-    path.resolve(__dirname, 'plugins/test-plugin'),
     [
       'docusaurus-plugin-module-alias',
       {
