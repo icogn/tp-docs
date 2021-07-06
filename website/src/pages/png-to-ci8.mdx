@@ -40,8 +40,15 @@ If you use files you generate here in a GCI file, make sure the header has the f
 - Offset 0x07 (imageFlags, u8) - The least significant 2 bits are 0b01. The value will likely be either 0x01 or 0x05.
 - Offset 0x30 (iconFormats, u16) - For a single icon, the value here should be 0x0001.
 
-:::note
+Also, each palette (banner and icon) will have 0x200 bytes reserved for it.
+So the image data would be one chunk as follows:
 
-This section applies to the DirectoryEntry on a memory card as well (since this is what a GCI header is).
+- 0xc00 bytes for banner pixel data
+- 0x200 bytes for banner palette data
+- 0x400 bytes for icon pixel data
+- 0x200 bytes for icon palette data
 
-:::
+Note that if your palette data is less than 0x200 bytes long, you simply write what you have at the start of the 0x200 bytes.
+The remaining reserved palette space is unused which is fine (TP does this with its banner).
+
+- See <Link to="/docs/save-file/memory-card">Memory Card</Link> for more info.

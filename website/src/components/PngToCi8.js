@@ -42,7 +42,7 @@ function genBtiData({ width: w, height: h, data }) {
     paletteEntries[color] = true;
 
     if (Object.keys(paletteEntries).length > 0x100) {
-      throw new Error('PNG can have at most 256 unique pixel rgba values.');
+      return 'PNG can have at most 256 unique pixel rgba values.';
     }
   }
 
@@ -97,64 +97,69 @@ export default function PngToCi8() {
   const [filename, setFilename] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  function onError(msg) {
+    setUrl('');
+    setFilename('');
+    setErrorMsg(msg);
+  }
+
   function handleChange(e) {
     const { files } = e.target;
 
+    setUrl('');
+    setFilename('');
+    setErrorMsg('');
+
     if (files.length < 1) {
-      setUrl('');
-      setFilename('');
-      setErrorMsg('');
       return;
     }
 
     const file = files[0];
 
     if (file.size > 100000) {
-      setUrl('');
-      setFilename('');
-      setErrorMsg(largeFileWarning);
+      onError(largeFileWarning);
       return;
     }
 
     const reader = new FileReader();
 
     reader.onload = function () {
-      try {
-        new PNG({ filterType: 4 }).parse(
-          Buffer.from(this.result),
-          function (error, data) {
-            if (error) {
-              throw new Error(error);
-            } else if (data.width * data.height >= 262144) {
-              throw new Error(largeFileWarning);
-            }
-
-            const btiBuffer = genBtiData(data);
-
-            const blob = new Blob([btiBuffer], {
-              type: 'application/octet-stream',
-            });
-
-            let outputFilename;
-
-            const origFilename = file.name;
-            if (origFilename.endsWith('.png')) {
-              outputFilename =
-                origFilename.substring(0, origFilename.length - 4) + '.bti';
-            } else {
-              outputFilename = origFilename + '.bti';
-            }
-
-            setUrl(window.URL.createObjectURL(blob));
-            setFilename(outputFilename);
-            setErrorMsg('');
+      new PNG({ filterType: 4 }).parse(
+        Buffer.from(this.result),
+        function (error, data) {
+          if (error) {
+            onError(error.message);
+            return;
+          } else if (data.width * data.height >= 262144) {
+            onError(largeFileWarning);
+            return;
           }
-        );
-      } catch (e) {
-        setUrl('');
-        setFilename('');
-        setErrorMsg(e.message);
-      }
+
+          const btiBuffer = genBtiData(data);
+          if (typeof btiBuffer === 'string') {
+            onError(btiBuffer);
+            return;
+          }
+
+          const blob = new Blob([btiBuffer], {
+            type: 'application/octet-stream',
+          });
+
+          let outputFilename;
+
+          const origFilename = file.name;
+          if (origFilename.endsWith('.png')) {
+            outputFilename =
+              origFilename.substring(0, origFilename.length - 4) + '.bti';
+          } else {
+            outputFilename = origFilename + '.bti';
+          }
+
+          setUrl(window.URL.createObjectURL(blob));
+          setFilename(outputFilename);
+          setErrorMsg('');
+        }
+      );
     };
 
     reader.readAsArrayBuffer(file);
