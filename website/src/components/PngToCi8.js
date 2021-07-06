@@ -4,11 +4,10 @@ import { Readable } from 'stream';
 import { Buffer } from 'buffer';
 import styles from './PngToCi8.module.css';
 
-function genBtiData(png) {
-  const data = png.data;
-  const w = png.width;
-  const h = png.height;
+const largeFileWarning =
+  'File seems quite large. Please open an issue if you need support for an image of this size.';
 
+function genBtiData({ width: w, height: h, data }) {
   const blockWidth = (w + 7) >> 3;
   const blockHeight = (h + 3) >> 2;
 
@@ -35,9 +34,8 @@ function genBtiData(png) {
     view.setUint32(i + paletteDataOffset, 0xffffffff);
   }
 
-  const arr = [];
-
-  const colorMap = {};
+  const pixelColors = [];
+  const paletteEntries = {};
 
   for (let i = 0; i < pixelDataLen; i++) {
     const blockIndex = i >> 5;
@@ -60,15 +58,15 @@ function genBtiData(png) {
       }
     }
 
-    arr[i] = color;
-    colorMap[color] = true;
+    pixelColors[i] = color;
+    paletteEntries[color] = true;
 
-    if (Object.keys(colorMap).length > 0x100) {
-      throw new Error('PNG must have 256 or fewer unique pixel rgba values.');
+    if (Object.keys(paletteEntries).length > 0x100) {
+      throw new Error('PNG can have at most 256 unique pixel rgba values.');
     }
   }
 
-  const sortedColors = Object.keys(colorMap)
+  const sortedColors = Object.keys(paletteEntries)
     .sort((a, b) => a - b)
     .map((a) => Number(a));
 
@@ -81,9 +79,8 @@ function genBtiData(png) {
     view.setUint16(paletteDataOffset + i * 2, sortedColors[i]);
   }
 
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = colorToIndex[arr[i]];
-    view.setUint8(0x20 + i, arr[i]);
+  for (let i = 0; i < pixelColors.length; i++) {
+    view.setUint8(0x20 + i, colorToIndex[pixelColors[i]]);
   }
 
   return view.buffer;
@@ -105,42 +102,53 @@ export default function PngToCi8() {
     }
 
     const file = files[0];
-    const origFilename = file.name;
 
-    let outputFilename;
-    if (origFilename.endsWith('.png')) {
-      outputFilename =
-        origFilename.substring(0, origFilename.length - 4) + '.bti';
-    } else {
-      outputFilename = origFilename + '.bti';
+    if (file.size > 100000) {
+      setUrl('');
+      setFilename('');
+      setErrorMsg(largeFileWarning);
+      return;
     }
 
     const reader = new FileReader();
 
     reader.onload = function () {
-      const buffer = Buffer.from(this.result);
+      try {
+        new PNG({ filterType: 4 }).parse(
+          Buffer.from(this.result),
+          function (error, data) {
+            if (error) {
+              throw new Error(error);
+            } else if (data.width * data.height >= 262144) {
+              throw new Error(largeFileWarning);
+            }
 
-      const readable = new Readable();
-      readable._read = () => {
-        readable.push(buffer);
-        readable.push(null);
-      };
+            const btiBuffer = genBtiData(data);
 
-      readable.pipe(new PNG({ filterType: 4 })).on('parsed', function () {
-        try {
-          const buffer = genBtiData(this);
+            const blob = new Blob([btiBuffer], {
+              type: 'application/octet-stream',
+            });
 
-          const blob = new Blob([buffer], { type: 'application/octet-stream' });
-          const url = window.URL.createObjectURL(blob);
-          setUrl(url);
-          setFilename(outputFilename);
-          setErrorMsg('');
-        } catch (e) {
-          setUrl('');
-          setFilename('');
-          setErrorMsg(e.message);
-        }
-      });
+            let outputFilename;
+
+            const origFilename = file.name;
+            if (origFilename.endsWith('.png')) {
+              outputFilename =
+                origFilename.substring(0, origFilename.length - 4) + '.bti';
+            } else {
+              outputFilename = origFilename + '.bti';
+            }
+
+            setUrl(window.URL.createObjectURL(blob));
+            setFilename(outputFilename);
+            setErrorMsg('');
+          }
+        );
+      } catch (e) {
+        setUrl('');
+        setFilename('');
+        setErrorMsg(e.message);
+      }
     };
 
     reader.readAsArrayBuffer(file);
