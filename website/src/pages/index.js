@@ -35,6 +35,15 @@ function HomepageHeader() {
           >
             Technical Explanations
           </Link>
+          <Link
+            className={clsx(
+              'button button--secondary button--lg',
+              styles.button
+            )}
+            to="/png-to-ci8"
+          >
+            PNG to BTI
+          </Link>
         </div>
       </div>
     </header>
@@ -101,7 +110,7 @@ export default function Home() {
           Not looking for PRs just yet. Select a button above to see some
           documentation.
           <br />
-          Plan to add more and more to this site over time.
+          Plan to add more to this site over time.
         </div>
         <HomepageFeatures />
       </main>

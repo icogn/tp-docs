@@ -160,6 +160,7 @@ export default function PngToCi8() {
     reader.readAsArrayBuffer(file);
   }
 
+  // p tag at bottom is to provide the standard amount of space in the document
   return (
     <>
       <form>
@@ -171,6 +172,7 @@ export default function PngToCi8() {
         </a>
       )}
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
+      <p></p>
     </>
   );
 }

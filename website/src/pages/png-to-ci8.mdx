@@ -1,23 +1,47 @@
 # PNG to BTI
 
+import Link from '@docusaurus/Link';
 import PngToCi8 from '@local/PngToCi8';
 
-This page provides an easy way to convert PNGs to BTIs.
-
-The motivation for this page was to allow people to create memory efficient icons and banners for GCI files, so it currently only generates BTIs with the following configuration:
+The goal of this page is to provide a way to create memory efficient icons and banners for GCI files, so it currently only generates BTIs with the following configuration:
 
 - Image is CI8 format
 - Palette is RGB5A3 format
 
+There are other tools (such as <Link to="https://szs.wiimm.de/wimgt/">wimgt</Link>) which handle general image conversion, but they do not support BTI files with palettes.
+
+**For a GCI file with a single icon and banner, you waste nearly half a block by not using a palette!**
+
 :::caution
 
-The image can have a maximum of 0x100 (256 decimal) different pixel colors (rgba values). If you have GIMP, you can select Image > Mode > Indexed.
+The image can have a maximum of 0x100 (256 decimal) different pixel colors (rgba values).
+If your image's palette is too large, you can use GIMP to shrink it.
+In GIMP, select Image > Mode > Indexed.
 Under "Colormap" in the popup, set the maximum number of colors to 256, then hit "Convert". Now you can export the file as a new PNG which will fit within the palette entry limit.
 
 :::
+
+---
 
 ## Converter
 
 Click the button below, then select a PNG file to convert to BTI format.
 
 <PngToCi8 />
+
+<br />
+
+---
+
+## GCI Header
+
+If you use files you generate here in a GCI file, make sure the header has the following values:
+
+- Offset 0x07 (imageFlags, u8) - The least significant 2 bits are 0b01. The value will likely be either 0x01 or 0x05.
+- Offset 0x30 (iconFormats, u16) - For a single icon, the value here should be 0x0001.
+
+:::note
+
+This section applies to the DirectoryEntry on a memory card as well (since this is what a GCI header is).
+
+:::
