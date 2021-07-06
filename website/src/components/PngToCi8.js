@@ -14,26 +14,6 @@ function genBtiData({ width: w, height: h, data }) {
   const pixelDataLen = blockWidth * 8 * blockHeight * 4;
   const paletteDataOffset = 0x20 + pixelDataLen;
 
-  const outputBuffer = new ArrayBuffer(paletteDataOffset + 0x200);
-  const view = new DataView(outputBuffer);
-
-  view.setUint8(0, 0x09);
-  view.setUint8(1, 0x02);
-  view.setUint16(2, w);
-  view.setUint16(4, h);
-  view.setUint8(8, 0x01);
-  view.setUint8(9, 0x02);
-  view.setUint16(0xa, 0x0100);
-  view.setUint32(0xc, paletteDataOffset);
-  view.setUint8(0x14, 0x01);
-  view.setUint8(0x15, 0x01);
-  view.setUint8(0x18, 0x01);
-  view.setUint32(0x1c, 0x20);
-
-  for (let i = 0; i < 0x200; i += 4) {
-    view.setUint32(i + paletteDataOffset, 0xffffffff);
-  }
-
   const pixelColors = [];
   const paletteEntries = {};
 
@@ -75,10 +55,36 @@ function genBtiData({ width: w, height: h, data }) {
     return acc;
   }, {});
 
+  let numPaletteEntries = (sortedColors.length + 0xe) >> 4;
+  numPaletteEntries = numPaletteEntries << 4;
+  const numPaletteBytes = numPaletteEntries * 2;
+
+  const outputBuffer = new ArrayBuffer(paletteDataOffset + numPaletteBytes);
+  const view = new DataView(outputBuffer);
+
+  // Write BTI header
+  view.setUint8(0, 0x09);
+  view.setUint8(1, 0x02);
+  view.setUint16(2, w);
+  view.setUint16(4, h);
+  view.setUint8(8, 0x01);
+  view.setUint8(9, 0x02);
+  view.setUint16(0xa, numPaletteEntries);
+  view.setUint32(0xc, paletteDataOffset);
+  view.setUint8(0x14, 0x01);
+  view.setUint8(0x15, 0x01);
+  view.setUint8(0x18, 0x01);
+  view.setUint32(0x1c, 0x20);
+
+  // Write palette data
+  for (let i = 0; i < numPaletteBytes; i += 4) {
+    view.setUint32(i + paletteDataOffset, 0xffffffff);
+  }
   for (let i = 0; i < sortedColors.length; i++) {
     view.setUint16(paletteDataOffset + i * 2, sortedColors[i]);
   }
 
+  // Write pixel data
   for (let i = 0; i < pixelColors.length; i++) {
     view.setUint8(0x20 + i, colorToIndex[pixelColors[i]]);
   }
