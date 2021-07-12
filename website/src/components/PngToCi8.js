@@ -55,8 +55,7 @@ function genBtiData({ width: w, height: h, data }) {
     return acc;
   }, {});
 
-  let numPaletteEntries = (sortedColors.length + 0xe) >> 4;
-  numPaletteEntries = numPaletteEntries << 4;
+  const numPaletteEntries = (sortedColors.length + 0xf) & 0xfffffff0;
   const numPaletteBytes = numPaletteEntries * 2;
 
   const outputBuffer = new ArrayBuffer(paletteDataOffset + numPaletteBytes);
