@@ -110,7 +110,7 @@ export default function Home() {
           Not looking for PRs just yet. Select a button above to see some
           documentation.
           <br />
-          Plan to add more to this site over time. Test gh-actions
+          Plan to add more to this site over time.
         </div>
         <HomepageFeatures />
       </main>
