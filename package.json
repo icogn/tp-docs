@@ -1,8 +1,0 @@
-{
-  "devDependencies": {
-    "docusaurus-plugin-module-alias": "^0.0.2"
-  },
-  "dependencies": {
-    "clsx": "^1.1.1"
-  }
-}

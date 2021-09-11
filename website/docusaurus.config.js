@@ -111,7 +111,7 @@ module.exports = {
   plugins: [
     path.resolve(__dirname, 'plugins/webpack-provide-plugin'),
     [
-      'docusaurus-plugin-module-alias',
+      path.resolve(__dirname, 'plugins/alias-plugin'),
       {
         alias: {
           '@local': path.resolve(__dirname, './src/components'),
