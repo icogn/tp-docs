@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Install dependencies
+      - name: Build
         run: |
           cd website
           yarn
