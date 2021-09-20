@@ -1,25 +1,225 @@
 # Snowpeak Ruins Lock Softlock
 
 import Link from '@docusaurus/Link';
-import introVid from '@site/static/video/sprLv5KeySoftlock/output18.mp4';
 import DocVideo from '@local/DocVideo';
 
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
+import introVid from '@site/static/video/sprLv5KeySoftlock/sprLockSoftlock.mp4';
+import framesVid from '@site/static/video/sprLv5KeySoftlock/sprLockFrames.mp4';
+import statusFixVid from '@site/static/video/sprLv5KeySoftlock/sprLockFixStatus.mp4';
+import openToLandFixVid from '@site/static/video/sprLv5KeySoftlock/sprLockFixOpenToLand.mp4';
+import fallAdjustFixVid from '@site/static/video/sprLv5KeySoftlock/sprLockFixFallAdjust.mp4';
+import matchSideFixVid from '@site/static/video/sprLv5KeySoftlock/sprLockFixMatchSide.mp4';
+import bounceBackVid from '@site/static/video/sprLv5KeySoftlock/sprLockBounceBack.mp4';
+import fallFromHighVid from '@site/static/video/sprLv5KeySoftlock/sprLockFallFromHigh.mp4';
 
-First, here is a video of the softlock:
+Only one of the four small key doors in Snowpeak Ruins can be unlocked from either side without
+issue.
+Unlocking any of the others from the side opposite the lock will cause the player to stand in front of the door forever.
 
 <DocVideo src={introVid} />
 
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
-This page explains how the Snowpeak Ruins (SPR) Lock Softlock works and various ways to fix it.
+## Why does this happen?
 
-First, here is a video of the softlock:
+In short, the lock falls through the floor instead of bouncing. This means it gets stuck partway through its unlock sequence, so it never communicates that the player can proceed through the door.
+
+### Lock Actions
+
+When the lock is in the camera's <Link to="https://wikipedia.org/wiki/Viewing_frustum">view frustum</Link>, it executes one Action per frame (in most cases).
+
+The lock's possible Actions are: Wait, Open, Fall, Land, and Shake.
+
+- When the lock is created, it is put in Wait during which it sits there and does nothing.
+- If the player tries to unlock it without a key, it enters Shake before returning to Wait.
+- If the player unlocks it, its Action changes to Open, then Fall, then ends on Land.
+
+<DocVideo src={framesVid} />
+
+:::note
+
+For the above video, plain text indicates the active Action at the start of the frame.
+Italic text indicates change during the execution of that frame.
+The image behind the text is what is drawn as a result of that frame (ignoring the frame delay between calculation and seeing the result on the screen). Video shows 3 frames per second.
+
+:::
+
+### Lock Phases
+
+Within each Action, the lock progresses through phases.<br/>
+Here is a list of each Action and its phases:
+
+- Wait
+  - Lock sits in place. Changes to either Shake or Open.
+  - Phases:
+    - 1 - Lock sits in place. Changes to Shake if `status` is set to 1, or
+      changes to Open if set to 2.
+- Open
+  - Lock is unlocking. Changes to Fall.
+  - Phases:
+    - 1 - Plays unlock animation. Changes to Fall once animation finishes.
+- Fall
+  - Lock falls straight down, hits ground, and bounces up and away from door.
+    Changes to Land.
+  - Phases:
+    - 1 - Drops straight to ground. Ground collision starts phase 2.
+    - 2 - Bounces away from door. Ground collision changes to Land.
+- Land
+  - Lock tilts over to rest on the ground. The player proceeds through the door
+    after this finishes.
+  - Phases:
+    - 1 - Lock tilts toward ground. Phase ends once xRotation is greater than or
+      equal to 0x4000 (flat with ground).
+    - -1 - Changes to this phase when phase 1 finishes. This is also when
+      `status` is changed to 3 to communicate that the door can be opened.
+- Shake
+  - Lock shakes because the player tried to open the door without a key. Changes back
+    to Wait.
+  - Phases:
+    - 1 - Wait as the player grabs the door knob. Runs for 30 frames.
+    - 2 - Lock bounces off door twice.
+
+#### Phases 0 and -1
+
+Each Action also has a phase 0 for initialization and -1 for cleanup.
+
+When swapping to a new Action, the current Action (if it exists) is run in phase -1, then the new Action is run in phase 0. When an Action runs in phase 0, it is responsible for updating the phase to a nonzero value.
+
+For example, three Actions could execute during a single frame as follows:
+
+- Wait runs in phase 1. It determines `status` is now 2, so it calls `setAction` to Open.
+- `setAction` runs Wait in phase -1.
+- `setAction` runs Open in phase 0. Open in phase 0 changes the phase to 1 for the next frame.
+
+However, most frames only see a single Action execute.
+
+:::tip
+
+All of the lock Actions do things in phase 0, but none of them do anything during phase -1.
+
+:::
+
+### Door-Lock Communication
+
+The lock has a `status` property which is used to communicate with the door.
+
+Valid lock `status` values are as follows:
+
+- 0 or `LOCKED`
+  - Initializes to this value.
+- 1 or `UNLOCK_FAIL`
+  - The door instance sets `status` to this when the player tries to unlock the door but has no key. Lock will change to Shake Action.
+- 2 or `UNLOCK_PASS`
+  - The door instance sets `status` to this when the player tries to unlock the door and has a key. Lock will change to Open Action.
+- 3 or `UNLOCKED`
+  - Lock sets `status` to this value when the Land Action finishes.
+
+The door instance sets `status` to 2 when unlocking the door, then it checks each frame if `status` has been changed to 3.
+When the check passes, the player is told to proceed through the door.
+
+In the case of the softlock, the Land Action never finishes since the lock gets stuck in the Fall Action, so `status` is never changed from 2 to 3.
+
+:::tip
+
+The doors which watch the locks are instances of `d_a_door_shutter`.
+The locks are instances of `d_a_obj_Lv5Key`.
+
+:::
+
+## Ways to fix it
+
+Here are some ways to fix the softlock:
+
+- Set `status` to 3 ourselves.
+- Tell the lock that the Land Action comes after Open (skips the problematic Fall Action).
+- Force the lock to proceed through the Fall Action at the correct frame counts regardless of when it thinks it should change.
+- Ensure ground collision always occurs during the Fall Action.
+
+### Force door opening
+
+We can set `status` to 3 as soon as the lock initializes its Open Action.
+We don't really care what happens to it after this point as long as we make it through the door.
+
+<DocVideo src={statusFixVid} />
+
+Disadvantages:
+
+- Door opens faster than it normally would.
+- Result is visually confusing.
+
+### Skip to Land state
+
+In order to change to the Fall Action after completing Open, the lock reads from an address which contains a pointer to the Fall function.
+We can modify this address to instead point to Land which causes Open to skip Fall and go straight to Land.
+
+<DocVideo src={openToLandFixVid} />
+
+Advantages:
+
+- Implementation is extremely simple.
+
+Disadvantages:
+
+- Door opens faster than it normally would.
+- Result is visually confusing.
+
+### Force Fall duration
+
+The following are true for every instance of the lock when it behaves as intended:<br/>
+
+- The first phase of Fall runs for exactly 3 frames.
+- The second phase of Fall runs for exactly 6 frames.
+
+The ground collision which normally triggers the phase and Action changes is unreliable (this is the cause of the softlock).
+Since we already know when the changes need to occur, we can ignore the ground checks and instead force the lock to progress at the right times.
+
+<DocVideo src={fallAdjustFixVid} />
+
+Advantages:
+
+- Lock works exactly how you would expect as a player.
+
+Disadvantages:
+
+- Implementation is complex.
+
+This is an acceptable solution, but the next one is a little better.
+
+### Keep lock on player's side
+
+We can update the lock's Wait function keep the lock on the same side as the player.
+The lock will always collide with the ground in this case, so the softlock is avoided.
+
+<DocVideo src={matchSideFixVid} />
+
+Advantages:
+
+- Lock works exactly how you would expect as a player.
+- Implementation is simple.
+- Player can easily see whether a door is locked or unlocked.
+
+:::note
+
+You might be thinking you can manipulate the camera to cause the lock to change to Open before Wait has a chance to put it on the correct side of the door.
+Remember that Wait is what says when to swap to Open, so such manipulation is not possible.
+
+:::
+
+## Other Thoughts
+
+### Naming
+
+- "Action", "Wait", "Open", "Fall", "Land", and "Shake" are all actual function names.
+- The terms "phase", "status", and the names for each status are made-up.
+
+### Videos
+
+#### Speed Angle
+
+If you change the lock's position to be on the same side of the door as the player but forget to change its speed angle, you can see the Fall Action make it to phase 2 but still fail to reach the Land Action.
+
+<DocVideo src={bounceBackVid} />
+
+#### Lock works from any height on the door
+
+The lock's Fall Action may have been written to use ground collision so that the height at which the lock is placed on the door could be adjusted without having to change any code or animations.
+
+<DocVideo src={fallFromHighVid} />

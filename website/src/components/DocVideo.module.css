@@ -1,6 +1,7 @@
 .videoWrapper {
   width: 100%;
   margin-bottom: var(--ifm-leading); /* match basic <p> tag in doc */
+  position: relative;
 }
 
 .video {
