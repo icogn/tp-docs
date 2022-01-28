@@ -1,0 +1,866 @@
+# Rando SeedInfo ARCP Structure Proposal
+
+import Link from '@docusaurus/Link';
+
+This page describes a alternative way of storing ARC patching instructions in a TPRando seed GCI.
+
+_Note: You will see this section of the seed GCI referred to as the `ARCP` section (for arc patching).<br/>
+This naming is inspired by what you already see in the game files, such as `RARC`, `J3D2`, `BMDR`, etc._
+
+## Motivation
+
+A smaller GCI is generally more desirable than a large one, but the GCI's block count is especially important for console players.
+
+If a user is putting 10 seed GCIs on their memory card as advertised, increases in block size are multiplied by 10.
+
+That is to say, an increase in block size from 3 to 4 is more like changing from 30 to 40.
+Likewise, shaving off a block from the size is more like shaving off 10 blocks.
+
+So it is reasonable to shave off blocks from the size if we are able to.
+
+_(This is why I think there should be an option to generate seed GCIs which leave out the image data.)_
+
+## Benefits
+
+- With the current data of 332 patches (288 items and 44 message indexes), we cut the Arc Patch section of the seed GCI down to approximately 27% of its current size (from 0x2980 bytes to 0xB40).
+  - The will allow Seed GCIs to likely be reduced to a single block (not counting the imageData/comments block).
+- Only do as many `my_DVDConvertPathToEntrynum` calls as absolutely necessary instead of one per patch.
+  - This goes from 332 calls to roughly 124.
+- Instead of scanning through every patch every time you might want to apply one, simply scan by `entryNum` then immediately apply all patches once/if you find a match.
+- Supports patching arcs in ways more complex than simply 1, 2, or 4 bytes.
+
+### Trade-offs
+
+- Need to generate the arc `entryNum` lookup table at runtime (only do this once).
+
+## At a high level
+
+When "arcA" is loaded, we check if this arc needs to be patched.
+If it does, we apply the appropriate patches.
+
+This means that we need a list of arc identifiers, with each entry mapping to a list of patches to apply:
+
+- arcsToPatch => [arcA, arcD, arcQ, arc7, arcC, arc2, ...]
+
+Within the list, each arc must map to a list of patches:
+
+- arcA => [patch0, patch1, patch2, ...]
+
+### The problem
+
+This would be simple enough, but the problem is that we must wait until runtime to generate the arc identifiers.
+
+For example:
+
+- We want to patch `/res/Stage/D_MN10/R00_00.arc`.
+- At runtime, we are notified that arc `000005AC` was just loaded.
+- We scratch our head, because we only know the string path of the arc, not its runtime identifier.
+
+In other words, we need this:
+
+- arcsToPatch => [arcA, arcD, ...]
+- arcA => [patch0, patch1, patch2, ...]
+
+but we have this:
+
+- arcsToPatch => ['/res/Stage/D_MN10/R00_00.arc', '/res/Stage/D_MN01/R03_00.arc', ...]
+- '/res/Stage/D_MN10/R00_00.arc' => [patch0, patch1, patch2, ...]
+
+Fortunately, the game uses a function to convert between the filepath and its identifier, and we can use this as well.
+
+So essentially, the complexity comes from the above conversion which must happen at runtime.
+
+:::note
+
+We can document all of the path-to-identifier mappings so that we know them at compile time.
+The problem is that if the user is playing on a modified ROM (such as tpgz), the identifiers for a given path may be different.
+
+:::
+
+## Current structure
+
+The current approach is fairly straightforward.
+
+We store an array which contains one entry for each patch.
+
+Each entry specifies:
+
+- the arc's filepath
+- where to apply the patch
+- the patch data to apply
+
+Size is 0x20 bytes.
+
+| Offset | Type       | Name              | Description                                                                 |
+| ------ | ---------- | ----------------- | --------------------------------------------------------------------------- |
+| 0x00   | u32        | offset            | The offset of the byte where the item is stored from the start of the file. |
+| 0x04   | u32        | arcFileIndex      | The index of the file that contains the check.                              |
+| 0x08   | u32        | replacementValue  | Used to be item (byte), but can be more now.                                |
+| 0xC    | char[0x12] | fileName          | The name of the file where the check is stored.                             |
+| 0x1E   | u8 (enum)  | fileDirectoryType | The type of directory where the check is stored.                            |
+| 0x1F   | u8 (enum)  | replacementType   | The type of replacement that is taking place.                               |
+
+Here is an example:
+
+| Offset | Type       | Name              | Value                                                                  |
+| ------ | ---------- | ----------------- | ---------------------------------------------------------------------- |
+| 0x00   | u32        | offset            | 0x8450C                                                                |
+| 0x04   | u32        | arcFileIndex      | (Placeholder space which is filled at runtime by entryNum of arc file) |
+| 0x08   | u32        | replacementValue  | 0x42 (Ball and Chain itemId)                                           |
+| 0xC    | char[0x12] | fileName          | "D_MN11/R00_00.arc"                                                    |
+| 0x1E   | u8 (enum)  | fileDirectoryType | 0x0 (Stage)                                                            |
+| 0x1F   | u8 (enum)  | replacementType   | 0x0 (Item)                                                             |
+
+### Problems with the current stucture
+
+The main problem is the amount of space this takes up.
+
+The expected patch count is currently 332.
+
+> 0x20 bytes per patch \* 332 patches => 0x2980 bytes
+
+Yikes!
+A block is only 0x2000 bytes, so we are using more than a block for this portion of the seed data alone.
+Surely we can do better.
+
+### How to improve
+
+The most obvious thing to look at is the `fileName`, which takes up 0x12 bytes per patch.
+Remember, the patch is only 0x20 bytes long, so this means each seed would have 0x1758 bytes (1.5 blocks!) of the following:
+
+"D_MN11/R00_00.arc","D_MN11/R00_00.arc","D_MN11/R00_00.arc","D_MN11/R00_01.arc","D_MN11/R00_02.arc",...
+
+And yes, you would have several copies of the same string if you needed to do multiple patches to the same arc.
+
+#### Solution
+
+Rather than looking at each patch and asking which ARC it affects, we can instead look at a given ARC and determine its patches.
+So instead of having one string per patch, we could have many patches which are pointed to by one string (generally speaking).
+
+Essentially, this means changing the structure to be more like a hierarchy/tree.
+
+## Tree Structure
+
+Example high-level representation:
+
+```
+{
+  res: {
+    Stage: {
+      D_MN01: {
+        R00_00: { patches: [] },
+        R01_00: { patches: [] },
+        R03_00: { patches: [] },
+        R05_00: { patches: [] },
+        R06_00: { patches: [] },
+        R07_00: { patches: [] },
+        R08_00: { patches: [] },
+        R09_00: { patches: [] },
+        R10_00: { patches: [] },
+        R11_00: { patches: [] },
+        R12_00: { patches: [] },
+        R13_00: { patches: [] },
+      },
+      D_MN01B: {
+        R51_00: { patches: [] },
+      },
+      D_MN04: {
+        R01_00: { patches: [] },
+        R03_00: { patches: [] },
+        R04_00: { patches: [] },
+        R06_00: { patches: [] },
+        R07_00: { patches: [] },
+        R09_00: { patches: [] },
+        R11_00: { patches: [] },
+        R14_00: { patches: [] },
+        R16_00: { patches: [] },
+        R17_00: { patches: [] },
+      },
+      D_MN05: {
+        R00_00: { patches: [] },
+        R01_00: { patches: [] },
+        R02_00: { patches: [] },
+        R03_00: { patches: [] },
+        R05_00: { patches: [] },
+        R09_00: { patches: [] },
+        R10_00: { patches: [] },
+        R11_00: { patches: [] },
+        R22_00: { patches: [] },
+      },
+      // ...
+    },
+  },
+}
+```
+
+:::tip
+
+That looks an awful lot like the game's directory structure.
+
+:::
+
+Describing the tree will have some overhead, but we will be eliminating a ton of wasteful string data, so we will have plenty of space to work with.
+
+### Building the structure
+
+- We can treat each directory and file as a node.
+  - The nodes themeselves can be stored in an array.
+- We need to be able to look at a node and determine if it is a file or a directory.
+- If the node is a directory, we need to be able to find its children.
+- If the node is a file, we need to be able to find its patches.
+- We need to be able to determine the string name of each node.
+  - For example, "res" => "Stage" => "D_MN01"
+
+Let us define a node structure at a high-level:
+
+| Name     | Description                              |
+| -------- | ---------------------------------------- |
+| name     | Something like "res" or "D_MN05".        |
+| isDir    | Is this a directory or a file?           |
+| children | (directory only) Child nodes.            |
+| patches  | (file only) Patches for this (arc) file. |
+
+This is a little too abstract and needs to be broken down.
+
+First, let's learn from the <Link to="https://wiki.cloudmodding.com/tww/ARC">RARC structure</Link> and use a string table.
+
+We will end up with something like this:
+
+```
+72 65 73 00 53 74 61 67 65 00 44 5F 4D 4E 30 35  res.Stage.D_MN05
+00 44 5F 4D 4E 30 34 00 44 5F 4D 4E 30 31 00 44  .D_MN04.D_MN01.D
+5F 4D 4E 30 31 42 00 44 5F 4D 4E 31 30 00 44 5F  _MN01B.D_MN10.D_
+4D 4E 31 30 42 00 44 5F 4D 4E 31 31 00 44 5F 4D  MN10B.D_MN11.D_M
+4E 31 31 42 00 44 5F 4D 4E 30 36 00 44 5F 4D 4E  N11B.D_MN06.D_MN
+30 36 42 00 44 5F 4D 4E 30 37 00 44 5F 4D 4E 30  06B.D_MN07.D_MN0
+37 42 00 44 5F 4D 4E 30 38 00 44 5F 4D 4E 30 39  7B.D_MN08.D_MN09
+00 52 5F 53 50 30 31 00 44 5F 53 42 31 30 00 46  .R_SP01.D_SB10.F
+5F 53 50 31 30 38 00 52 5F 53 50 31 30 39 00 46  _SP108.R_SP109.F
+5F 53 50 31 32 31 00 46 5F 53 50 31 30 39 00 46  _SP121.F_SP109.F
+5F 53 50 31 31 31 00 46 5F 53 50 31 31 33 00 44  _SP111.F_SP113.D
+5F 53 42 30 33 00 46 5F 53 50 31 31 35 00 46 5F  _SB03.F_SP115.F_
+53 50 31 31 30 00 44 5F 53 42 30 32 00 46 5F 53  SP110.D_SB02.F_S
+50 31 32 32 00 46 5F 53 50 31 32 34 00 44 5F 53  P122.F_SP124.D_S
+42 30 34 00 46 5F 53 50 31 31 38 00 46 5F 53 50  B04.F_SP118.F_SP
+31 31 34 00 44 5F 53 42 30 30 00 46 5F 53 50 31  114.D_SB00.F_SP1
+31 37 00 46 5F 53 50 31 31 36 00 62 6D 67 72 65  17.F_SP116.bmgre
+73 35 00 62 6D 67 72 65 73 31 00 62 6D 67 72 65  s5.bmgres1.bmgre
+73 36 00 62 6D 67 72 65 73 34 00 62 6D 67 72 65  s6.bmgres4.bmgre
+73 32 00 62 6D 67 72 65 73 38 00 62 6D 67 72 65  s2.bmgres8.bmgre
+73 37 00 52 32 32 5F 30 30 00 52 30 30 5F 30 30  s7.R22_00.R00_00
+00 52 30 39 5F 30 30 00 52 30 32 5F 30 30 00 52  .R09_00.R02_00.R
+30 35 5F 30 30 00 52 30 33 5F 30 30 00 52 30 31  05_00.R03_00.R01
+5F 30 30 00 52 31 30 5F 30 30 00 52 31 31 5F 30  _00.R10_00.R11_0
+30 00 52 31 34 5F 30 30 00 52 30 34 5F 30 30 00  0.R14_00.R04_00.
+52 30 36 5F 30 30 00 52 30 37 5F 30 30 00 52 31  R06_00.R07_00.R1
+37 5F 30 30 00 52 31 36 5F 30 30 00 52 30 38 5F  7_00.R16_00.R08_
+30 30 00 52 31 32 5F 30 30 00 52 31 33 5F 30 30  00.R12_00.R13_00
+00 52 35 31 5F 30 30 00 52 31 35 5F 30 30 00 00  .R51_00.R15_00..
+```
+
+:::note
+
+Notice that we only need one copy of "R01_00" even though it is used in D_MN01, D_MN04, D_MN05, and I'm sure plenty of others.
+
+:::
+
+Revisiting the structure
+
+| Name                 | Type | Description                              |
+| -------------------- | ---- | ---------------------------------------- |
+| **_strTableOffset_** | u16? | Offset in string table                   |
+| isDir                | ?    | Is this a directory or a file?           |
+| children             | ?    | (directory only) Child nodes.            |
+| patches              | ?    | (file only) Patches for this (arc) file. |
+
+Let's look at "patches" now.
+
+A node can have an arbitrary number of patches, so let's go ahead and pull that out into its own table.
+
+| Name                  | Type | Description                                        |
+| --------------------- | ---- | -------------------------------------------------- |
+| strTableOffset        | u16? | Offset in string table                             |
+| isDir                 | ?    | Is this a directory or a file?                     |
+| children              | ?    | (directory only) Child nodes.                      |
+| **_patchTableIndex_** | u16? | (file only) Patches for this (arc) file.           |
+| **_numPatches_**      | u8?  | (file only) Number of patches for this (arc) file. |
+
+Let's look at "children" now.
+
+A child is a Node, and we already have a table for this.
+In fact, this structure we are describing is an entry in that table.
+
+| Name                 | Type | Description                                        |
+| -------------------- | ---- | -------------------------------------------------- |
+| strTableOffset       | u16? | Offset in string table                             |
+| isDir                | ?    | Is this a directory or a file?                     |
+| **_nodeTableIndex_** | u16? | (directory only) Index of first child node.        |
+| **_numChildren_**    | u8?  | (directory only) Number of Child nodes.            |
+| patchTableIndex      | u16? | (file only) Patches for this (arc) file.           |
+| numPatches           | u8?  | (file only) Number of patches for this (arc) file. |
+
+Let's see how much room this takes up:
+
+| Name                              | Type                                 |
+| --------------------------------- | ------------------------------------ |
+| isDir                             | 1 bit                                |
+| strTableOffset                    | 15 bits (10 is actually plenty here) |
+| nodeTableIndex or patchTableIndex | u16                                  |
+| numChildren or numPatches         | u8                                   |
+
+This takes up 5 bytes, which we can round up to 8.
+If we can get this down to 4 bytes, the space we need for the node table will be cut in half.
+
+We'll come back to this.
+
+## Patches
+
+When the ARC file is loaded, its path such as `/res/Stage/D_MN01/R01_00.arc` is converted to a u32 id called `entryNum`.
+
+Let's imagine we have a table which we will refer to as the RuntimeTable containing entries like the following:<br/>
+_(A better table name will be at end of this article once I come up with one.)_
+
+| Name            | Type |
+| --------------- | ---- |
+| entryNum        | u32  |
+| patchTableIndex | u16  |
+| numPatches      | u16  |
+
+Whenever an ARC is loaded, we can look at its `entryNum` then scan the above table.
+If we find a match, we can use `patchTableIndex` and `numPatches` alongside the patch table itself to handle applying the appropriate patches.
+
+Ideally, the only data we would have in the seed GCI's ARC patch section are the above RuntimeTable and the patch table.
+Unfortunately, we must wait until runtime to accurately convert filepaths to entryNums.
+
+Let's look at the chunks we have mentioned so far:
+
+| Name         | Needed when?                           |
+| ------------ | -------------------------------------- |
+| nodeTable    | Not needed after creating runtimeTable |
+| stringTable  | Not needed after creating runtimeTable |
+| patchTable   | Needed                                 |
+| runtimeTable | Generated at runtime                   |
+
+## Generating the RuntimeTable
+
+```
+{
+  res: {
+    Stage: {
+      D_MN01: {
+        R11_00: { patches: [] },
+        R12_00: { patches: [] },
+        R13_00: { patches: [] },
+      },
+      D_MN01B: {
+        R51_00: { patches: [] },
+      },
+      D_MN04: {
+        R01_00: { patches: [] },
+        R03_00: { patches: [] },
+        R04_00: { patches: [] },
+      },
+    },
+  },
+},
+```
+
+Let's pretend the above represents the ARCs which we want to patch.
+
+To generate the runtimeTable, we need to navigate through the tree and convert each File node into the following:
+
+| Name            | Type |
+| --------------- | ---- |
+| entryNum        | u32  |
+| patchTableIndex | u16  |
+| numPatches      | u16  |
+
+I'm going to keep track of a variable called `currentPatchIndex` to make a point later.
+
+Here is how that (depth-first) traversal would look:
+
+- `currentPatchIndex` is 0.
+- At root. Not a file. numChildren is 1.
+- At `res`. Not a file. numChildren is 1.
+- At `Stage`. Not a file. numChildren is 3.
+- At `D_MN01`. Not a file. numChildren is 3.
+- At `R11_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 0. Copy into RuntimeTableEntry0.
+  - the node's `numPatches` property is 1. Copy into RuntimeTableEntry0.
+  - Increase `currentPatchIndex` by the number of patches (1).
+    - `currentPatchIndex` becomes 1.
+- At `R12_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 1. Copy into RuntimeTableEntry1.
+  - the node's `numPatches` property is 3. Copy into RuntimeTableEntry1.
+  - Increase `currentPatchIndex` by the number of patches (3).
+    - `currentPatchIndex` becomes 4.
+- At `R13_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 4. Copy into RuntimeTableEntry2.
+  - the node's `numPatches` property is 1. Copy into RuntimeTableEntry2.
+  - Increase `currentPatchIndex` by the number of patches (1).
+    - `currentPatchIndex` becomes 5.
+- (That was the last entry in `D_MN01`, so will go to next child of `Stage`)
+- At `D_MN01B`. Not a file. numChildren is 1.
+- At `R51_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 5. Copy into RuntimeTableEntry3.
+  - the node's `numPatches` property is 2. Copy into RuntimeTableEntry3.
+  - Increase `currentPatchIndex` by the number of patches (2).
+    - `currentPatchIndex` becomes 7.
+- (That was the last entry in `D_MN01B`, so will go to next child of `Stage`)
+- At `D_MN04`. Not a file. numChildren is 3.
+- At `R01_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 7. Copy into RuntimeTableEntry4.
+  - the node's `numPatches` property is 4. Copy into RuntimeTableEntry4.
+  - Increase `currentPatchIndex` by the number of patches (4).
+    - `currentPatchIndex` becomes 11.
+- At `R03_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 11. Copy into RuntimeTableEntry5.
+  - the node's `numPatches` property is 1. Copy into RuntimeTableEntry5.
+  - Increase `currentPatchIndex` by the number of patches (1).
+    - `currentPatchIndex` becomes 12.
+- At `R04_00`. Is a file.
+  - `currentPatchIndex` and the node's `patchTableOffset` property are both 12. Copy into RuntimeTableEntry6.
+  - the node's `numPatches` property is 1. Copy into RuntimeTableEntry6.
+  - Increase `currentPatchIndex` by the number of patches (1).
+    - `currentPatchIndex` becomes 13.
+- (That was the last entry in `D_MN04`)
+- (That was the last entry in `Stage`)
+- (That was the last entry in `res`)
+- (That was the last entry of the root)
+- We are done.
+
+The key takeaways are the following:
+
+1. The traversal is deterministic (will always be done in the same order).
+1. `currentPatchIndex` and `patchTableOffset` are equal every step of the way.
+
+Thus we can conclude:
+
+- We do not need to store the patchTableOffset in the node data.
+
+Let's look at what a Node might look like now:
+
+| Name                      | Type                                 |
+| ------------------------- | ------------------------------------ |
+| isDir                     | 1 bit                                |
+| strTableOffset            | 15 bits (10 is actually plenty here) |
+| firstChildNodeIndex       | (directory only) u16                 |
+| numChildren or numPatches | u8                                   |
+
+- In the case of a File, we only need 24 bits.
+- In the case of a Directory, we need 40 bits.
+
+If we can get it down to <= 32 bits in the case of a Directory, then we can cut the nodeTable size in half.
+
+## DirInfoTable
+
+Here is something we can do:
+
+- Create another table called `dirInfoTable` which has entries like the following:
+
+| Name                | Type |
+| ------------------- | ---- |
+| firstChildNodeIndex | u16  |
+| numChildren         | u16  |
+
+- Then change Node to look like this:
+
+| Name                                    | Type                                 |
+| --------------------------------------- | ------------------------------------ |
+| isDir                                   | 1 bit                                |
+| strTableOffset                          | 15 bits (10 is actually plenty here) |
+| dirInfoIndex (dir) or numPatches (file) | u8                                   |
+
+We have pulled out the data which is only needed for the Directory nodes into their own table.
+There is only one entry for a directory node, and 0 for a file node.
+Since the majority of our nodes are files, this saves quite a bit of space.
+
+So now both the File node and Directory node only need 24 bytes.
+
+:::note
+
+We can store `dirInfoIndex` as a u8 because there is a maximum of 90 directory nodes in the game based on the exhaustive list of arc files which is well under the 255 max for a u8.
+
+Probably won't be doing anywhere close to 255 patches on an individual arc, so u8 for `numPatches` should be fine as well.
+
+:::
+
+But we can do even better.
+
+Storing this as 3 bytes would force us to round up to 4, but we can store it in 2 arrays so that we only use 3 bytes while still having the data nicely aligned.
+
+First array will contain NodeInfoA (size: 2 bytes):
+
+| Name                               | Type    |
+| ---------------------------------- | ------- |
+| isDir                              | 1 bit   |
+| Reserved bits (more on this later) | 3 bits  |
+| strTableOffset                     | 12 bits |
+
+Second array will contain NodeInfoB (size: 1 byte):
+
+| Name                                    | Type |
+| --------------------------------------- | ---- |
+| dirInfoIndex (dir) or numPatches (file) | u8   |
+
+At this point, we have all of the pieces we need to describe the following:
+
+- arcsToPatch => [arcA, arcD, arcQ, arc7, arcC, arc2, ...]
+
+Now we just need to go discuss this part:
+
+- arcA => [patch0, patch1, patch2, ...]
+
+## Patches Part 2
+
+A patch is made up of the following information:
+
+- Where should we overwrite bytes
+- What value should we write there
+
+### Patch offset
+
+The largest arc file is `/res/Object/Demo28_01.arc` which is 3603200 bytes when uncompressed, or 0x0036FB00.
+
+This means 3 bytes will always be enough to specify the offset at which we will write the patch.
+
+### Patch contents
+
+The first thing to note is that the patch we want to write could be 1, 2, or 4 bytes, so we will need a way to specify how many bytes we should write.
+
+Let's use a u8 enum for this.
+
+Here is what we have so far:
+
+| Name            | Type    |
+| --------------- | ------- |
+| patchType       | u8      |
+| offset          | 3 bytes |
+| Remaining space | 4 bytes |
+
+We can use the patchType enum to specify what is in the remaining space.
+
+For example, if we needed to patch an itemId which is 1 byte, we could have something like the following:
+
+`[00 05 E6 EC 00 00 00 45]`
+
+meaning:
+
+- patchType: 0 (ItemId)
+- offset: 0x05E6EC
+- value: 0x45 (`patchType` indicates that the value is 1 byte)
+
+Example 2:
+
+`[01 02 FB 6C 00 00 AB CD]`
+
+meaning:
+
+- patchType: 1 (ItemMessage)
+- offset: 0x02FB6C
+- value: 0xABCD (`patchType` indicates that the value is 2 bytes)
+
+If we have a type of patch that only needs to write 1, 2, 3, or 4 bytes, we can fit that into the remaining space.
+
+But what if we want to write more than 4 bytes?
+
+### Patch contents extended
+
+Let's create another chunk and call it patchExtensions.
+It is a stream of bytes which contains data for patches that are too big to fit into the 2nd half of the patch.
+
+A patch's `patchType` will indicate if a patch uses the patchExtensions chunk.
+
+For example:
+
+`[AB 01 A6 6F 01 23 00 0C]`
+
+meaning:
+
+- patchType: 0xAB (LongPatch) (enum value was chosen arbitrarily)
+- offset: 0x01A66F
+- patchExtensionsOffset: 0x0123
+- patchBytelength: 0x000C
+
+Notice that the 2nd group of 4 bytes has a completely different meaning than before.
+That is the power of using the `patchType` enum -- the remaining 4 bytes can be interpreted according to the value of the enum.
+
+The patchExtensions chunk is a stream of bytes, so according to the above Patch, we should start at byte 0x123 in the extensions chunk and copy 0xC bytes into the arc data starting at offset 0x01A66F.
+
+Here is an example of another kind of patch you might use:
+
+`[CD 0B FA E0 00 F3 00 FF]`
+
+meaning:
+
+- patchType: 0xCD (LongPatchSkipBytes)
+- offset: 0x0BFAE0
+- patchExtensionsOffset: 0x00F3
+- skipIfByteIs: 0xFF
+
+We didn't specify the byteLength, but let's check what the data looks like in the extensions section:
+
+`[00 08 67 FF FF 63 FF FF 12 34]`
+
+Let's assume that `LongPatchSkipBytes` means that the first 2 bytes in the extensions section will indicate the length.
+
+In this case, the byte length is 8.
+
+The `skipIfByteIs` is 0xFF, so we will copy the next 8 bytes, but we will skip over any bytes which have a value of 0xFF.
+
+Those were just some examples.
+You can really do whatever you want with the enum, and the good news is that you can easily add new enum types without breaking backwards compatibility.
+
+:::note
+
+This extension section is just an idea.
+It wouldn't be included until/unless we actually need it.
+
+:::
+
+### Patch Content Optimization
+
+Our patches currently look like the following:
+
+| Name            | Type    |
+| --------------- | ------- |
+| patchType       | u8      |
+| offset          | 3 bytes |
+| Remaining space | 4 bytes |
+
+In terms of our current seed's `ARCP` section size, these actually take up the majority of the space, so if we can improve this we will get some pretty significant gains.
+
+Of our 332 patches currently, 288 only need one byte of the "Remaining space" bytes (meaning they waste 3 bytes), and the other 44 are message indexes (meaning they waste 2 bytes).
+
+Let's create another chunk called patchContent and write the values that we would have put in the "Remaining space" in the above table there in a back-to-back fashion.
+
+As we iterate through the patches (which are now 4 bytes long), we can use `patchType` to determine how many bytes to read from the patchContent.
+We will keep track of our current position in patchContent (which is essentially a data stream) as we do this.
+
+So patches look like this now:
+
+| Name                           | Type    |
+| ------------------------------ | ------- |
+| patchType                      | u8      |
+| offset (to apply patch in arc) | 3 bytes |
+
+## Special String Values
+
+Earlier we described the string table.
+The keen eye may have noticed that it had `bmgres4` in it, but nothing like `Msgus`.
+
+This is because the exact name that should be used in place of `Msgus` depends on the TP region you are playing (US, PAL, JP) and will be filled in at runtime by the Randomizer.
+
+We can use a bit in the NodeA entry to indicate that it is a string enum and not a value in the string table as follows:
+
+| Name                               | Type    |
+| ---------------------------------- | ------- |
+| isDir                              | 1 bit   |
+| isStringEnum                       | 1 bit   |
+| Reserved bits (more on this later) | 2 bits  |
+| strTableOffset or stringEnum       | 12 bits |
+
+So for example:
+
+`[80 05]` is a directory node, and its name is stored at offset 0x5 in the string table.
+
+`[C0 AA]` is a directory node.
+It uses a string enum rather than the string table, and its enum is 0xAA.
+The Randomizer was compiled for the US version, so it knows that the value of enum 0xAA is `Msgus`.
+
+That should be all of the areas we need to discuss regarding the inner structure.
+
+## Header
+
+The entire structure is split up into the chunks we discussed above, so we will use a header to indicate things like the offset to a chunk and how many entries are in it.
+
+| Offset | Type    | Name             | Description                                         |
+| ------ | ------- | ---------------- | --------------------------------------------------- |
+| 0x00   | char[4] | offset           | Always "ARCP"                                       |
+| 0x04   | u8      | majorVersion     | This is independent of the randomizer version       |
+| 0x05   | u8      | minorVersion     | This is independent of the randomizer version       |
+| 0x06   | u16     | totalSize        | Total byte size of ARCP section                     |
+| 0x08   | u16     | nodeInfoAOffset  | Offset to NodeInfoA table                           |
+| 0x0A   | u16     | nodeInfoBOffset  | Offset to NodeInfoB table                           |
+| 0x0C   | u16     | numNodes         | Number of entries in NodeInfoA and NodeInfoB tables |
+| 0x0E   | u16     | dirInfoOffset    | Offset to DirInfo table                             |
+| 0x10   | u16     | numDirInfos      | Number of entries in DirInfo table                  |
+| 0x12   | u16     | strTableOffset   | Offset to string table                              |
+| 0x14   | u16     | patchTableOffset | Offset to Patch table                               |
+| 0x16   | u16     | numPatches       | Number of entries in Patch table                    |
+| 0x18   | u16     | patchExtOffset   | Offset to PatchExtensions chunk                     |
+| 0x8    | u8[8]   | padding/reserved | Currently unused, rounds header to 0x20 bytes       |
+
+- The section title of "ARCP" (short for Arc Patch) is to make it easier to visually understand what you are looking at when inspecting in a hex editor.
+  This is inspired by how many of the files are already handled in TP.
+  Might be useful some other way at some point as well.
+  We also have room for it.
+
+Major version is a u8 which gets incremented every time there is a change which breaks backwards compatibility.
+
+- The benefit of storing a version number at this level rather than just at the top SeedInfo level is that the Randomizer can check the ArcPatch section's version and run the appropriate routines based off of that (if that version of the Randomizer was supporting multiple ARCP major versions at the same time, for example).
+
+Minor version number is more for debugging purposes.
+This would be incremented whenever a non-breaking change is made, such as adding a `patchType` enum or a string enum such as the one which is used for `Msgus`.
+Non-breaking in the sense that version 42.4 is essentially a superset of 42.3.
+
+- Incrementing the major or minor version of the ARCP section would also increment the version number of SeedInfo as appropriate.
+
+- totalSize is the total number of bytes of the ARCP section.
+  Each chunk will be rounded to a multiple of 0x10, so this value will also always be rounded to 0x10.
+
+- patchExtOffset will be 0x0000 if there is no patchExtensions chunk (because it is not needed).
+  Or realistically it will always be 0x0000 until we actually have something that needs the extensions chunk.
+
+Now we are ready to put everything together.
+
+## Structure Definition
+
+The ARCP section will be broken into the following chunks:
+
+| Name            | Type   |
+| --------------- | ------ |
+| Header          | object |
+| NodeInfoA       | array  |
+| NodeInfoB       | array  |
+| DirInfo         | array  |
+| StrTable        | chunk  |
+| PatchTable      | array  |
+| PatchContent    | chunk  |
+| PatchExtensions | chunk  |
+
+At runtime, this will transform into another block of data:
+
+| Name            | Type   | source    |
+| --------------- | ------ | --------- |
+| RuntimeHeader   | object | generated |
+| ArcList         | array  | generated |
+| PatchTable      | array  | generated |
+| PatchExtensions | chunk  | copied    |
+
+:::note
+
+We may not actually want to add the PatchExtensions part until/unless it becomes necessary, but we can leave space for it in the header to make it easily backwards compatible.
+
+:::
+
+---
+
+### Structures in GCI
+
+**Header (size: 0x20):**
+
+| Offset | Type    | Name               | Description                                         |
+| ------ | ------- | ------------------ | --------------------------------------------------- |
+| 0x00   | char[4] | offset             | Always "ARCP"                                       |
+| 0x04   | u8      | majorVersion       | This is independent of the randomizer version       |
+| 0x05   | u8      | minorVersion       | This is independent of the randomizer version       |
+| 0x06   | u16     | totalSize          | Total byte size of ARCP section                     |
+| 0x08   | u16     | numNodes           | Number of entries in NodeInfoA and NodeInfoB tables |
+| 0x0A   | u16     | nodeInfoAOffset    | Offset to NodeInfoA table                           |
+| 0x0C   | u16     | nodeInfoBOffset    | Offset to NodeInfoB table                           |
+| 0x0E   | u16     | numDirInfos        | Number of entries in DirInfo table                  |
+| 0x10   | u16     | dirInfoOffset      | Offset to DirInfo table                             |
+| 0x12   | u16     | strTableOffset     | Offset to string table                              |
+| 0x14   | u16     | numPatches         | Number of entries in Patch table                    |
+| 0x16   | u16     | patchTableOffset   | Offset to Patch table                               |
+| 0x18   | u16     | patchContentOffset | Offset to Patch content stream                      |
+| 0x1A   | u16     | numArcs            | Number of nodes of type "File"                      |
+| 0x1C   | u16     | patchExtOffset     | Offset to PatchExtensions chunk (0 if unused)       |
+| 0x1E   | u8[2]   | padding/reserved   | Currently unused, rounds header to 0x20 bytes       |
+
+**NodeInfoA (size: 0x2):**
+
+| Type    | Name                                                    |
+| ------- | ------------------------------------------------------- |
+| 1 bit   | isDir                                                   |
+| 1 bit   | isStringEnum                                            |
+| 2 bits  | Reserved/unused bits                                    |
+| 12 bits | strTableOffset (u16 & 0xFFF) or stringEnum (u16 & 0xFF) |
+
+**NodeInfoB (size: 0x1):**
+
+| Offset | Type | Name                                    |
+| ------ | ---- | --------------------------------------- |
+| 0x0    | u8   | dirInfoIndex (dir) or numPatches (file) |
+
+**DirInfo (size: 0x4):**
+
+| Offset | Type | Name            |
+| ------ | ---- | --------------- |
+| 0x0    | u16  | firstChildIndex |
+| 0x2    | u16  | numChildren     |
+
+**StrTable:**
+
+Back-to-back null-terminated strings.
+
+**PatchTable (size: 0x4):**
+
+| Offset           | Type          | Name      |
+| ---------------- | ------------- | --------- |
+| 0x0              | u8            | patchType |
+| 0x0 & 0x00FFFFFF | u32 (3 bytes) | offset    |
+
+**PatchContent:**
+
+Stream of bytes.
+
+**PatchExtensions:**
+
+Optional chunk of bytes.
+Patches can point to data in here.
+
+### Generated Structures
+
+**RuntimeHeader:**
+
+Not really in the scope of this article to define an exact structure for this, but it will need something to do the following:
+
+- pointer/offset to ArcList
+- pointer/offset to PatchTable
+- pointer/offset to PatchExtensions
+- way to free data
+
+**ArcList:**
+
+| Offset | Type | Name                                                   |
+| ------ | ---- | ------------------------------------------------------ |
+| 0x0    | u32  | entryNum (returned from `my_DVDConvertPathToEntrynum`) |
+| 0x4    | u16  | patchTableIndex                                        |
+| 0x6    | u16  | numPatches                                             |
+
+**PatchTable (size: 0x8):**
+
+| Offset           | Type          | Name           |
+| ---------------- | ------------- | -------------- |
+| 0x0              | u8 (enum)     | patchType      |
+| 0x0 & 0x00FFFFFF | u32 (3 bytes) | offset         |
+| 0x4              | 4 bytes       | remainingSpace |
+
+**PatchExtensions:**
+
+Copied directly from ARCP section.
+Optional chunk of bytes.
+Patches can point to data in here.
+
+## Other thoughts
+
+There is another optimization which can be done.
+You can make a change such that:
+
+- `[bmgres1,bmgres4,bmgres5,bmgres6,bmgres7,bmgres8]`
+
+changes to something more like:
+
+- `[bmgres] => [1,4,5,6,7,8]`
+
+for this and similar strings, but this adds a lot of complexity (to generating the GCI) and saves very little space, so it is not really worth it.
+
+Here is validated example data which has you can view in a hex editor:
+
+<p>
+  <a target="_blank" href="/binData/arcpExampleData.bin">
+    Download arcpExampleData.bin
+  </a>
+</p>
