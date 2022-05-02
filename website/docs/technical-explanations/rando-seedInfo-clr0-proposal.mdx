@@ -318,12 +318,12 @@ Header is size 0x10 bytes.
 | Offset | Type      | Name                  | Description                                                                          |
 | ------ | --------- | --------------------- | ------------------------------------------------------------------------------------ |
 | 0x00   | char[4]   | magic                 | "CLR0"                                                                               |
-| 0x04   | u16       | maxEnum               | Any enum larger than this is guaranteed to not have any RGB values in the data.      |
-| 0x06   | u8 (enum) | dataStructure         | 0x00 means no RGB data (skip all recoloring). 0x01 is simplistic. 0x02 is complex.   |
-| 0x07   | u8        | bitTableOffset        | Offset to bitTable section relative to start of header. (Also the header size, 0x10) |
-| 0x08   | u16       | cummulativeSumsOffset | Offset to cummulativeSums section relative to start of header.                       |
-| 0x0a   | u16       | rgbDataOffset         | Offset to rgbData section relative to start of header.                               |
-| 0x0c   | u8[4]     | reserved              | reserved (must all be set to 0x00)                                                   |
+| 0x04   | u32       | totalByteSize         | Total number of bytes for chunk (including header and padding at end).               |
+| 0x08   | u16       | maxEnum               | Any enum larger than this is guaranteed to not have any RGB values in the data.      |
+| 0x0a   | u8 (enum) | dataStructure         | 0x00 means no RGB data (skip all recoloring). 0x01 is simplistic. 0x02 is complex.   |
+| 0x0b   | u8        | bitTableOffset        | Offset to bitTable section relative to start of header. (Also the header size, 0x10) |
+| 0x0c   | u16       | cummulativeSumsOffset | Offset to cummulativeSums section relative to start of header.                       |
+| 0x0e   | u16       | rgbDataOffset         | Offset to rgbData section relative to start of header.                               |
 
 Note that the sections of the CLR0 chunk are ordered as follows:
 
@@ -366,6 +366,12 @@ Notes on certain header properties:
 
 :::note
 
+The meaning of the last 5 bytes of the header can change if you were to add a new dataStructure type in addition to the 3 listed above.
+
+:::
+
+:::note
+
 It is recommended that the entire CLR0 chunk's byte length be rounded up to a multiple of 0x10 (as is recommended for all chunks) so that data is aligned correctly and so that seed data is easier to read in a hex editor.
 
 :::
@@ -374,7 +380,7 @@ It is recommended that the entire CLR0 chunk's byte length be rounded up to a mu
 
 If there is no RGB data at all (meaning the player does not want anything to be recolored), you can just set the entire CLR0 chunk to the following 0x10 bytes:
 
-"CLR0" followed by 0xc bytes which are all 0x00.
+"CLR0" 00 00 00 10 00 00 00 00 00 00 00 00
 
 :::
 
