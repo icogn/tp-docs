@@ -1,0 +1,434 @@
+# Rando SeedInfo CLR0 Structure Proposal
+
+This page describes a way of storing RGB colors in the TPRando seed GCI.
+The main purpose of these colors would be for recoloring things in the game (such as tunic color).
+
+## Intro
+
+The simplistic approach to storing these colors would be to have an array of 4-byte structures as follows:
+
+| Offset | Type  | Name      |
+| ------ | ----- | --------- |
+| 0x00   | u8    | isEnabled |
+| 0x01   | u8[3] | RGB       |
+
+Each thing you want to recolor would be represented by an enum such as:
+
+```
+{
+	Tunic: 0,
+	ZoraArmorPrimary: 1,
+	ZoraArmorSecondary: 2,
+	ZoraArmorHelmet: 3,
+	OrdonShield: 4,
+}
+```
+
+You would then have an array of the 4-byte structures such that the index in the array is the enum.
+
+```
+// Example byte array
+[
+	TunicEnabled,
+	TunicR,
+	TunicG,
+	TunicB,
+	ZoraArmorPrimaryEnabled,
+	ZoraArmorPrimaryR,
+	ZoraArmorPrimaryG,
+	ZoraArmorPrimaryB,
+	...
+]
+```
+
+`ZoraArmorPrimary` has a value of 1, so we would look at offset 1 in the array (starts at byte 0x04 since each structure is 4 bytes).
+
+With this approach, the size of the CLR0 structure would be 4 bytes \* numberOfSupportedEnums.
+
+In order to future-proof and in order to simultaneously support a more space-efficient design, we will want a header.
+
+## Header
+
+This chunk in the seed data is named CLR0.
+
+`CLR` is short for "color", and the 0 is essentially the version number.
+
+This follows the scheme that is used by pretty much every file in the game (that is, sections start with a 4-char label).
+
+---
+
+For the simplistic approach, let's go ahead and assume that the header is 0x10 bytes long and somewhere in there is a byte that indicates "hey, the data after the header is structured according to the simplistic approach".
+
+Adding to the example from before, the byte array would look like:
+
+```
+// Example byte array
+[
+	"C",
+	"L",
+	"R",
+	"0",
+	HeaderOffset_0x04,
+	HeaderOffset_0x05,
+	HeaderOffset_0x06,
+	HeaderOffset_0x07,
+	HeaderOffset_0x08,
+	HeaderOffset_0x09,
+	HeaderOffset_0x0a,
+	HeaderOffset_0x0b,
+	HeaderOffset_0x0c,
+	HeaderOffset_0x0d,
+	HeaderOffset_0x0e,
+	HeaderOffset_0x0f,
+	TunicEnabled,
+	TunicR,
+	TunicG,
+	TunicB,
+	ZoraArmorPrimaryEnabled,
+	ZoraArmorPrimaryR,
+	ZoraArmorPrimaryG,
+	ZoraArmorPrimaryB,
+	...
+]
+```
+
+## Space-efficient approach
+
+The above works well if you only need to store a few colors.
+But what if we need to be able to store 75 colors?
+
+This is not that farfetched when you consider that the Midna color customizations contain 7 distinct RGB values, and the Zora Armor contains 3.
+
+Also consider the case in which we support 75 recoloring options, but the player decided the only thing they want to recolor is the tunic (which takes 1 RGB value).
+With the simplistic approach, we would have approximately 74 \* 4 bytes of wasted data (296 or 0x128 bytes which is nearly 4% of a block).
+
+---
+
+Instead of including an array entry for every single enum, we would ideally only include entries for enums we are actually using.
+Then if the player only needed 2 colors, we would only need 6 bytes of RGB data instead of 3 \* 75 bytes.
+
+The problem then becomes how do we map an enum to its index in the RGB array (previously the enum and its index were always identical).
+
+## Mapping enum to rgb index
+
+Imagine we have a bunch of enums which are either enabled or disabled.
+
+| Enum   | Enabled? |
+| ------ | -------- |
+| 0x0000 | enabled  |
+| 0x0001 | no       |
+| 0x0002 | no       |
+| 0x0003 | enabled  |
+| 0x0004 | no       |
+| 0x0005 | enabled  |
+| 0x0006 | enabled  |
+| 0x0007 | no       |
+| 0x0008 | enabled  |
+| 0x0009 | no       |
+| 0x000a | enabled  |
+| 0x000b | no       |
+
+:::note
+
+The enums are u16 (not u8) so that we are not limited to 256 colors.
+We might never hit that limit, but it is not so unlikely that we shouldn't plan for it.
+
+:::
+
+The RGB array for this would look like:
+
+```
+// Example byte array
+[
+	enum_0000_R, enum_0000_G, enum_0000_B, // offset 0x0
+	enum_0003_R, enum_0003_G, enum_0003_B, // offset 0x3
+	enum_0005_R, enum_0005_G, enum_0005_B, // offset 0x6
+	enum_0006_R, enum_0006_G, enum_0006_B, // offset 0x9
+	enum_0008_R, enum_0008_G, enum_0008_B, // offset 0xc
+	enum_000a_R, enum_000a_G, enum_000a_B, // offset 0xf
+	...
+]
+```
+
+There are 2 things we need to be able to do given an enum:
+
+- Determine if it is enabled or not.
+- Find its index in the RGB data.
+
+---
+
+For example, using the above data, we want to find the RGB index of enum 0x8.
+
+(Let's assume we magically know that enum 0x8 is enabled for the time being)
+
+The solution is to count up how many of the enums 0 through 7 are enabled.
+
+Since enums 0, 3, 5, and 6 are enabled (4 total), enum 8's RGB index is 4.
+
+However, this way of determining the memory index is too slow and does not scale well.
+
+## Check enum is enabled
+
+Let's go ahead and answer the question of how we can tell that an enum is enabled.
+
+There is no reason to waste more than a single bit on this, so we only need one byte for every 8 enums (rounded up).
+
+```
+// pseudocode
+function isThisEnumEnabled(u16 myEnum) {
+	u16 tableIndex = myEnum >> 3;
+	u8 bitMask = 1 << (myEnum & 0x7);
+
+	// Assume we have a reference to the bitTable in the CLR0 chunk.
+	return (bitTable[tableIndex] & bitMask) !== 0;
+}
+```
+
+## Mapping enum to rgb index quickly
+
+If we are looking up enum 0x3e (62 decimal), instead of iterating through enums 0 through 0x3d and keeping track of how many are enabled, we can instead keep track of the cummulative results for every 8 enums.
+
+For example:
+
+| cummulativeSums Index | For Enums X to Y | Cummulative Count |
+| --------------------- | ---------------- | ----------------- |
+| 0x00                  | 0x0000 to 0x0007 | 0x0000            |
+| 0x01                  | 0x0008 to 0x000f | 0x0003            |
+| 0x02                  | 0x0010 to 0x0017 | 0x0005            |
+| 0x03                  | 0x0018 to 0x001f | 0x0005            |
+| 0x04                  | 0x0020 to 0x0027 | 0x0008            |
+| 0x05                  | 0x0028 to 0x002f | 0x000c            |
+| 0x06                  | 0x0030 to 0x0037 | 0x0010            |
+| 0x07                  | 0x0038 to 0x003f | 0x0012            |
+
+The index in the cummulative table is the same as the index in the bitTable.
+
+```
+enumNumber >> 3.
+```
+
+0x3e >> 3 gives 7.
+
+We check the cummulative value at index 7.
+The value for this is 0x12.
+
+So then we fetch the value from the bitTable at offset 7.<br/>
+Let's assume it like the following bits:
+
+0101 0110
+
+:::note
+
+From left to right, these bits are for enums 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, and 0x38.
+
+:::
+
+So now all we need to do is count the number of set bits to the right of our bit in question (which is bit 6 in this case), then add this value to the cummulative value (which we determined was 0x12).
+
+The number of set bits to the right of bit 6 is 3, so our RGB index for enum 0x3f is 0x15 (0x12 + 3).
+
+---
+
+So the final question to answer is how do we quickly count the number of bits to the right of bit 6.
+
+Fortunately, this is a solved problem.
+
+We can keep a small lookup table to quickly map from a bit pattern to the number of bits which are set.
+
+For 8 bits, there are 256 possible patterns.
+If we instead process each half of the 8 bits individually and add the results, we only need to handle 16 patterns:
+
+| bit pattern | num bits set |
+| ----------- | ------------ |
+| 0b0000      | 0            |
+| 0b0001      | 1            |
+| 0b0010      | 1            |
+| 0b0011      | 2            |
+| 0b0100      | 1            |
+| 0b0101      | 2            |
+| 0b0110      | 2            |
+| 0b0111      | 3            |
+| 0b1000      | 1            |
+| 0b1001      | 2            |
+| 0b1010      | 2            |
+| 0b1011      | 3            |
+| 0b1100      | 2            |
+| 0b1101      | 3            |
+| 0b1110      | 3            |
+| 0b1111      | 4            |
+
+```
+// pseudocode, from https://stackoverflow.com/questions/9949935/calculate-number-of-bits-set-in-byte
+uint8_t NIBBLE_LOOKUP [16] =
+{
+	0, 1, 1, 2, 1, 2, 2, 3,
+	1, 2, 2, 3, 2, 3, 3, 4
+};
+
+uint8_t count_ones (uint8_t byte)
+{
+	return NIBBLE_LOOKUP[byte & 0x0F] + NIBBLE_LOOKUP[byte >> 4];
+}
+```
+
+The above will return the total number of set bits in a byte, but we are only concerned with the bits to the right of a specific one, so we can adjust it to the following:
+
+```
+// pseudocode
+uint8_t NIBBLE_LOOKUP [16] =
+{
+	0, 1, 1, 2, 1, 2, 2, 3,
+	1, 2, 2, 3, 2, 3, 3, 4
+};
+
+uint8_5 BITS_TO_RIGHT_MASK [8] =
+{
+	0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f
+};
+
+// bitNumber is one of 0,1,2,3,4,5,6,7
+uint8_t count_ones_to_right_of_bit_number (uint8_t byte, uint8_t bitNumber)
+{
+	if (bitNumber === 0)
+	{
+		return 0;
+	}
+
+	uint8_t maskedByte = byte & BITS_TO_RIGHT_MASK[bitNumber];
+
+	uint8_t result = NIBBLE_LOOKUP[maskedByte >> 4]
+
+	if (bitNumber >= 5)
+	{
+		result += NIBBLE_LOOKUP[maskedByte & 0x0F];
+	}
+
+	return result;
+}
+```
+
+So we now have all of the tools we need.
+
+Let's talk about the entire CLR0 structure now.
+
+## CLR0 Header
+
+Header is size 0x10 bytes.
+
+| Offset | Type      | Name                  | Description                                                                          |
+| ------ | --------- | --------------------- | ------------------------------------------------------------------------------------ |
+| 0x00   | char[4]   | magic                 | "CLR0"                                                                               |
+| 0x04   | u16       | maxEnum               | Any enum larger than this is guaranteed to not have any RGB values in the data.      |
+| 0x06   | u8 (enum) | dataStructure         | 0x00 means no RGB data (skip all recoloring). 0x01 is simplistic. 0x02 is complex.   |
+| 0x07   | u8        | bitTableOffset        | Offset to bitTable section relative to start of header. (Also the header size, 0x10) |
+| 0x08   | u16       | cummulativeSumsOffset | Offset to cummulativeSums section relative to start of header.                       |
+| 0x0a   | u16       | rgbDataOffset         | Offset to rgbData section relative to start of header.                               |
+| 0x0c   | u8[4]     | reserved              | reserved (must all be set to 0x00)                                                   |
+
+Note that the sections of the CLR0 chunk are ordered as follows:
+
+- header
+- bitTable
+- cummulativeSums
+- rgbData
+
+Notes on certain header properties:
+
+- magic
+  - CLR0 could change to CLR1 and so on if we ever needed an entire restructure of this chunk for some reason (doesn't seem likely, especially with the dataStructure enum property).
+- maxEnum
+  - This is used to future-proof.
+    Let's assume at the current day we are using enums 0x0000 through 0x00ab.
+    If someone generates a seed today, its bitTable and cummulativeSums will be a certain size.
+    If someone then uses that seed with the newer randomizer 6 months later, that rando code might try to check "should I recolor enum 0xcc?"
+    If we didn't have a bounds on the maximum we should check, we would start reading bytes from outside the table and misinterpreting them.
+    This is needed for both the complex and the simplistic data structures.
+    - Note that this value should ideally be the largest enum which the player actually elected to recolor, not the largest one that could have been supported at the time the seed was generated.
+      The lower we can make this value, the smaller we can make both the bitTable and cummulativeSums sections.
+      - bitTable byte length should be ((maxEnum >> 3) + 1) rounded up to multiple of 2.
+      - cummulativeSums section byte length should be ((maxEnum >> 3) + 1) \* 2.
+- bitTableOffset
+  - The header is only 0x10 bytes long, so we don't need more than a byte for bitTableOffset.
+- cummulativeSumsOffset
+  The max enum is 0xffff.
+  (0xffff >> 3) is 0x1fff which is the maximum index of the bitTable.
+  So the max bitTable length is one more than that, or 0x2000.
+  Adding the 0x10 from the bitTableOffset, the largest value we could have for this is 0x2010, so u16 is enough for this field.
+- rgbDataOffset
+  - The max enum is 0xffff.
+    (0xffff >> 3) is 0x1fff which is the maximum index of the cummulativeSums section.
+    So the max cummulativeSums length is one more than that, or 0x2000.
+    Since each entry is a u16 (2 bytes), the maximum byte length of the cummulativeSums section is 0x4000.
+    Adding this to the maximum cummulativeSumsOffset which is 0x2010, the maximum possible rgbDataOffset value is 0x6010.
+    So a u16 is enough for rgbDataOffset.
+  - Note that the rgbData should immediately follow the cummulativeSums section.
+    The data within this section is not aligned since each entry is 3 bytes, and the entries are back-to-back.
+
+:::note
+
+It is recommended that the entire CLR0 chunk's byte length be rounded up to a multiple of 0x10 (as is recommended for all chunks) so that data is aligned correctly and so that seed data is easier to read in a hex editor.
+
+:::
+
+:::tip
+
+If there is no RGB data at all (meaning the player does not want anything to be recolored), you can just set the entire CLR0 chunk to the following 0x10 bytes:
+
+"CLR0" followed by 0xc bytes which are all 0x00.
+
+:::
+
+## CLR0 complex structure
+
+### bitTable
+
+bitTable section is an array of bytes which comes directly after the header.
+This section's byte length should be rounded up to a multiple of 2 bytes so that cummulativeSums section is aligned correctly.
+Padding byte (if needed) should be 0x00.
+
+### cummulativeSums
+
+cummulativeSums section is an array of u16 which comes directly after the bitTable section.
+
+### rgbData
+
+rgbData section is an array of RGB structs (which have length 3 bytes) which comes directly after the cummulativeSums section.
+
+## CLR0 simplistic structure
+
+Immediately following the header, you have an array of the following structure.
+
+| Offset | Type  | Name      |
+| ------ | ----- | --------- |
+| 0x00   | u8    | isEnabled |
+| 0x01   | u8[3] | RGB       |
+
+The enum's value is also the index for its data in this table.
+
+If the enum's value is greater than maxEnum in the header, then the recolor for that enum should not occur (this is true for both simplistic and complex).
+
+## Other notes
+
+### Optimal simplistic approach
+
+The simplistic approach is actually better to use if the following equation is true:
+
+4 \* (maxEnum + 1) <= roundUpTo2(3 \* ((maxEnum >> 3) + 1)) + 3 \* numEnumsWhichAreEnabled
+
+Basically:
+
+- maxEnum is exactly 0
+- maxEnum is 1, 2 or 3, and maxEnum and numEnumsWhichAreEnabled are equal
+
+### Future splitting up of recoloring
+
+Let's assume that the tunic recoloring is enum 0x0000.
+
+It is possible that in the future, we will want people to be able to recolor the hat and body separately.
+
+In that case, we can add 2 new enums (let's say 0x00cd and 0x00ce).
+
+Then in the rando code, we can check if either of these is enabled.<br/>
+If either is enabled, we will use the values from those enums and ignore enum 0x0000.
+
+We still want to support 0x0000 for backwards compatibility if neither of the new enums are enabled but 0x0000 is enabled.
