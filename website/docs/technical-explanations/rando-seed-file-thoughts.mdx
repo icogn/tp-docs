@@ -1,0 +1,182 @@
+# Thoughts on Rando Seed File Naming (and more)
+
+import Link from '@docusaurus/Link';
+import SeedFilenameGeneratorDemo from '@local/SeedFilenameGeneratorDemo/SeedFilenameGeneratorDemo';
+
+This page describes solutions to the following problems:
+
+- Randomizer and SeedData version schemes
+- Ten seed limit and internal gci filename clashes
+- Better seed image data handling
+- Debug info in the seed data to help when people report bugs
+
+### Before continuing
+
+Remember that a `GCI` is not a real concept from the GameCube's perspective.
+
+The first 0x40 bytes of a GCI file is a `DirectoryEntry` which lives on the special `Directory` block (and its backup block) on the memory card.
+These special blocks are the reason memory card sizes are values like 59 (which is 64 minus the reserved 5 special blocks).
+
+The remaining bytes (which will have a length that is a multiple of 0x2000) form a number of blocks which are stored on the memory card.
+They are not necessarily contiguous on the memory card (though you don't have to worry about this).
+
+I will use the term `GCI` to refer to a file and its metadata on the memory card, but keep in mind that GCIs are an invented concept that has nothing to do with Nintendo.
+
+## Version scheme
+
+- The `Randomizer` refers to the file (and its metadata/DirectoryEntry) on the memory card which makes everything happen and which takes the seed data as input.
+- A `Seed` or `SeedData` GCI refers to the file (and its metadata/DirectoryEntry) on the memory card which is used as input to the Randomizer.
+  It specifies things like where items go and what color your Tunic should be.
+
+Both of these things have a version number which consists of the following:
+
+| Type | Description  |
+| ---- | ------------ |
+| u16  | versionMajor |
+| u16  | versionMinor |
+
+- All `major version numbers` start at 1 and increment whenever there is a significant change.
+  - For the Randomizer, a major version change can happen whenever it feels appropriate.
+    Maybe this is when major refactoring occurs or major features are added.
+  - For the SeedData, a major version change MUST happen whenever there is a change to the file's internal structure such that the following is a true:
+    - The new SeedData file will not work in some ways with existing versions of the Randomizer.
+    - The ways the SeedData no longer works are considered significant enough that we do not want to allow people to even try to use those versions of the Randomizer and the SeedData together (more on this later).
+- All `minor version numbers` start at 0 and increment whenever there is a change that does not require a major version change.
+  - The minor version number will also reset back to 0 whenever the major version increments.
+  - Increment the minor version when:
+    - For the Randomizer, this will probably be the case for most updates.
+      The Randomizer version is only important from the perspective of documentation and communicating expectations to the playerbase.
+    - For the SeedData, this will occur whenever there is a non-breaking change such as "now the seed supports Ball and Chain recoloring".
+      It is not worth forcing someone to update their Randomizer if the only part of the Seed it does not support are largely inconsequential (we can simply warn them that they may want to update their Randomizer version).
+
+For example, the following is how a version number (in the format `major.minor`) might change over time:
+
+1.0 => 1.1 => 1.2 => 2.0 => 3.0 => 3.1 => 3.2 => 4.0 => 4.1
+
+---
+
+Internally the Randomizer knows which Seed versions it supports:
+
+| Type | Description                |
+| ---- | -------------------------- |
+| u16  | minSeedVerMajor            |
+| u16  | minSeedVerMinor            |
+| u16  | fullSupportMaxSeedVerMajor |
+| u16  | fullSupportMaxSeedVerMajor |
+
+- Any Seed with a version that:
+  - is below the `minSeedVer` will be 100% NOT supported.
+    - For example, minSeedVer is 10.5 and the Seed is version 10.2.
+  - is between the `minSeedVer` and `fullSupportMaxSeedVer` (inclusive) will be 100% supported.
+    - For example, minSeedVer is 14.3, fullSupportMaxSeedVer is 16.2, and the Seed is version 15.23.
+  - has a `versionMajor` which is greater than `fullSupportMaxSeedVerMajor` will be 100% NOT supported.
+    - For example, fullSupportMaxSeedVer is 16.2, and the Seed is version 17.0.
+  - has a `versionMajor` which is equal to `fullSupportMaxSeedVerMajor` and a `versionMinor` which is greater than `fullSupportMaxSeedVerMinor` will be PARTIALLY supported.
+    - For example, fullSupportMaxSeedVer is 12.4 and the Seed is version 12.5.
+
+For example, we might have the following files on the memory card:
+
+- Randomizer v1.3, which supports Seed versions 12.3 to 15.2
+- Seed v11.7 (no support)
+- Seed v13.0 (full support)
+- Seed v15.0 (full support)
+- Seed v15.2 (full support)
+- Seed v15.3 (partial support)
+- Seed v16.3 (no support)
+
+When the Randomizer scans the memory card for seed files, it will warn the user if it finds any which are not fully supported.
+
+For example, 0 or more of the following could show:
+
+- "Found X seed files with unsupported versions.
+  You must update the Randomizer version on your memory card to play these seeds."
+- "Found Y seed files with versions which are no longer supported."
+- "Found Z seed files which are partially supported.
+  You can still play these seeds, but some minor features such as certain recoloring may not work.
+  It is recommended that you update the Randomizer version on your memory card."
+
+When the user is paging through their available seeds, if a seed they are viewing has any of the above issues, we will display the message there as well:
+
+- "You must update the Randomizer version on your memory card to play this seed."
+- "This seed version is no longer supported."
+- "This seed is partially supported.
+  You can still play it, but some minor features such as certain recoloring may not work."
+
+### Documenting versions
+
+#### Randomizer
+
+On GitHub (I assume), each Randomizer release should have the following information immediately visible:
+
+- Randomizer version
+  - Nothing new here.
+- Minimum and maximum supported Seed versions
+  - Only need to include these 2 values without any other explanation.
+    The Randomizer will display messages if the user needs to see them.
+
+#### Seed Data
+
+A change log of the Seed Data can probably be hosted on the Randomizer generator website (for example, in a modal the user can open, or that opens automatically whenever there is an update. I'm sure you've seen things that do this).
+
+It is important to have a paper trail of when changes happened in both the Randomizer and the SeedData.
+
+Here is an example of the some entries in the SeedData changelog:
+
+---
+
+**Randomizer SeedData Version History**
+
+_Note: You may need to update your Randomizer version to get all of the latest features._
+
+**Version 17.2 (2022/07/11)**
+
+- Added recoloring support for the Master Sword blade color.
+
+**Version 17.1 (2022/07/03)**
+
+- Added ability to skip Bo wrestling.
+
+**Version 17.0 (2022/06/20)**
+
+_Update your Randomizer version to at least v1.4 to play Seeds with this version._
+
+- Made some important breaking change.
+
+**Version 16.1 (2022/05/07)**
+
+- Fixed typo in the custom text for XYZ.
+
+...
+
+---
+
+## Naming seed files
+
+This section will describe how to solve the following problems:
+
+- Seed filename clashes on the memory card.
+- Breaking through the 10 seed limit on the memory card.
+
+Before going into more details, I recommend playing around with the `Example Filename Generator` tool directly beneath this to get a feel for what the filenames would look like (I think it's kind of fun).
+
+You can edit any of the fields below to see the output change.
+The textarea will change the `AdjectiveNoun_abc` part.
+
+<SeedFilenameGeneratorDemo />
+
+#### Problematic Nouns
+
+- Titles are left off ("MayorBo" => "Bo", "DrBorville" => "Borville", etc.)
+
+- Ilia
+  - I's and l's together makes it hard to visually parse the filename when you are reading it.
+- Yeta and Yeto
+  - These look too alike, and it is too easy for the following scenario to occur:<br/>
+    > "The seed file should be 'Purple Yeto 123'"<br/>
+    > "Did you say Yeto or Yeta?"<br/>
+  - So both are not included in the list of nouns (Blizzeta is still there).
+- "KingBulblin" is 11 chars and the limit is 10
+- "Bullbo" (general boars) chosen over "KingBullbo" (the specific one) since it is simpler
+- "Ganondorf" chosen over "Ganon" (didn't want both)
+- "Argorok" chosen over "Kargorok"
+  - These sound similar, but didn't want to leave out any of the bosses.
