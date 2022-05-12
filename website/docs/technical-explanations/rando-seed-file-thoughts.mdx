@@ -1,4 +1,4 @@
-# Thoughts on Rando Seed File Naming (and more)
+# Rando Seed File Thoughts
 
 import Link from '@docusaurus/Link';
 import SeedFilenameGeneratorDemo from '@local/SeedFilenameGeneratorDemo/SeedFilenameGeneratorDemo';
@@ -7,8 +7,8 @@ This page describes solutions to the following problems:
 
 - Randomizer and SeedData version schemes
 - Ten seed limit and internal gci filename clashes
-- Better seed image data handling
-- Debug info in the seed data to help when people report bugs
+- Better seed image data handling (not written yet)
+- Debug info in the seed data to help when people report bugs (not written yet)
 
 ### Before continuing
 
@@ -26,7 +26,7 @@ I will use the term `GCI` to refer to a file and its metadata on the memory card
 
 - The `Randomizer` refers to the file (and its metadata/DirectoryEntry) on the memory card which makes everything happen and which takes the seed data as input.
 - A `Seed` or `SeedData` GCI refers to the file (and its metadata/DirectoryEntry) on the memory card which is used as input to the Randomizer.
-  It specifies things like where items go and what color your Tunic should be.
+  It specifies things like where items go and what color your tunic should be.
 
 Both of these things have a version number which consists of the following:
 
@@ -38,18 +38,20 @@ Both of these things have a version number which consists of the following:
 - All `major version numbers` start at 1 and increment whenever there is a significant change.
   - For the Randomizer, a major version change can happen whenever it feels appropriate.
     Maybe this is when major refactoring occurs or major features are added.
-  - For the SeedData, a major version change MUST happen whenever there is a change to the file's internal structure such that the following is a true:
+  - For the SeedData, a major version change MUST happen whenever there is a change to the file's internal structure such that the following are all true:
     - The new SeedData file will not work in some ways with existing versions of the Randomizer.
-    - The ways the SeedData no longer works are considered significant enough that we do not want to allow people to even try to use those versions of the Randomizer and the SeedData together (more on this later).
+    - The ways the SeedData no longer works are considered significant enough that:
+      - the SeedData would not work at all (simply incompatible).
+      - or we do not want to allow people to even attempt to use those versions of the Randomizer and the SeedData together.
 - All `minor version numbers` start at 0 and increment whenever there is a change that does not require a major version change.
   - The minor version number will also reset back to 0 whenever the major version increments.
   - Increment the minor version when:
     - For the Randomizer, this will probably be the case for most updates.
       The Randomizer version is only important from the perspective of documentation and communicating expectations to the playerbase.
     - For the SeedData, this will occur whenever there is a non-breaking change such as "now the seed supports Ball and Chain recoloring".
-      It is not worth forcing someone to update their Randomizer if the only part of the Seed it does not support are largely inconsequential (we can simply warn them that they may want to update their Randomizer version).
+      It is not worth forcing someone to update their Randomizer if the only part of the Seed it does not support is largely inconsequential (we can simply warn them that they may want to update their Randomizer version).
 
-For example, the following is how a version number (in the format `major.minor`) might change over time:
+The following is how a version number (in the format `major.minor`) might change over time:
 
 1.0 => 1.1 => 1.2 => 2.0 => 3.0 => 3.1 => 3.2 => 4.0 => 4.1
 
@@ -102,6 +104,13 @@ When the user is paging through their available seeds, if a seed they are viewin
 - "This seed is partially supported.
   You can still play it, but some minor features such as certain recoloring may not work."
 
+:::note
+
+I am using recoloring as an example, but it could be any minor feature.
+Also, those messages are just examples I came up with pretty quickly.
+
+:::
+
 ### Documenting versions
 
 #### Randomizer
@@ -112,13 +121,13 @@ On GitHub (I assume), each Randomizer release should have the following informat
   - Nothing new here.
 - Minimum and maximum supported Seed versions
   - Only need to include these 2 values without any other explanation.
-    The Randomizer will display messages if the user needs to see them.
+    The Randomizer will display "partial support" messages if the user needs to see them.
 
 #### Seed Data
 
-A change log of the Seed Data can probably be hosted on the Randomizer generator website (for example, in a modal the user can open, or that opens automatically whenever there is an update. I'm sure you've seen things that do this).
+A changelog of the Seed Data can probably be hosted on the Randomizer generator website (for example, in a modal the user can open, or that opens automatically whenever there is an update. I'm sure you've seen things that do this).
 
-It is important to have a paper trail of when changes happened in both the Randomizer and the SeedData.
+**It is important to have a paper trail of when changes happened in both the Randomizer and the SeedData.**
 
 Here is an example of the some entries in the SeedData changelog:
 
@@ -138,7 +147,7 @@ _Note: You may need to update your Randomizer version to get all of the latest f
 
 **Version 17.0 (2022/06/20)**
 
-_Update your Randomizer version to at least v1.4 to play Seeds with this version._
+_Update your Randomizer version to at least v1.4 to play Seeds with version 17.x._
 
 - Made some important breaking change.
 
@@ -152,7 +161,7 @@ _Update your Randomizer version to at least v1.4 to play Seeds with this version
 
 ## Naming seed files
 
-This section will describe how to solve the following problems:
+Next we will address the following problems:
 
 - Seed filename clashes on the memory card.
 - Breaking through the 10 seed limit on the memory card.
@@ -164,19 +173,362 @@ The textarea will change the `AdjectiveNoun_abc` part.
 
 <SeedFilenameGeneratorDemo />
 
-#### Problematic Nouns
+## Breaking through the 10 seed limit
 
+In the current Seed design, Seed GCIs can only have 10 different hardcoded names.
+I am not going to spend the time typing up why that is undesirable.
+
+There is one benefit of doing it this way though:<br/>
+to check for seeds on the memory card, we can simply check for every filename in a hardcoded list.
+
+So is there a way to check for seed files on the memory card which does not require us to use hardcoded values?
+
+Fortunately, yes.
+Here is what we can do:
+
+- Seed names now follow a pattern instead of being hardcoded values which can easily clash.
+- Iterate through the `DirectoryEntry`s (file metadata) on the memory card (thankfully, there is a fixed limit of 127 files on a memory card).
+  - For each `DirectoryEntry`, make sure its `gameCode` and `publisherCode` match the current game we are playing (for example, "GZ2E01").
+    This confirms that the file on the memory card is a file for Twilight Princess.
+  - For each `DirectoryEntry`, make sure its `filename` matches the pattern we use to indicate that this file on the memory card is `SeedData`.
+    This confirms that the file on the memory card is a Randomizer seed file.
+
+And it's that simple.
+
+---
+
+We still have some other problems to solve though.
+
+Using only the `DirectoryEntry`:
+
+- how can the we know the Seed's `versionNumber`?
+  - We need this to determine compatibility betweeen the Randomizer and the SeedData.
+- how can we know the Seed's human-readable name?
+  - We need this so the user can pick the correct seed while playing the Rando.
+
+It is imperative that we can determine these things from the metadata (DirectoryEntry), or we would have to potentially read the file contents of 127 files which is unacceptable.
+
+To store arbitrary data, the only space we have in the `DirectoryEntry` (without getting funky) is the `filename`, a string which can be up to 32 characters long.
+
+## Seed filename parts
+
+To reiterate, we have 32 characters to do the following:
+
+- include a pattern which indicates this file is a `SeedData` file.
+- include the Seed's major and minor version number
+- include the human-readable part of the Seed's name
+  - this part is largely responsible for preventing filename clashes.
+    It will look something like "PurpleMidna".
+
+### Version numbers
+
+A version number (major or minor) is a u16, which is 16 bits of data (min 0, max 65535).
+
+So how many alphanumeric characters does it take to represent a u16?
+
+:::note
+
+We are sticking to alphanumeric characters since this is a filename.
+
+:::
+
+We can trivially use 4 characters.
+For example, 0xffff can be written as "FFFF".
+
+How about 2 characters?
+
+Each character would need to represent 8 bits, meaning we would need 2^8 or 128 different possible characters for this.
+We only have 62 characters to work with (10 numbers + 26 uppercase + 26 lowercase), so that is not going to happen.
+
+So how about 3 characters?
+
+If each character represented 6 bits, we would be able to represent 18 bits in 3 characters which is good.
+To do this, we would need 6 bits per character, meaning we would need 2^6 or 64 different characters to do this.
+This is slightly outside of our 62 limit, but it is still a possibility.
+
+Five bits per character would only require 32 different characters, but it would only allow us to represent 15 bits in 3 characters and we need to represent 16 bits.
+
+So maybe we can use a number of characters somewhere between 32 and 62?
+
+It turns out that 41 different characters is the smallest amount we can use to represent 16 bits in 3 characters.
+
+```
+// Needs to be at least 65535
+39^3 => 59319
+40^3 => 64000
+41^3 => 68921 (this one)
+42^3 => 74088
+```
+
+This is a pretty good number -- only 5 more than 26 + 10, meaning we only need to include an uppercase and lowercase version of the same letter for 5 letters.
+
+#### How to convert between chars and u16
+
+Imagine we had the string "abc".
+
+Each character will map to a number between 0 and 40.
+
+Let's say that "a" is 10, "b" is 11, and "c" is 12.
+
+To get the u16, we would do:
+
+```
+(10 * 41^2) + (11 * 41^1) + (12 * 41^0)
+which gives 17273 or 0x4379
+```
+
+Here is some js code for going the other way (u16 to char[3]):
+
+```js
+const chars = '0123456789abcDefghiJkLmNopQrstuVwxyzABEHR';
+
+function sixteenBitTo3Char(number) {
+  const iterations = 3;
+  const charCount = 41;
+
+  const arr = [];
+  let currNum = number;
+
+  for (let i = 0; i < iterations; i++) {
+    const charIndex = currNum % charCount;
+    arr.push(chars[charIndex]);
+    currNum = (currNum - charIndex) / charCount;
+  }
+
+  return arr.reverse().join('');
+}
+```
+
+You can scroll back up to the `Example Filename Generator` and change the major and minor versions to see it in action.
+
+:::tip
+
+Another benefit of using 41 characters instead of 64 is that the 3 characters in the string will vary more.
+If you had 64 characters, one of them would only ever be a small portion of its 64 possibilities.
+This is much less pronounced with 41 characters.
+Using the above letters, the first character will never be "H" or "R", but it still has 39 possibilities.
+
+:::
+
+### Human-readable part
+
+We want to have some part of the filename that looks like "AdjectiveNoun" for a couple of reasons:
+
+- it allows people to more easily reference a seed when communicating.
+  - Don't want to have to say "Yes, it's seed dshf829hfo9aiwnf2" (hit random keys)
+- having a bunch of different options here is how we prevent filename clashes
+
+First, let's think about what it means for two seeds to be different.
+Alternatively we can say, when should the generated filename be exactly the same?
+
+For example, if you were to generate a seed with the same u64 randomization starting point and the same settings string on the same exact Generator code, you should get the exact same seed generated (meaning the filename is the same as well).
+
+However, if multiple people want to play the same seed (as confirmed by the filename), they should't have to use the same cosmetic options (since the playthrough will be exactly the same for each from a gameplay perspective).
+
+Or maybe the same person generates a seed which is the same from one they have already played except for the tunic color.
+It would pointless for them to essentially play the exact same playthrough without realizing it.
+
+Let us directly address an important conclusion from the above examples:
+
+> **The filename is representative of the playthrough experience.**
+
+If you show someone two files which have the exact same name, they will say they represent the same playthrough.
+
+If you show someone two files which have different names, they will expect them to be completely different things.
+
+---
+
+Let's think about some things which define the playthrough experience:
+
+- item locations
+- starting items
+- starting location
+
+Or more broadly, thinking about a playthrough as a graph traversal:
+
+- your starting state
+- your ability to traverse the graph
+  - for example, skip MDH on or off provides two different playthrough graphs.<br/>
+    Being able to transform anywhere is also a different graph compared to one in which you can't.
+- where state changes occur
+  - where items are located, or any state changes resulting from traversing an edge.
+- settings which allow you to traverse the same edge on a graph more quickly (for example, quick climbing)
+
+On the opposite side, what about things where if two people were racing, changing any of these would not give anyone an advantage over anyone else:
+
+- anything which does not affect any of the things listed above
+  - recoloring
+  - anything else?
+
+The above is not meant to be an exact definition, but rather provide some guidelines.
+The main point is that not all settings should be taken into account when generating the Seed filename.
+
+To summarize, the following are inputs to the filename:
+
+- u64 randomization starting point
+- settings which impact your starting state (items, location, etc.)
+- settings which impact the playthrough graph and fairness with regards to its traversal
+
+---
+
+If we want to be thorough, we should actually take the generated item placements into account (not just the input settings).
+
+The same randomization starting point and settings can still generate a different playthrough graph if any sort of small change ever happened with the item placement algorithm.
+
+So we can take the item placements, and convert them all to a string and add it as an input.
+That way, any change in item placement would generate a different filename.
+Put differently, we can be confident that the same filenames will have the same item placement without worrying about which version of the Generator was used.
+
+---
+
+#### Generating the human-readable part
+
+Essentially, we have this:
+
+- a bunch of inputs which can be converted to strings
+
+And we need a function with the following properties:
+
+- takes all of the inputs and generates a representation that is a relatively small number of bits
+- the same input must give the same output
+- a small adjustment to the input should generate a different output (ideally much different)
+
+That sounds like a hash function.
+
+So what we can do is take all of our inputs as strings, concatenate them, run a hash function on that string, and get a 32 bit result.
+
+With 32 bits, the chance that we generate two Seeds with different inputs which end up with clashing filenames is approximately 1/(2^32) or 1 in 4,294,967,296 or 0.00000023283% which is negligible.
+
+---
+
+#### Making 32 bits human-readable
+
+Remember that we have 32 characters in the `DirectoryEntry` filename to work with, and 6 of them are already being used on the `versionMajor` and `versionMinor`.
+Let's say that we need 2 characters to establish the filename pattern.
+
+This leaves us with 24 characters to represent 32 bits.
+
+Let's first define our lower bound:
+
+- we can represent 32 bits in 6 characters.
+
+If we want to represent 32 bits using adjectives and nouns alone, we could split them evenly.
+We would need 2^16 (65535) adjectives and 65535 nouns, which is obviously not going to work.
+
+I will go ahead and say, the most nouns we will get (which is a power of 2) using proper nouns closely related to Twilight Princess is 128 (or 7 bits worth of data).
+
+So this means we need 2^25 or 33,554,432 adjectives.
+I don't think English has that many.
+
+But what if we instead use the same 3 character pattern we used with the version numbers to cover for 16 of the bits.
+
+In that case, with 7 bits of data covered by the noun, we only need 9 bits of data using adjectives.
+This means we only need 512 adjectives, which is doable (I already did it. Did the nouns too. See the `Example Filename Generator` back near the top).
+
+---
+
+We have 24 characters in the filename to work with.
+If we use 4 on the 3-char u16 and a delimiter, we have 20 characters for an adjective and noun.
+
+It turns out that splitting this evenly (10 characters for each) gives us plenty of flexibility for picking adjectives and nouns.
+
+To summarize, our human-readable part of the filename will look like:
+
+- Adjective (1 to 10 chars, 512 possibilities)
+- Noun (1 to 10 chars, 128 possibilities)
+- Delimiter (1 char)
+- 3-char u16 representation (3 chars, 65536 possibilities)
+
+And you would read it aloud like "Happy Zelda abc".
+
+---
+
+I will go over briefly how I picked out the adjectives and nouns.
+
+#### Picking out adjectives
+
+I looked up a list of 1000 adjectives, then did the following to reduce it to 512.
+
+- Removed any that had dashes
+- Removed any that were more than 3 syllables long (according to me)
+- Removed any which were too similar to others (for example, "magic" and "magical")
+- Removed any that could be interpreted as having to do with topics which might be problematic such as religion, race, politics, sexuality, etc.
+- Finally, to get down to 512, manually removed any that I thought didn't roll off the tongue or didn't like
+
+#### Picking out nouns
+
+The nouns come from the following categories:
+
+- NPC names
+- Enemy types (including Bosses and Midbosses)
+- Golden Bug types (such as Phasmid)
+- Fish species (such as Greengill)
+- Items, especially if specific to TP (Spinner, etc.)
+- A few manual picks
+
+with the following rules:
+
+- 10 characters max
 - Titles are left off ("MayorBo" => "Bo", "DrBorville" => "Borville", etc.)
+- 3 syllables max (same as adjectives)
+- None which are too similar
+  - Bulblin/Bullbo/Bubble, Purlo/Purdy, Argorok/Kargorok, Yeto/Yeta, Fyer/Fyrus, etc.
+- None which are too difficult to read, including all which start with "I"
+  - For example, "MeaningfulIlia"
 
-- Ilia
-  - I's and l's together makes it hard to visually parse the filename when you are reading it.
-- Yeta and Yeto
-  - These look too alike, and it is too easy for the following scenario to occur:<br/>
-    > "The seed file should be 'Purple Yeto 123'"<br/>
-    > "Did you say Yeto or Yeta?"<br/>
-  - So both are not included in the list of nouns (Blizzeta is still there).
-- "KingBulblin" is 11 chars and the limit is 10
-- "Bullbo" (general boars) chosen over "KingBullbo" (the specific one) since it is simpler
-- "Ganondorf" chosen over "Ganon" (didn't want both)
-- "Argorok" chosen over "Kargorok"
-  - These sound similar, but didn't want to leave out any of the bosses.
+---
+
+Since the nouns and adjectives are all 3 syllables at most, reading the string out loud is usually pretty nice.
+
+- On the shorter side, we have "ColdBo_J3u".
+- On the longer side, we have "AnnualHylian_hE2".
+
+The chance of a collision using just the adjective and noun is still only 0.0015%, so most of the time you can probably ignore the 3-char part at the end.
+We still want to keep it though, since it makes collisions almost impossible.
+
+---
+
+We haven't addressed it yet, but the filename pattern which indicates SeedData is "sd", which is short for "seed".
+This is fine because the only normal Twilight Princess file starts with "gc", and the Randomizer GCI is named "Custom REL File".
+
+:::note
+
+You could use 3 characters instead of 2 by removing the delimiter from the filename in the GCI.
+This would just make displaying the name to the user a little more involved.
+
+:::
+
+:::tip
+
+If you had an experimental branch of the Rando which was using a completely different seed format, you could generate seeds which use a different pattern such as "se" for "seed experimental".
+Or if we ever had files which stored fully custom textures, they could have a different file pattern as well.
+
+:::
+
+---
+
+Here is the Example filename generator once again so you don't have to scroll back up.
+
+<SeedFilenameGeneratorDemo />
+
+Note that the "ge" part after the version number in the `osFilename` is so someone can immediately tell which game a Seed file is targeting without viewing it in a hex editor.
+
+The letters are the lowercase version of the first and last letters of the `gameCode` (such as "RZDE").
+The first letter is the `SystemCode` (which console) and the last letter is the `RegionCode`.
+
+- The TprSeed and version number are put at the front so the files.
+  - You can immediately tell it is a Seed file.
+  - They group together in a directory on your computer which is sorted alphabetically and which may contain other files.
+  - If we add any other new Rando file types which also start with `Tpr`, it kind of functions like a namespace (like `tpr::seed::etc...`).
+- We use an underscore between the AdjectiveNoun and the 3-char part because double-clicking will select that whole part.
+- We use dashes between the other sections since we are using an underscore for the above purpose.
+  It also just makes it pretty easy to read imo.
+- We use two dashes before the AdjectiveNoun part because the adjective is the part that we want the player's eye to go to first.
+  It does not stick out as much with only one dash:
+  - `TprSeed-v17.3ge--DreadfulCheese_4tp.gci`
+  - `TprSeed-v17.3ge-DreadfulCheese_4tp.gci`
+  - Everything kind of blends together with only one dash imo.
+
+## More to come
+
+// still have some other stuff to write, but don't want to delay proposing the above part.

@@ -23,27 +23,47 @@ function sixteenBitTo3Char(number) {
   return arr.reverse().join('');
 }
 
-function genFilenames({ verMajor, verMinor, textAreaContent }) {
-  let internalFilename = '';
-  let osFilename = '';
+function genFilenames({ verMajor, verMinor, gameVer, textAreaContent }) {
+  let gameVerStr = 'GE';
 
-  if (verMajor && verMinor) {
-    const hash = md5(textAreaContent).substring(0, 8);
-    const u32 = parseInt(hash, 16);
-
-    const adjIndex = u32 >>> 23;
-    const nounIndex = (u32 >> 16) & 0x7f;
-    const adjNoun = adjectives[adjIndex] + nouns[nounIndex];
-    const threeChar = sixteenBitTo3Char(u32 & 0xffff);
-
-    const thirtyTwoBitName = `${adjNoun}_${threeChar}`;
-
-    internalFilename = `sd${sixteenBitTo3Char(verMajor)}${sixteenBitTo3Char(
-      verMinor
-    )}${thirtyTwoBitName}`;
-
-    osFilename = `TprSeedV${verMajor}.${verMinor}--${thirtyTwoBitName}.gci`;
+  switch (gameVer) {
+    case 'GZ2E':
+      gameVerStr = 'ge';
+      break;
+    case 'GZ2P':
+      gameVerStr = 'gp';
+      break;
+    case 'GZ2J':
+      gameVerStr = 'gj';
+      break;
+    case 'RZDE':
+      gameVerStr = 're';
+      break;
+    case 'RZDP':
+      gameVerStr = 'rp';
+      break;
+    case 'RZDJ':
+      gameVerStr = 'rj';
+      break;
+    case 'RZDK':
+      gameVerStr = 'rk';
+      break;
   }
+
+  const hash = md5(textAreaContent).substring(0, 8);
+  const u32 = parseInt(hash, 16);
+
+  const adjIndex = u32 >>> 23;
+  const nounIndex = (u32 >> 16) & 0x7f;
+  const adjNoun = adjectives[adjIndex] + nouns[nounIndex];
+  const threeChar = sixteenBitTo3Char(u32 & 0xffff);
+
+  const thirtyTwoBitName = `${adjNoun}_${threeChar}`;
+
+  const internalFilename = `sd${sixteenBitTo3Char(verMajor)}${sixteenBitTo3Char(
+    verMinor
+  )}${thirtyTwoBitName}`;
+  const osFilename = `TprSeed-v${verMajor}.${verMinor}${gameVerStr}--${thirtyTwoBitName}.gci`;
 
   return {
     internalFilename,
@@ -112,39 +132,54 @@ const VersionInput = ({ field: { onChange, ...other } }) => (
 );
 
 function SeedFilenameGeneratorDemo() {
-  const { control } = useForm({
+  const { control, register } = useForm({
     defaultValues: {
       verMajor: '17',
       verMinor: '3',
-      textAreaContent: 'Change me!',
+      gameVer: 'GZ2E',
+      textAreaContent: 'Change me to see the adjectives and nouns change.',
     },
   });
 
   return (
-    <div className={styles.root}>
-      <h3>Example Filename Generator</h3>
-      <div className={styles.description}>
-        Edit the fields below to see example filenames.
+    <p>
+      <div className={styles.root}>
+        <h3>Example Filename Generator</h3>
+        <div className={styles.description}>
+          Edit the fields below to see example filenames.
+        </div>
+        <div className={styles.gridGroup}>
+          <label className={styles.versionLabel}>versionMajor</label>
+          <Controller control={control} name="verMajor" render={VersionInput} />
+        </div>
+        <div className={styles.gridGroup}>
+          <label className={styles.versionLabel}>versionMinor</label>
+          <Controller control={control} name="verMinor" render={VersionInput} />
+        </div>
+        <div className={styles.gridGroup}>
+          <label className={styles.versionLabel}>gameVersion</label>
+          <select {...register('gameVer')}>
+            <option value="GZ2E">GZ2E (GC US)</option>
+            <option value="GZ2P">GZ2P (GC PAL)</option>
+            <option value="GZ2J">GZ2J (GC JP)</option>
+            <option value="RZDE">RZDE (Wii US)</option>
+            <option value="RZDP">RZDP (Wii US)</option>
+            <option value="RZDJ">RZDJ (Wii JP)</option>
+            <option value="RZDK">RZDK (Wii Korea)</option>
+          </select>
+        </div>
+        <div className={styles.gridGroup}>
+          <Controller
+            control={control}
+            name="textAreaContent"
+            render={({ field }) => (
+              <textarea {...field} className={styles.textarea} rows="4" />
+            )}
+          />
+        </div>
+        <FilenameTable control={control} />
       </div>
-      <div className={styles.gridGroup}>
-        <label className={styles.versionLabel}>versionMajor</label>
-        <Controller control={control} name="verMajor" render={VersionInput} />
-      </div>
-      <div className={styles.gridGroup}>
-        <label className={styles.versionLabel}>versionMinor</label>
-        <Controller control={control} name="verMinor" render={VersionInput} />
-      </div>
-      <div className={styles.gridGroup}>
-        <Controller
-          control={control}
-          name="textAreaContent"
-          render={({ field }) => (
-            <textarea {...field} className={styles.textarea} rows="4" />
-          )}
-        />
-      </div>
-      <FilenameTable control={control} />
-    </div>
+    </p>
   );
 }
 
