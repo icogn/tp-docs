@@ -7,8 +7,8 @@ This page describes solutions to the following problems:
 
 - Randomizer and SeedData version schemes
 - Ten seed limit and internal gci filename clashes
-- Better seed image data handling (not written yet)
-- Debug info in the seed data to help when people report bugs (not written yet)
+- Better seed image data handling
+- Debug info in the seed data to help when people report bugs
 
 ### Before continuing
 
@@ -529,6 +529,35 @@ The first letter is the `SystemCode` (which console) and the last letter is the 
   - `TprSeed-v17.3ge-DreadfulCheese_4tp.gci`
   - Everything kind of blends together with only one dash imo.
 
-## More to come
+## Image and debug info
 
-// still have some other stuff to write, but don't want to delay proposing the above part.
+This article is already long enough, so I will be brief here.
+
+### Image data
+
+The user should be able to choose to leave the image data out of their Seed data.
+For people playing on actual hardware, every block can count, and people should be able to opt out of spending an additional (1 \* numSeedFilesOnMemCard) blocks on a bunch of copies of the same images.
+You could potentially have 3 options for this: always include the images, never include, or only include if it would not increase the block size.
+
+Structure:
+
+- the comments should be put at offset 0x0 since they are mandatory and they must not be split across block boundaries.
+- The actual seed data will start at offset 0x40.
+  This is a hardcoded value.
+- You can tell the length of the seed data by checking the image offset information in the `DirectoryEntry`.
+  - If there are no images, the seed data length which should be copied from the memory card is from offset 0x40 until the end of the last block.
+
+### Debug info
+
+At the very end of the file after the image data, I would recommend putting the following information such that you can easily read it in a hex editor:
+
+- timestamp for when the seed was created
+  - easy to read version using ascii characters like "2022/07/21..."
+- u64 randomization starting point
+  - This is debug info which does not need to be in the seed header as far as I can tell.
+- settings string (you will need to specify its length as well)
+- Generator version?
+- whatever else you want
+
+This part will be read into RAM if there is no image data, but it is not a big deal as long as the size is small.
+Perhaps you let people opt out of this too.
