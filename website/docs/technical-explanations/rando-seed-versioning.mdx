@@ -1,0 +1,334 @@
+# Rando Seed Versioning
+
+import Link from '@docusaurus/Link';
+
+This page describes concerns with the way version compatibility between the Randomizer and the SeedData is currently handled.
+It also proposes an alternative to address these concerns.
+
+## Current implementation
+
+Currently, the Randomizer code reads the following values from a header in the SeedData:
+
+- `minVersion` - the oldest version of the Randomizer GCI that this SeedData will work with.
+- `maxVersion` - the newest version of the Randomizer GCI that this SeedData will work with.
+
+For example, let's say you were playing version 7.8 of the Randomizer, which is the most up-to-date version of the Randomizer.
+If a SeedData on the memory card had a `minVersion` of 5.0 and a `maxVersion` of 9.192, the Randomizer would conclude the following:
+
+- "I am within the range that this SeedData allows, so I will say that I am able to play this seed".
+
+So you can immediately ask:
+
+- How can the SeedData say that the `maxVersion` is 9.192 when the latest Randomizer version is only 7.8?
+  How did it decide the `maxVersion`?
+
+That is a good question.
+
+9.192 is obviously a random value that makes absolutely no sense, but we'll just accept it for now.
+
+Let's say we need to make some changes to the format of the SeedData.
+Maybe there is a new important feature, or we found a way to decrease the block count of the SeedData by restructuring.
+
+The new SeedData is obviously not going to work with Randomizer v7.8, so we need to set a `minVersion` that is at least 7.9.
+We still have no idea what the hell is going on with `maxVersion`, so we'll just let that one stay the same at 9.192.
+
+Now we are obviously going to need to create a new version of the Randomizer GCI which knows how to read this new SeedData.
+
+The old Randomizer was v7.8, so let's say this new Randomizer version is 7.9.
+
+But wait, we can't do that!
+
+If we set it to 7.9, then the old SeedData (5.0 to 9.192) will tell the Randomizer:
+
+- "Hey, you know how to understand me. Trust me. I was finalized before you were even a concept in someone's head, so I am totally aware of your capabilities."
+
+This is because Version 7.9 is still in the old SeedData's range of 5.0 to 9.192.
+
+If the new Randomizer does not support the old format, then we are going to have to set its version to at least 9.193.
+
+That is dumb as hell, so let's just set it to 10.0 and move on.
+
+But wait!
+
+We need to change the new SeedData to have a `maxVersion` that is at least 10.0.
+In fact, none of the Randomizers which have existed before this point will be able to understand this SeedData, so we actually need to set the `minVersion` to 10.0 to match the new Randomizer version.
+
+So now we have a `minVersion` of 10.0 and a `maxVersion` of at least 10.0.
+
+Let's pick a `maxVersion`.
+We're not going to pick something like 11.192 because we determined last time that that was a terrible idea.
+
+It looks like we are back at the same question:
+
+- How do we decide a SeedData's `maxVersion`?
+
+Last time we just accepted 9.192 without questioning it, but I have figured it out now:
+
+The answer is that we can predict the future.
+It is obvious that the `maxVersion` should be 10.7.
+
+But seriously, how?
+
+And another issue is this:
+
+- We are saying "old SeedData version" and "new SeedData version" in the above text, but wouldn't it be nice if we actually had a name for each of them.
+- It's almost like the SeedData should have its own version so we can accurately reference them and keep track of changes to the format over time.
+
+---
+
+But let's pretend we still have hope for the current system.
+9.192 is a strawman!
+
+How about we use the current values in the SeedData at the time of writing:
+
+- `minVersion` is 1.0
+- `maxVersion` is 1.0
+
+So that's pretty cool, because if we ever have to make a change to the Randomizer then we have no hope of supporting these seeds.<br/>
+_(We are not going to entertain the idea of making changes to the Randomizer without incrementing its version.)_
+
+When asked about compatibility after the first update to the Randomizer:
+
+> "The latest Randomizer (v1.1) adds support for gradients for Link's tunic color!
+> I know that it's not a major change, but all of those seeds that you generated and put on your memory card are not going to work if you update your Randomizer version, so I guess figure it out.
+> ...
+> What's that?
+> Oh yeah, this shit is gonna happen every time.
+> You'll get used to it."
+
+Following the same pattern because we still have no idea what to do about `maxVersion`, the new SeedData which works with Randomizer v1.1 will have `minVersion` 1.1 and `maxVersion` 1.1.
+
+Using the same value for both `minVersion` and `maxVersion` is obviously pretty crappy.
+
+That person's SeedData files on their memory card were created before tunic gradients were a thing, so maybe the new Randomizer should still work with them and simply not put gradient colors on the tunic?
+
+Maybe we can adjust it a little.
+What if for the new SeedData we instead used:
+
+- `minVersion` of 1.0
+- `maxVersion` of 1.1
+
+After defining the new SeedData format, we can look back through the Randomizer releases until we find the first one which will not work with the new format, and then we can set the `minVersion` based on that.
+
+That's actually a pretty okay way of handling `minVersion`, but `minVersion` hasn't been the one we've had a problem with this entire time.
+
+---
+
+Here is probably the least bad way of handling it with the current setup:
+
+Let's look at the following scenario:
+
+- The only Randomizer versions in existence are 1.0 and 1.1.
+- We are creating a new SeedData format which works with both of these Randomizers.
+
+We can do the following:
+
+- Set `minVersion` to 1.0.
+- Set `maxVersion` to 1.999999999 (or the highest minorVersion possible).
+
+So now whenever we need to make a "breaking change" to the SeedData format, we can set the new one to have `minVersion` 2.0 and `maxVersion` 2.999999999.
+
+Then we can change the Randomizer from v1.12 or something to v2.0.
+
+This will absolutely work, but here are some problems with this appraoch:
+
+- We probably don't want to have to increment the major version of the Randomizer that often.
+  Or alternatively, we don't want resistance to having to increment the major version of the Randomizer make it so that we are slow to introduce new features into SeedData formats.
+  - After all, "RANDOMIZER 2.0 GUYS!!!!" is probably something that we want to celebrate.
+    Said differently, we don't want to drain that of its meaning optically by forcing frequent major version updates.
+- We do not have a way to easily refer to different versions of the SeedData format over time and keep track of changes.
+  - We can describe a SeedData format as `minVer1.0-maxVer1.x`, but then if the next format has those same min and max versions, we are going to have trouble documenting and troubleshooting.
+- This way of who controls whether or not the Randomizer is allowed to support a SeedData file is backwards.
+  - The Randomizer itself should be the one who decides if it can support a file -- not the file which was created before that Randomizer version even existed.
+
+## Suggested implementation
+
+In the SeedData, instead of:
+
+- `minVersion` - randoVerMajor.randoVerMinor
+- `maxVersion` - randoVerMajor.randoVerMinor
+
+The suggestion is to have:
+
+- `version` - seedDataVerMajor.seedDataVerMinor
+
+And then internally, the Randomizer has the following:
+
+- `minSeedDataVersion` - seedDataVerMajor.seedDataVerMinor (ex: 17.0)
+- `maxFullySupportedSeedDataVersion` - seedDataVerMajor.seedDataVerMinor (ex: 17.5)
+- Implied:
+  - `maxSeedDataVersion` - implied by minSeedDataVersion; (min 17.3 would mean all versions of 17 which are at least 17.3)
+
+From a data perspective, instead of doing `minVersion` u8.u8 and `maxVersion` u8.u8, we do `minSeedDataVersion` u16.u16, and `maxFullySupportedSeedDataVersion` u16.u16.
+
+Note that you could theoretically have something like a `minSeedDataVersion` of 12.0 and a `maxFullySupportedSeedDataVersion` of 13.2.
+We will need to do a SeedData version bump every time sSettings change (more on this later), but that does not necessarily mean that we need to stop supporting older SeedData versions.
+
+### Example
+
+Let's assume we have the following history of Randomizer versions:
+
+```
+Randomizer Releases
+
+- Randomizer v1.12
+	Minimum SeedData version is 6.0
+	Maximum fully supported SeedData version is 6.2
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.11
+	Minimum SeedData version is 6.0
+	Maximum fully supported SeedData version is 6.1
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.10
+	Minimum SeedData version is 6.0
+	Maximum fully supported SeedData version is 6.0
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.9
+	Minimum SeedData version is 5.0
+	Maximum fully supported SeedData version is 5.1
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.8
+	Minimum SeedData version is 5.0
+	Maximum fully supported SeedData version is 5.0
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.7
+	Minimum SeedData version is 4.0
+	Maximum fully supported SeedData version is 4.1
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.6
+	Minimum SeedData version is 4.0
+	Maximum fully supported SeedData version is 4.0
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.5
+	Minimum SeedData version is 3.0
+	Maximum fully supported SeedData version is 3.0
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.4
+	Minimum SeedData version is 2.0
+	Maximum fully supported SeedData version is 2.2
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.3
+	Minimum SeedData version is 2.0
+	Maximum fully supported SeedData version is 2.1
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.2
+	Minimum SeedData version is 2.0
+	Maximum fully supported SeedData version is 2.0
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.1
+	Minimum SeedData version is 1.0
+	Maximum fully supported SeedData version is 1.1
+	- Did this
+	- Did that
+	> Assets (5)
+
+- Randomizer v1.0
+	Minimum SeedData version is 1.0
+	Maximum fully supported SeedData version is 1.0
+	- Did this
+	- Did that
+	> Assets (5)
+```
+
+The Randomizers could theoretically have a `minSeedVersion` like 3.4, but this would only happen in the following scenario:
+
+- SeedData format bumps from 3.3 to 3.4.
+- Randomizer says "you know what, I'm not going to support 3.0-3.3 even though it would be pretty easy".
+
+We could potentially get away with just saying the Randomizer has a `minSeedVersionMajor`, but it is probably better to be safe than sorry.
+
+So using the above table, let's say we have the following scenario:
+
+---
+
+As a player, let's say that I am playing on Randomizer v1.11, and the website is currently generating SeedData with version 6.2.
+
+When the game shows me a SeedData of version 6.2 as an option to play, it can say something along the lines of:
+
+- "Hey, this Seed you want to play is version 6.2, so some of the new features may not work.
+  You will want to update your Randomizer version for these features to work."
+
+This is because the maxFullySupportedVersion for Randomizer v1.11 is 6.1.
+
+This way, people are nudged/reminded to update to newer versions of the Randomizer, but we do not make things harder on them.
+
+### Update process
+
+Firstly, these things are true when updating the Randomizer version:
+
+- Any code change requires a new version number.
+- Major version only needs to change at major milestones, so most updates will be minor version bumps.
+- The Randomizer version and the SeedData version are independent, meaning the numbers do not line up and they are not meant to (see the table in the above Example section).
+  In fact, we could start making every Randomizer version a string like "Apple" and "Banana", and this wouldn't affect the SeedData because the Randomizer reads the SeedData and not the other way around.
+
+If the Randomizer change was a simple bug fix, we do not need to do anything about the SeedData.
+That new release of the randomizer will have the same `minSeedDataVersion` and `maxFullySupportedSeedDataVersion`.
+
+If it was a Randomizer change that required a SeedData change:
+
+- Determine if the SeedData change should be a major or minor version bump.
+  - To determine if it is a minor bump, we can look back at the oldest Randomizer version which would attempt to load the new SeedData.
+  - If there are no problems, we can do a minor bump.
+  - If there would be problems, we need to do a major version bump.
+
+Another scenario to consider is the following:
+
+- Let's pretend the the CLR0 recoloring stuff has already been merged.
+  This section of the SeedData maps enums to 24-bit colors.
+- If we add support to recolor the master sword blade, this would be a new enum in the CLR0 section.
+- Based on how this section is written, this would never cause problems with older versions of the Randomizer.
+  They simply would not color the blade.
+- However, we still need to do a minor version bump of the SeedData.
+  - The reason is that a minor version bump will alert the user that "Hey, this SeedData that you want to load may have some unsupported features in it".
+    In this case, the blade would not be recolored even if the SeedData said that it should be, so we want to alert the user of this.
+    That is all we need to do.
+
+Thinking about it, it is probably safe to do a minor bump only in the following scenario:
+
+- The change is related to pSettings (not sSettings).
+- Doing a minor bump would not break the oldest Randomizer which is looking at that major version.
+
+The reason we need to do a major version bump for sSettings is that the sSettings are a critical part of the definition of the playthrough experience, so any that are meant to be supported in the SeedData must be supported for it to be considered playable.
+This would be very important in the case of races.
+I assume for official races, everyone would be forced to use a specific Randomizer version, but that doesn't necessarily have to be the case for more casual stuff.
+
+_Note that we would also keep track of SeedData format changes in the same way that I showed above for the Randomizer version, through probably with more detail._
+
+---
+
+We will probably also want to scan all of the SeedData on the memory card (whether we are still using seedIndexes or not), and let the user know about any which are totally incompatible and why, so that they are not completely lost and have to make a post about it.
+
+This might only be feasible in the "seedIndexes are no more" situation though, since that one wouldn't have to read the memory card several times.
