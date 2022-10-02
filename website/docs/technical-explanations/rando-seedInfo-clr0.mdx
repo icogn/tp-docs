@@ -1,4 +1,4 @@
-# Rando SeedInfo CLR0 Structure Proposal
+# Rando SeedInfo CLR0 Structure
 
 This page describes a way of storing RGB colors in the TPRando seed GCI.
 The main purpose of these colors would be for recoloring things in the game (such as tunic color).
@@ -56,8 +56,6 @@ This chunk in the seed data is named CLR0.
 This follows the scheme that is used by pretty much every file in the game (that is, sections start with a 4-char label).
 
 ---
-
-For the simplistic approach, let's go ahead and assume that the header is 0x10 bytes long and somewhere in there is a byte that indicates "hey, the data after the header is structured according to the simplistic approach".
 
 Adding to the example from before, the byte array would look like:
 
@@ -184,6 +182,14 @@ function isThisEnumEnabled(u16 myEnum) {
 }
 ```
 
+:::note
+
+The above is slightly different than how it actually works in code
+We have to adjust the input based on the minRecolorId in the header.
+Always reference the code if you want to see exactly how something works.
+
+:::
+
 ## Mapping enum to rgb index quickly
 
 If we are looking up enum 0x3e (62 decimal), instead of iterating through enums 0 through 0x3d and keeping track of how many are enabled, we can instead keep track of the cummulative results for every 8 enums.
@@ -201,7 +207,11 @@ For example:
 | 0x06                  | 0x0030 to 0x0037 | 0x0010            |
 | 0x07                  | 0x0038 to 0x003f | 0x0012            |
 
-The index in the cummulative table is the same as the index in the bitTable.
+:::note
+
+The cummulative sum for index 0 will always be 0, so we will leave this off in the final structure.
+
+:::
 
 ```
 enumNumber >> 3.
@@ -312,120 +322,156 @@ So we now have all of the tools we need.
 
 Let's talk about the entire CLR0 structure now.
 
-## CLR0 Header
+## CLR0 structure
 
-Header is size 0x10 bytes.
+### Header
 
-| Offset | Type      | Name                  | Description                                                                          |
-| ------ | --------- | --------------------- | ------------------------------------------------------------------------------------ |
-| 0x00   | char[4]   | magic                 | "CLR0"                                                                               |
-| 0x04   | u32       | totalByteSize         | Total number of bytes for chunk (including header and padding at end).               |
-| 0x08   | u16       | maxEnum               | Any enum larger than this is guaranteed to not have any RGB values in the data.      |
-| 0x0a   | u8 (enum) | dataStructure         | 0x00 means no RGB data (skip all recoloring). 0x01 is simplistic. 0x02 is complex.   |
-| 0x0b   | u8        | bitTableOffset        | Offset to bitTable section relative to start of header. (Also the header size, 0x10) |
-| 0x0c   | u16       | cummulativeSumsOffset | Offset to cummulativeSums section relative to start of header.                       |
-| 0x0e   | u16       | rgbDataOffset         | Offset to rgbData section relative to start of header.                               |
+Header is size 0x16 bytes.
+
+| Offset | Type    | Name                  | Description                                                            |
+| ------ | ------- | --------------------- | ---------------------------------------------------------------------- |
+| 0x00   | char[4] | magic                 | "CLR0"                                                                 |
+| 0x04   | u32     | totalByteSize         | Total number of bytes for chunk (including header and padding at end). |
+| 0x08   | u8      | reserved              | Not currently used. Always 0x00.                                       |
+| 0x09   | u8      | bitTableOffset        | Offset to bitTable section relative to start of header.                |
+| 0x0a   | u16     | minRecolorId          | Must be equal to the smallest enum which has data.                     |
+| 0x0c   | u16     | maxRecolorId          | Must be equal to the largest enum which has data.                      |
+| 0x0e   | u16     | cummulativeSumsOffset | Offset to cummulativeSums section relative to start of header.         |
+| 0x10   | u32     | complexDataOffset     | Offset to complexData section relative to start of header.             |
+| 0x14   | u16     | basicDataOffset       | Offset to basicData section relative to start of header.               |
 
 Note that the sections of the CLR0 chunk are ordered as follows:
 
 - header
 - bitTable
 - cummulativeSums
-- rgbData
+- basicData
+- complexData
 
 Notes on certain header properties:
 
 - magic
-  - CLR0 could change to CLR1 and so on if we ever needed an entire restructure of this chunk for some reason (doesn't seem likely, especially with the dataStructure enum property).
+  - CLR0 could change to CLR1 and so on if we ever needed an entire restructure of this chunk for some reason (though that doesn't seem likely).
 - maxEnum
   - This is used to future-proof.
     Let's assume at the current day we are using enums 0x0000 through 0x00ab.
     If someone generates a seed today, its bitTable and cummulativeSums will be a certain size.
     If someone then uses that seed with the newer randomizer 6 months later, that rando code might try to check "should I recolor enum 0xcc?"
     If we didn't have a bounds on the maximum we should check, we would start reading bytes from outside the table and misinterpreting them.
-    This is needed for both the complex and the simplistic data structures.
-    - Note that this value should ideally be the largest enum which the player actually elected to recolor, not the largest one that could have been supported at the time the seed was generated.
+    - Note that this value should be the largest enum which the player actually elected to recolor, not the largest one that could have been supported at the time the seed was generated.
       The lower we can make this value, the smaller we can make both the bitTable and cummulativeSums sections.
       - bitTable byte length should be ((maxEnum >> 3) + 1) rounded up to multiple of 2.
-      - cummulativeSums section byte length should be ((maxEnum >> 3) + 1) \* 2.
+      - cummulativeSums section byte length should be (bitTable length - 1) \* 2.
 - bitTableOffset
-  - The header is only 0x10 bytes long, so we don't need more than a byte for bitTableOffset.
+  - The header is only 0x16 bytes long, so we don't need more than a byte for bitTableOffset.
+  - This value must be set to 0 if there is no data for any enums (meaning the CLR0 chunk is empty).
 - cummulativeSumsOffset
   The max enum is 0xffff.
   (0xffff >> 3) is 0x1fff which is the maximum index of the bitTable.
   So the max bitTable length is one more than that, or 0x2000.
-  Adding the 0x10 from the bitTableOffset, the largest value we could have for this is 0x2010, so u16 is enough for this field.
-- rgbDataOffset
+  Adding the 0x16 from the bitTableOffset, the largest value we could have for this is 0x2016, so u16 is enough for this field.
+- basicData
   - The max enum is 0xffff.
     (0xffff >> 3) is 0x1fff which is the maximum index of the cummulativeSums section.
     So the max cummulativeSums length is one more than that, or 0x2000.
     Since each entry is a u16 (2 bytes), the maximum byte length of the cummulativeSums section is 0x4000.
-    Adding this to the maximum cummulativeSumsOffset which is 0x2010, the maximum possible rgbDataOffset value is 0x6010.
-    So a u16 is enough for rgbDataOffset.
-  - Note that the rgbData should immediately follow the cummulativeSums section.
-    The data within this section is not aligned since each entry is 3 bytes, and the entries are back-to-back.
-
-:::note
-
-The meaning of the last 4 bytes of the header can change if you were to add a new dataStructure type in addition to the 3 listed above.
-
-:::
-
-:::note
-
-It is recommended that the entire CLR0 chunk's byte length be rounded up to a multiple of 0x10 (as is recommended for all chunks) so that data is aligned correctly and so that seed data is easier to read in a hex editor.
-
-:::
-
-:::tip
-
-If there is no RGB data at all (meaning the player does not want anything to be recolored), you can just set the entire CLR0 chunk to the following 0x10 bytes:
-
-"CLR0" 00 00 00 10 00 00 00 00 00 00 00 00
-
-:::
-
-## CLR0 complex structure
+    Adding this to the maximum cummulativeSumsOffset which is 0x2016, the maximum possible basicDataOffset value is 0x6016.
+    So a u16 is enough for basicData.
+  - Note that the basicData should immediately follow the cummulativeSums section.
 
 ### bitTable
 
 bitTable section is an array of bytes which comes directly after the header.
-This section's byte length should be rounded up to a multiple of 2 bytes so that cummulativeSums section is aligned correctly.
-Padding byte (if needed) should be 0x00.
+
+It contains one byte for every 8 recolorIds.
+
+If no recolorIds are enabled, the offset to the bitTable in the header must be 0.
 
 ### cummulativeSums
 
 cummulativeSums section is an array of u16 which comes directly after the bitTable section.
+We leave off the entry for index 0 of the bitTable since it would always be 0x0000.
 
-### rgbData
+If this section is empty, the offset to it in the header should be 0.
 
-rgbData section is an array of RGB structs (which have length 3 bytes) which comes directly after the cummulativeSums section.
+### basicData
 
-## CLR0 simplistic structure
+The basicData section comes directly after the cummulativeSums section, and it is an array of words.
 
-Immediately following the header, you have an array of the following structure.
+For example, an entry might be:
 
-| Offset | Type  | Name      |
-| ------ | ----- | --------- |
-| 0x00   | u8    | isEnabled |
-| 0x01   | u8[3] | RGB       |
+`00 63 82 A0`
 
-The enum's value is also the index for its data in this table.
+The first byte is an enum called the `RecolorType`.
 
-If the enum's value is greater than maxEnum in the header, then the recolor for that enum should not occur (this is true for both simplistic and complex).
+In this case, 0x00 means the next 3 bytes (63 82 A0) are an rgb value (63 is R, 82 is G ,and A0 is B).
+
+The last 3 bytes could have a different meaning depending on the first byte (the enum).
+For example, if the first byte was 0x01 meaning RgbArray, then the remaining 3 bytes would actually be an offset in the complexData section, and the RGB array would be stored in the complexData section.
+
+### complexData
+
+The complexData section could very well be empty (in which case the offset to it in the header should be 0).
+
+But assuming it is not empty, it is just an array of bytes with no structure.
+
+A basicData entry which makes use of it will point to an offset in the complexData section.
+The bytes at that location in the complexData will be interpreted according to the enum that was in the basicData.
+
+For example, recolorType 0x01 is an RgbArray.
+
+Let's look at some example data:
+
+```
+43 4C 52 30 00 00 00 38 00 16 00 00 00 07 00 00  CLR0...8........
+00 00 00 1F 00 17 81 00 63 82 A0 01 00 00 00 08  ........c, .....
+FF FF FF FF A0 FF FF FF 40 00 E8 7B 00 F3 FF 00  .... ...@..{....
+AA FF 60 78 FF 00 00 00 00 00 00 00 00 00 00 00  ..`x............
+```
+
+From offset 0x14 of the header, we get that the basicData offset is 0x0017.
+
+The 2 basicData entries are as follows:
+
+- 00 63 82 A0
+- 01 00 00 00
+
+Looking at the 2nd entry, we see the RecolorType is 0x01 which is RgbArray.
+This means the last 3 bytes (in this case, 00 00 00) is an offset in the complexData section.
+
+We can get the offset to the complexData section from offset 0x10 of the header.
+
+In this case, the complexData section is at offset 0x1F.
+
+So the data we are looking at starts with `08 FF FF FF FF A0 ...`.
+
+The structure of the data is entirely dependent on the recolorType, but in the case of RgbArray, the first byte is the array length, and it is followed by 3 byte RGB array entries.
+
+So in this case:
+
+- length
+  - 8
+- entries:
+  - FF FF FF
+  - FF A0 FF
+  - FF FF 40
+  - 00 E8 7B
+  - 00 F3 FF
+  - 00 AA FF
+  - 60 78 FF
+  - 00 00 00
+
+The above data in this example are the colors for the rainbow hearts.
+
+:::note
+
+The rainbow hearts are always displayed in the game with an ABCABCABC pattern.
+If you wanted a ping-pong ABCBABCBA pattern, you could probably update the first byte to be:
+0x80 mask gives 0 or 1 to indicate pattern, and the 0x7F mask gives the array length.
+
+:::
 
 ## Other notes
-
-### Optimal simplistic approach
-
-The simplistic approach is actually better to use if the following equation is true:
-
-4 \* (maxEnum + 1) <= roundUpTo2(3 \* ((maxEnum >> 3) + 1)) + 3 \* numEnumsWhichAreEnabled
-
-Basically:
-
-- maxEnum is exactly 0
-- maxEnum is 1, 2 or 3, and maxEnum and numEnumsWhichAreEnabled are equal
 
 ### Future splitting up of recoloring
 
