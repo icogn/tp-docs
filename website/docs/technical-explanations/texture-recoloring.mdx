@@ -1,0 +1,253 @@
+# Texture Recoloring
+
+import Link from '@docusaurus/Link';
+import RecolorDemo from '@local/RecolorDemo/RecolorDemo';
+
+This page explains how texture recoloring can be done without modifying the ROM.
+
+## Demo
+
+You can adjust the color picker to see the texture get recolored.
+
+<RecolorDemo />
+
+:::note
+
+The above is just for demonstration purposes.
+The exact color you see in the game depends on the lighting of the area, so the only real way to see how a color looks in the game is to see the color in the game.
+I may publish something to make this easier to accomplish at some point.
+
+:::
+
+## Colors
+
+We're just going to focus on the color and texture parts of the recoloring.
+Where to hook, how to locate which bytes to change, etc. are out of the scope of this document.
+
+Recoloring an image is essentially a two-step process:
+
+1. Desaturate the image.
+1. Blend the image with a color.
+
+### Desaturation
+
+There are many ways to desaturate a color.
+
+We use a quick but effective method of desaturation:
+
+```
+grayValue = 0.22 * r + 0.72 * g + 0.06 * b;
+```
+
+We make use of multiplication and shifts to make this calculation very fast.
+
+### Blending
+
+There are many ways to blend colors.
+
+The algorithm we use is known as an "Overlay" blend.
+
+This algorithm was chosen because when you use a color like 0xFF0000 (red), the result is probably way too red for most people.
+This is a good thing though, because it means we do not wind up in a situation where people are left wanting more.
+If the extremes are extreme, then that means any reasonable values that someone might want should be available somewhere in the middle.
+
+The blend algorithm is as follows:
+
+```
+f(a,b) = 2ab, if a < 0.5
+f(a,b) = 1 - 2(1 - a)(1 - b), otherwise
+```
+
+We make use of multiplication and shifts to speed this calculation up as well, so it is not as slow as it might look.
+
+Additionally, since we are only ever converting a gray value (0 through 255) to an RGB value, we can run the blend once for every possible gray value up-front.
+Then as we iterate through the texture, if we need to blend 0x78 (a gray value) with the rgb for example, we can use the cached value.
+This means we only need to execute the blend a maximum of 256 times no matter how large the texture we are recoloring is.
+
+## Textures
+
+The model textures we are currently recoloring are all the same format known as CMPR, so we will discuss the details of this since it can be a little confusing.
+
+We'll ignore most of the details since they aren't really important and focus on the changes that happen as they relate to the RGB values.
+
+### CMPR format
+
+The CMPR format can encode the colors for 16 pixels using only 8 bytes of data.
+
+This is pretty impressive since if you were to simply use 3 bytes (R,G,B) for each pixel, this would take 48 bytes (6 times as much space).
+
+Each 8 byte chunk can be split up as follows:
+
+| Offset | Type | Name        | Description                       |
+| ------ | ---- | ----------- | --------------------------------- |
+| 0x00   | u16  | leftColor   | RGB565 value                      |
+| 0x02   | u16  | rightColor  | RGB565 value                      |
+| 0x04   | u32  | paletteBits | 16 entries which are 2 bits each. |
+
+The 16 entries each point to either the leftColor, the rightColor, or a derived palette entry.
+
+The derived palette is based on the numerical relationship between the leftColor and the rightColor.
+
+If `leftColor > rightColor` (comparing them as `uint16_t`), then the palette is:
+
+| bits | Palette Entry          |
+| ---- | ---------------------- |
+| 00   | leftColor              |
+| 01   | rightColor             |
+| 10   | 2/3 left and 1/3 right |
+| 11   | 1/3 left and 2/3 right |
+
+otherwise (meaning `leftColor <= rightColor`):
+
+| bits | Palette Entry          |
+| ---- | ---------------------- |
+| 00   | leftColor              |
+| 01   | rightColor             |
+| 10   | 1/2 left and 1/2 right |
+| 11   | transparent            |
+
+### RGB565
+
+You could say 8 bits of red, then 8 bits of green, then 8 bits of blue might be RGB888.
+
+In this way, RGB565 is 5 bits of red, then 6 bits of green, then 5 bits of blue.
+
+Pushing these up next to each other makes 16 bits to represent an RGB value.
+
+The `leftColor` and `rightColor` in the CMPR format are each RGB565 values.
+
+### How to recolor CMPR
+
+We can desaturate, blend, then store the result for the `leftColor` and the `rightColor`.
+
+The main thing we have to take into consideration is that we need to handle the relative values of the left and right colors.
+
+For example, if L was greater than R before the blend, but afterward they are equal, then we will run into some problems.
+This is because the derived palette will now be different, so whereas bits `11` previously meant `1/3 left and 2/3 right`, it now means `transparent`.
+
+We can't be having transparency when there shouldn't be any!
+
+---
+
+After the blends, we will have 2 new colors.
+
+If the relative values of them are the same as before the blend, then we can just store them and move on.
+
+We need to make sure we handle some edge cases otherwise, and here is what the code for that looks like:
+
+```
+if ( leftIsGreater )
+{
+    if ( leftNewRgb565 == rightNewRgb565 )
+    {
+        // Need to make sure that subtracting 1 does not mess
+        // everything up. For example, 0x1000 - 1 => 0x0fff which is
+        // a completely different color.
+        if ( ( leftNewRgb565 & 0x1f ) == 0 )
+        {
+            // If left value has 0 blue, we change its blue to 1.
+            leftNewRgb565 += 1;
+        }
+        rightNewRgb565 = leftNewRgb565 - 1;
+    }
+    else if ( leftNewRgb565 < rightNewRgb565 )
+    {
+        needsBitSwap = true;
+    }
+}
+else if ( leftNewRgb565 > rightNewRgb565 )
+{
+    needsBitSwap = true;
+}
+```
+
+So if "left was greater and now right is greater" or if "right was greater and now left is greater", we need to update the palette bits to point to the correct palette entry (the `needsBitSwap` parts).
+
+In the specific case that "left was greater, but now they are equal", we actually have to modify the left one to still be greater.
+If we didn't do this, we would get some transparency in the palette when there shouldn't be any.
+
+To fix this, we set the right to be one less than the left.
+
+There is an additional edge-case within the edge-case in which subtracting 1 from the new leftColor would cause problems if the leftColor had 0 blue.
+
+For example, if both of the new colors were 0x1000, when we subtract 1 from the right one, we would get 0xfff.
+This is a completely different color which actually has maximum blue!
+
+So in the case that the blue of the leftColor is 0, we set it to be 1 in the leftColor and 0 in the rightColor.
+
+#### Bit-swapping
+
+For the cases that we need to update the palette bits, we use the following:
+
+```
+// In the case of left being greater than right:
+// 0b00 will swap to 0b01
+// 0b01 will swap to 0b00
+// 0b10 will swap to 0b11
+// 0b11 will swap to 0b10
+// So the left bit stays the same, and the right bit changes
+// Can do xor (^) like 0b01010101 or 0x55 for each u16
+
+// In the case of left not being greater than right:
+// 0b00 will swap to 0b01
+// 0b01 will swap to 0b00
+// 0b10 will stay the same
+// 0b11 will stay the same
+// so if the left bit is a 0, the right bit will change
+uint32_t swapIndexBits( bool leftIsGreater, uint32_t bits )
+{
+    if ( leftIsGreater )
+    {
+        return bits ^ 0x55555555;
+    }
+    else
+    {
+        uint32_t mask = ( ( bits >> 1 ) & 0x55555555 ) ^ 0x55555555;
+        return bits ^ mask;
+    }
+}
+```
+
+:::note
+
+Humans perceive blue less than red and green, so that is why we make modifications to the blue when we handle the "left was greater, but the new ones are equal" edge-case.
+This is also why blue has the smallest coefficient in the desaturate function.
+
+:::
+
+## Other
+
+### Partial texture recoloring
+
+You can also use a callback function to only conditionally recolor parts of the texture.
+This is needed for something like the Hylian Shield which is a large number of colors.
+
+You can do a pretty decent job of recoloring just the bird on the shield.
+But this kind of thing has to be handled case-by-case.
+
+### Limitations
+
+This is mainly meant to work with colors on 3D models, but even then some things are handled differently, so you will still have to solve for each thing based on research findings.
+
+This has only been written to support updating CMPR textures, but you could theoretically handled other formats as well.
+
+### Fancy stuff
+
+You could theoretically do gradients and whatnot as well, but the code for this would be more complicated.
+
+Maybe worth looking into how MAT stuff works more to see what is possible there.
+
+## References
+
+- <Link to="https://tannerhelland.com/2011/10/01/grayscale-image-algorithm-vb6.html">
+    Seven grayscale conversion algorithms (with pseudocode and VB6 source code)
+  </Link>
+- <Link to="https://docs.gimp.org/2.10/en/gimp-filter-desaturate.html">
+    GIMP - Desaturate
+  </Link>
+- <Link to="https://en.wikipedia.org/wiki/Blend_modes#Overlay">
+    Wikipedia - Blend modes
+  </Link>
+- <Link to="https://wiki.tockdom.com/wiki/Image_Formats#CMPR">
+    Custom Mario Kart Wiiki - Image Formats
+  </Link>
