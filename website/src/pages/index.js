@@ -40,6 +40,15 @@ function HomepageHeader() {
               'button button--secondary button--lg',
               styles.button
             )}
+            to="/docs/rando/race-rules"
+          >
+            Rando
+          </Link>
+          <Link
+            className={clsx(
+              'button button--secondary button--lg',
+              styles.button
+            )}
             to="/png-to-ci8"
           >
             PNG to BTI
