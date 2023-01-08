@@ -5,19 +5,23 @@ These are the rules for the standard races hosted by isaac (usually on Sunday).
 The main goals of the rules and settings are the following:
 
 - Pretty much anyone should be able to join and complete the seed.
-- More experienced players should be able to complete most seeds in under 4 hours.
+- More experienced players should be able to complete most seeds in under 3.5 hours.
 - "Bad seeds" should not be unreasonably time-consuming.
 - Some number of tricks/glitches should be allowed so that people have things to learn and so that more experienced players do not become frustrated with the rules.
+- It should be fun!
 
 ## General rules
 
-- Using any emulator features which give a meaningful advantage over someone playing on console are banned.
-  These include, but are not limited to, save states, custom macros, and pausing execution or advancing frames.
+- Loading quest logs which were created before the race starts is banned (other than the REL Loader quest log).
+- Playing the game ahead of the race to change values in RAM to give you an advantage is banned.
+  - For example, setting up Early Boss Flags before the race starts.
+- Using any emulator features which give a meaningful advantage over someone playing on console is banned.
+  - These include, but are not limited to, save states, custom macros, pausing execution, and advancing frames.
 
 ## Settings
 
 Settings string:<br/>
-`1sA192koP_yViP8Hv_zEZtdgug3_6eC3LAPe5S8o0FiywyEMuYwXRvI_9xWzbtL0SzfjMiCD5J8R_W`
+`1sY1M2kv9_yUaP4fqkbqkbqkb2FF_fqUyzN5GVur1WQfJD0hX6G1zddNXot4NKBVANvFS7iku74oe3djDgrXXegP3Vy`
 
 ### Logic Rules
 
@@ -45,20 +49,23 @@ Randomized bugs are nice because they are quick to check.
 
 ### Dungeon Items
 
-Small Keys and Big Keys are set to `Own Dungeon` which has the following benefits:
+Small Keys and Big Keys are set to `Keysy` which has the following benefits:
 
-- Spices the dungeon up a little compared to Vanilla key placement.
-- "Double-dipping" a dungeon is less likely than with some of the other options.
-- It is not as important that the player memorizes how many keys each dungeon has compared to some options.
+- When you are go-mode, you do not have to waste time doing checks.
+  - This can be especially nice for Hyrule Castle.
+- Dungeons are more likely to have important items in them.
+  - Seeds which have more important items in dungeons are typically faster to complete.
+- Players have the option to intentionally skip a large number of checks, a small number of checks, or no checks in dungeons.
+  - You might skip checks (a risk) to potentially gain a time advantage (a reward).
+    You can balance the risk/reward however you like.
 
 `Maps and Compasses` is set to `Start With` for the following reasons:
 
 - Players do not have to be as familiar with each dungeon since they start with the map and compass.
-- Getting Maps and Compasses from chests plays the music to hype you up like you are getting something good which results in disappointment when you find out it is just a Map or Compass.
 
 ### Starting Inventory
 
-Players start with `Shadow Crystal`, `Horse Call`, and `Gate Keys`.
+Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive_Fishing_Rod`, and six `Progressive_Sky_Book`.
 
 - Shadow Crystal
   - Speeds up seeds significantly since you start with the ability to warp.
@@ -68,6 +75,11 @@ Players start with `Shadow Crystal`, `Horse Call`, and `Gate Keys`.
 - Gate Keys
   - Opens up the seed more at the beginning.
     If you don't start with gate keys, the seeds pretty much all start out by going through Kakariko Village and finding Bombs.
+- Progressive_Fishing_Rod
+  - Makes it so you only have to find a single Progressive_Fishing_Rod to progress in Snowpeak.
+  - Also convenient for Upper Zora's River.
+- 6 Progressive_Sky_Book
+  - Makes it so you only have to find a single Progressive_Sky_Book to make the Sky Cannon appear in Lake Hylia.
 
 ### Excluded Checks
 
@@ -87,13 +99,21 @@ Players start with `Shadow Crystal`, `Horse Call`, and `Gate Keys`.
   - There were some bugs related to Impaz which may or may not have been fixed.
     Would hate for people to lose their run to a bug.
   - Full list: `Cats Hide and Seek Minigame, Skybook From Impaz`
-- Iza 2
-  - Iza 1 is already quite time-consuming.
-    Iza 2 is like Iza 1 but easy to fail and have to restart.
-  - If Iza 2 is actually required, chances are it is a "bad seed".
-  - Full list: `Iza Raging Rapids Minigame`
+- Hyrule Castle Dominion Rod Chest
+  - This check is almost never required to complete the seed.
+    However, there is always a very small chance it matters.
+    And if it ever did matter, some people would definitely forfeit.
+  - It is removed purely because it is not fun to enter the final dungeon every seed knowing that there is a small chance you will have to leave again to go find the 2nd Dominion Rod.
+  - Full list: `Hyrule Castle Graveyard Owl Statue Chest`
+- Iza Checks
+  - Both Iza checks are some of the longest checks in the game.
+  - Reasonable players all save these checks until the end.
+    If an Iza check is required, everyone ends up doing it at the very end.
+    So all that happens is the seed is bad for everyone, and no one gains any advantage from doing it early (no one does it early since it is an unreasonable strategy).
+  - Full list: `Iza Helping Hand, Iza Raging Rapids Minigame`
 - Jovani Poe Soul Rewards
   - Reward for 60 should obviously be excluded, and 20 was removed by group decision.
+  - Aside from the group decision, the reasoning for its removal is similar to the reasoning for removing the Iza checks.
   - Could maybe try it again once we can reduce the number to more like 10 poes.
   - Full list: `Jovani 20 Poe Soul Reward, Jovani 60 Poe Soul Reward`
 - Trade Quest Checks
@@ -124,12 +144,6 @@ Players start with `Shadow Crystal`, `Horse Call`, and `Gate Keys`.
   - `Arbiters Does Not Require Bulblin Camp`
     - Speeds things up.
     - There are bugs related to the camp key currently.
-  - `Snowpeak Does Not Require Reekfish Scent`
-    - Speeds things up.
-    - I prefer that people search for useful item-wheel items rather than keys to get into places.
-  - `City Does Not Require Filled Skybook`
-    - Sky Characters are the worst thing about this game.
-    - Rather than searching for Sky Characters, I think it is more enjoyable to search for useful items.
   - `Temple of Time Entrance`
     - Set to `Open`.
     - Saves time and gives the portal to Sacred Grove at the start which is nice.
@@ -137,6 +151,17 @@ Players start with `Shadow Crystal`, `Horse Call`, and `Gate Keys`.
       The reason to change to Open Grove would be if you wanted swords to be easier to find, and you did not like ToT.
       I would prefer to keep swords as they are.
       For making ToT nicer, I would rather use an option to remove the Door of Time which would skip bringing the statue back down.
+
+"Other" settings which are NOT turned on are:
+
+- `Snowpeak Does Not Require Reekfish Scent`
+  - You must find the Coral Earring, then get the Reekfish scent in order to access most of Snowpeak.
+    - Note that skipping the Reekfish scent with Map Glitch is banned.
+  - This makes it so that SPR is never Sphere 0, and you can complete UZR is one pass.
+- `City Does Not Require Filled Skybook`
+  - You must find one sky character before the cannon to CitS appears at Lake Hylia.
+  - This is an experimental setting, but the idea is to reduce the likelihood that you have to double-dip CitS.
+    More research with actual data needs to be done on the difference between this settings and starting with the cannon at Lake Hylia.
 
 ## Glitches/Tricks
 
@@ -181,13 +206,6 @@ This probably won't be enforced if the race is casual, but keep in mind it is te
   - Can give a significant time advantage.
   - Reduces the item requirements to beat the seed.
 
-### Door of Time Skip
-
-- What is it:
-  - In Temple of Time, you can skip bringing the statue all the way back down by clipping through the door which would disappear after you bring the statue back down.
-- Why is it banned:
-  - Can give a significant time advantage.
-
 ### Iza Item Manipulation
 
 - What is it:
@@ -196,13 +214,6 @@ This probably won't be enforced if the race is casual, but keep in mind it is te
     This includes, but is not limited to, stealing bomb bag and infinite bomb arrows.
 - Why is it banned:
   - Goes against the spirit of the Randomizer by giving a guaranteed item.
-
-### Morpheel/Zant without Zora Armor
-
-- What is it:
-  - You can complete the Morpheel and Zant fights without Zora Armor by refilling your air with water bombs.
-- Why is it banned:
-  - Reduces the item requirements to beat the seed.
 
 ### Early Monkey Chain Room
 
@@ -214,6 +225,27 @@ This probably won't be enforced if the race is casual, but keep in mind it is te
   - If this was not banned, then it is kind of at the level such that you would be putting yourself at a meaningful disadvantage by not practicing it.
     And it would definitely require practice for more than just a few minutes.
   - Even outside of bingo, you can potentially get Forest Temple out of the way much faster than other players who may need to (re)visit it later once they find boomerang.
+
+### Morpheel/Zant without Zora Armor
+
+- What is it:
+  - You can complete the Morpheel and Zant fights without Zora Armor by refilling your air with water bombs.
+- Why is it banned:
+  - Reduces the item requirements to beat the seed.
+
+### Skipping Reekfish Scent
+
+- What is it:
+  - You can skip getting the Reekfish scent by using Map Glitch in Snowpeak.
+- Why is it banned:
+  - Reduces the item requirements to beat the seed.
+
+### Door of Time Skip
+
+- What is it:
+  - In Temple of Time, you can skip bringing the statue all the way back down by clipping through the door which would disappear after you bring the statue back down.
+- Why is it banned:
+  - Can give a significant time advantage.
 
 ### Hyrule Castle Double Clawshots Skips
 
