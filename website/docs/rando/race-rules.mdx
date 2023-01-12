@@ -7,6 +7,7 @@ The main goals of the rules and settings are the following:
 - Pretty much anyone should be able to join and complete the seed.
 - More experienced players should be able to complete most seeds in under 3.5 hours.
 - "Bad seeds" should not be unreasonably time-consuming.
+  If people frequently are saying "pain..." after the seed finishes, that is a problem.
 - Some number of tricks/glitches should be allowed so that people have things to learn and so that more experienced players do not become frustrated with the rules.
 - It should be fun!
 
@@ -17,11 +18,13 @@ The main goals of the rules and settings are the following:
   - For example, setting up Early Boss Flags before the race starts.
 - Using any emulator features which give a meaningful advantage over someone playing on console is banned.
   - These include, but are not limited to, save states, custom macros, pausing execution, and advancing frames.
+- Dolphin settings should match the specifications in this pin: https://discord.com/channels/596503283124666368/737120005723914360/1043278585240223804
+- If playing on console, it is recommended to follow the setup as specified in this post: https://discord.com/channels/596503283124666368/737120005723914360/1043270665769340968
 
 ## Settings
 
 Settings string:<br/>
-`1sY1M2kv9_yUaP4fqkbqkbqkb2FF_fqUyzN5GVur1WQfJD0hX6G1zddNXot4NKBVANvFS7iku74oe3djDgrXXegP3Vy`
+`1sA1O2kv9_yVaP4fqkbqkbqkb2FF_fqUyzN5GVur1WQfJD0hX6G1zddNXot4NKBVANvFS7ikvM0ucL0SzfjMiCD5J8R_W`
 
 ### Logic Rules
 
@@ -59,7 +62,7 @@ Small Keys and Big Keys are set to `Keysy` which has the following benefits:
   - You might skip checks (a risk) to potentially gain a time advantage (a reward).
     You can balance the risk/reward however you like.
 
-`Maps and Compasses` is set to `Start With` for the following reasons:
+`Maps and Compasses` is set to `Start With` for the following reason:
 
 - Players do not have to be as familiar with each dungeon since they start with the map and compass.
 
@@ -76,8 +79,8 @@ Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive
   - Opens up the seed more at the beginning.
     If you don't start with gate keys, the seeds pretty much all start out by going through Kakariko Village and finding Bombs.
 - Progressive_Fishing_Rod
-  - Makes it so you only have to find a single Progressive_Fishing_Rod to progress in Snowpeak.
-  - Also convenient for Upper Zora's River.
+  - Initially was added so that getting the Reekfish scent was easier, but the Reekfish was changed to no longer be required.
+  - We still start with a fishing rod since it only unlocks one check in UZR, and being able to do UZR in one pass at any time feels better than it having 2 sphere 0 checks and 1 check locked behind an item which does nothing but unlock that one check.
 - 6 Progressive_Sky_Book
   - Makes it so you only have to find a single Progressive_Sky_Book to make the Sky Cannon appear in Lake Hylia.
 
@@ -93,6 +96,11 @@ Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive
 - Golden Wolves
   - Skipping the Howling Stones and Golden Wolf Trainings saves a good amount of time.
   - Full list: `Faron Woods Golden Wolf, Gerudo Desert Golden Wolf, Kakariko Graveyard Golden Wolf, North Castle Town Golden Wolf, Ordon Spring Golden Wolf, Outside South Castle Town Golden Wolf, West Hyrule Field Golden Wolf`
+- Goron Springwater Rush
+  - This check is one of the longest single checks in the game, taking nearly 3 minutes and 500 rupees.
+  - If this check is required, everyone ends up doing it at the very end.
+    So all that happens is the seed is bad for everyone, and no one gains any advantage from doing it early (no one does it early since it is an unreasonable strategy).
+  - Full list: `Goron Springwater Rush`
 - Hidden Village Checks
   - The Hidden Village checks are only relevant if ToT is required, so it can be easy to forget them.
   - The cat hide-and-seek minigame is time-consuming.
@@ -107,8 +115,7 @@ Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive
   - Full list: `Hyrule Castle Graveyard Owl Statue Chest`
 - Iza Checks
   - Both Iza checks are some of the longest checks in the game.
-  - Reasonable players all save these checks until the end.
-    If an Iza check is required, everyone ends up doing it at the very end.
+  - If an Iza check is required, everyone ends up doing it at the very end.
     So all that happens is the seed is bad for everyone, and no one gains any advantage from doing it early (no one does it early since it is an unreasonable strategy).
   - Full list: `Iza Helping Hand, Iza Raging Rapids Minigame`
 - Jovani Poe Soul Rewards
@@ -144,6 +151,12 @@ Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive
   - `Arbiters Does Not Require Bulblin Camp`
     - Speeds things up.
     - There are bugs related to the camp key currently.
+- `Snowpeak Does Not Require Reekfish Scent`
+  - You do not need to find fishing rods and get the Reekfish scent to access Snowpeak checks.
+  - The idea behind requiring fishing rods to access SPR was to remove any sphere 0 checks from SPR.
+    However, when SPR is not a required dungeon, the Snowpeak checks become much worse.
+    Since SPR is required a minority of the time, requiring the player to find fishing rods and get the Reekfish scent tends to do more harm than good.
+    So this setting was reverted back to being enabled.
   - `Temple of Time Entrance`
     - Set to `Open`.
     - Saves time and gives the portal to Sacred Grove at the start which is nice.
@@ -154,14 +167,10 @@ Players start with `Shadow Crystal`, `Horse Call`, `Gate Keys`, one `Progressive
 
 "Other" settings which are NOT turned on are:
 
-- `Snowpeak Does Not Require Reekfish Scent`
-  - You must find the Coral Earring, then get the Reekfish scent in order to access most of Snowpeak.
-    - Note that skipping the Reekfish scent with Map Glitch is banned.
-  - This makes it so that SPR is never Sphere 0, and you can complete UZR is one pass.
 - `City Does Not Require Filled Skybook`
   - You must find one sky character before the cannon to CitS appears at Lake Hylia.
   - This is an experimental setting, but the idea is to reduce the likelihood that you have to double-dip CitS.
-    More research with actual data needs to be done on the difference between this settings and starting with the cannon at Lake Hylia.
+    More research with actual data needs to be done on the difference between this setting and starting with the cannon at Lake Hylia.
 
 ## Glitches/Tricks
 
@@ -230,13 +239,6 @@ This probably won't be enforced if the race is casual, but keep in mind it is te
 
 - What is it:
   - You can complete the Morpheel and Zant fights without Zora Armor by refilling your air with water bombs.
-- Why is it banned:
-  - Reduces the item requirements to beat the seed.
-
-### Skipping Reekfish Scent
-
-- What is it:
-  - You can skip getting the Reekfish scent by using Map Glitch in Snowpeak.
 - Why is it banned:
   - Reduces the item requirements to beat the seed.
 
