@@ -1,0 +1,857 @@
+# Hints
+
+Hints help nudge the player in the correct direction as they complete a seed.
+
+Hints as a feature are still being developed in a fork.
+When development is completed for the first iteration of the feature, hints will be available for a seed on its seed page.
+Eventually, you will have the option to discover hints through gameplay (but that will not be here anytime soon).
+The hints on the seed page will continue to be an available option even once the gameplay hints are working.
+
+## Hint Zones
+
+Every check in the game is assigned to exactly one Hint Zone.
+For example, "Wrestling With Bo" belongs to the "Ordon" hint zone.
+
+---
+
+**Hint Zones (35 total):**
+
+- Other (2 zones)
+  - Hero's Spirit
+    - Golden Wolf checks are their own zone.
+  - Agitha
+    - All rewards which you receive from Agitha.
+- Dungeons (9 zones)
+  - Forest Temple
+  - Goron Mines
+  - Lakebed Temple
+  - Arbiter’s Grounds
+  - Snowpeak Ruins
+  - Temple of Time
+  - City in the Sky
+  - Palace of Twilight
+  - Hyrule Castle
+- Ordona Province (1 zone)
+  - Ordon
+- Faron Province (3 zones)
+  - Greater Sacred Grove Area
+    - Sacred Grove, Lost Woods, Past Area (room before the actual Temple of Time dungeon; this room has the 2 owl statues you can move)
+  - Faron Field
+    - Hyrule Field part which is in Faron Province
+  - Faron Woods
+    - Everything else. Includes caves, mist area, Coro area, outside Forest Temple
+- Eldin Province (7 zones)
+  - Kakariko Gorge
+  - Kakariko Village
+    - Includes Goron Springwater Rush.
+  - Kakariko Graveyard
+  - Eldin Field
+    - Hyrule Field part which is in Eldin Province. Also includes the checks which are on the Bridge of Eldin (1 bug, owl statue checks)
+  - North of Eldin Bridge
+    - Includes the lava cave (stock cave), the Stalfos grotto which requires Spinner to access, and one of the bugs.
+  - Death Mountain
+    - All checks on the path up to Goron Mines
+  - Hidden Village
+- Lanayru Province (9 zones)
+  - Lanayru Field
+    - Part of Hyrule Field which is in Lanayru Province. This includes the checks in the Ice Block Puzzle area and the one Spinner check by itself. The “Outside Castle Town” areas are NOT part of Lanayru field.
+  - Outside Castle Town
+    - This includes the areas West of Castle Town (amphitheater area), South of Castle Town, and East of Castle Town (where there is a single Poe)
+  - Castle Town
+    - Includes everything but Agitha (STAR game, Charlo Donation, Magic Armor, etc.)
+  - Great Bridge of Hylia
+    - This includes all checks on the bridge and those slightly north and south of it. The grotto area south of the bridge which requires you to blow up the rocks is included. The owl statues north of the bridge are included.
+  - Lake Hylia
+    - Does not include the Lake Hylia Cave (long lantern cave, hype cave, whatever you want to call it). Plumm is considered a Lake Hylia check.
+  - Lake Hylia Cave
+    - Hype cave. The one with a bunch of rooms which each have 2 or 3 bombable walls.
+  - Lanayru Spring
+    - Note the 2 chests outside the Spring belong to the Lake Hylia zone, not this one.
+  - Zora’s Domain
+  - Upper Zora’s River
+    - Fishing Hole, outside the Fishing hole, Iza checks
+- Desert Province (3 zones)
+  - Upper Gerudo Desert
+    - All checks in Gerudo Desert which you access before jumping down to the lower level with the campfire and the Bulblins on watch.
+  - Lower Desert to Arbiter’s
+    - Checks in the lower desert area all the way up to the entrance of Arbiter’s Grounds.
+  - Cave of Ordeals
+- Peak Province (1 zone)
+  - Snowpeak
+    - All Peak Province checks. Does not include the SPR dungeon which is its own zone (each dungeon is its own zone).
+
+---
+
+:::note
+
+The hints are meant to answer the question “Should I go to this place?”.
+That being the case, checks which are initiated in one place and which end in another are classified by where you go to start the check.
+This means:
+
+- Plumm is considered a Lake Hylia check
+- Iza checks are considered Upper Zora’s River checks
+- Goron Springwater Rush check is a Kakariko Village check
+
+:::
+
+Most of the hint zones are self-explanatory, but I would like to point out a few things:
+
+- `Kakariko Village` and `Kakariko Graveyard` are separate hint zones.
+- `Faron Woods` includes all Faron Province overworld checks which are not in `Faron Field` (including the caves).
+- Areas which would be considered "Hyrule Field" are split into the following zones:
+  - Faron Field
+  - Kakariko Gorge
+  - Eldin Field (includes the checks on Eldin Bridge)
+  - North of Eldin Bridge (stalfos grotto, lava cave, and one bug)
+  - Lanayru Field (does NOT include the west part of Outside Castle Town; includes the Spinner check)
+  - Outside Castle Town (includes the west, east, and south parts)
+  - Great Bridge of Hylia
+- Since the desert is so large, it has been split into two zones:
+  - Upper Gerudo Desert
+    - The part of the desert where you land when entering from Lake Hylia
+  - Lower Desert to Arbiter's
+    - The part of the desert after the portal area which you reach by jumping down a level.
+      This includes the grotto with 2 poes, and it continues all the way up to the Arbiter's Grounds entrance.
+
+## Hint Types
+
+There are currently 5 types of hints:
+
+`Spirit of Light`, `Barren`, `Always`, `Sometimes`, and `AgithaRewards`
+
+### Spirit of Light
+
+Spirit of Light hints (or SpoL hints for short) indicate a hint zone which contains a specific check which is 100% required to logically complete the seed.
+
+For example, if you are playing a glitchless logic seed and one of the SpoL zones is Ordon, you would not be able to logically complete the seed if you were to leave Ordon without doing any checks and never go back.
+
+If `Ordon` is SpoL, Spinner might be on `Wrestling with Bo` for example.
+You could also have something a little more complex like a Male Mantis in `Ordon` and a Clawshot from the Male Mantis reward.
+
+:::note
+
+SpoL hints will never refer to a check already covered by an Always hint.
+So if the Jovani 20 Poes check is hinted to be Clawshot and Castle Town is SpoL, then there must be another required check in Castle Town which is not Jovani.
+
+:::
+
+### Barren
+
+Barren hints indicate a hint zone for which all of its checks contain unimportant items such as rupees and ammo refills.
+
+:::note
+
+It is technically possible that a Barren hint zone is required, but the chance is incredibly low.
+Hidden Skills do not prevent a hint zone from being hinted barren, so it is possible for all 7 hidden skills to be in Lake Hylia Cave which is hinted Barren.
+You need at least 1 hidden skill to finish the game, so in this case you would have to visit Lake Hylia Cave despite it being hinted Barren.
+Again, the chance of this is so low it might as well not exist, but I wanted to mention it.
+
+:::
+
+### Always
+
+Always hints tell you the rewards for a list of checks.
+For all seeds you do, you will always be told what these checks have, hence the name.
+
+For example, you will always be told the rewards for the following checks in the Sunday race settings:
+
+- Goron Springwater Rush
+- Iza Helping Hand
+- Jovani 20 Poe Soul Reward
+- Lanayru Ice Block Puzzle Cave Chest
+
+These checks are some of the worst in the game, and people almost always do them only after they have exhausted all of their other options.
+
+Always hints really shine when they hint things that may or may not be required, such as a Bomb Bag or a Bug when Agitha has required stuff.
+
+### Sometimes
+
+Sometimes hints are like Always hints in that they tell you the rewards given by certain checks.
+
+The difference is that Always hints are always selected, but Sometimes hints are randomly selected from a pool.
+So a specific Sometimes hint will only be selected some of the time.
+The exact Sometimes hint pool will vary depending on settings.
+
+These checks are usually time-consuming ones which are not so bad they deserve to be Always hints.
+
+:::note
+
+Zones not already covered by SpoL and Barren hints are prioritized when picking Sometimes hints.
+
+:::
+
+### AgithaRewards
+
+The AgithaRewards hint tells you every interesting item Agitha can give out as a reward.
+
+## How hints are calculated
+
+Hints are generated in the following order:
+
+1.  Always
+1.  AgithaRewards
+1.  Spirit of Light
+1.  Barren
+1.  Sometimes
+
+- The only one which really matters is that Sometimes is calculated after Spirit of Light and Barren.
+- Barren is done after SpoL so that it can filter out the SpoL zones up front (though this is just an optimization which isn't strictly necessary).
+- Spirit of Light needs to know which checks are used for Always hints, but this list is known before the Always hints are created, so Always hints could technically be done last.
+
+:::note
+
+Every hint references a specific check even if the exact check is unimportant (such as with Barren hints).
+
+:::
+
+### Always
+
+These are extremely straightforward.
+Generate a hint for each "Always check".
+
+### AgithaRewards
+
+Determine what constitutes an "interesting item":
+
+- Start with a generous pool of items
+  - Includes items such as Shields and Magic Armor since they are nice to know, but they likely don't decide whether or not you completely ignore Agitha for the seed.
+  - Exact list: `Progressive_Sword, Progressive_Wallet, Ordon_Shield, Hylian_Shield, Zora_Armor, Magic_Armor, Shadow_Crystal, Boomerang, Lantern, Slingshot, Progressive_Fishing_Rod, Iron_Boots, Progressive_Bow, Filled_Bomb_Bag, Progressive_Clawshot, Aurus_Memo, Asheis_Sketch, Spinner, Ball_and_Chain, Progressive_Dominion_Rod, Progressive_Sky_Book, Renados_Letter, Invoice, Wooden_Statue, Ilias_Charm, Horse_Call, Gate_Keys`
+- Add any items which show up in the Spheres.
+- Add any bugs for which their Agitha reward is not excluded or vanilla.
+- Remove Hidden Skills and Poe Souls since they are not that helpful and they make the hints harder to read.
+
+Loop through all Agitha rewards:
+
+- if the reward is an "interesting item", add a hint to the list for that check.
+
+Sort the hint list alphabetically so players can't try to infer anything about which bugs matter based on the order.
+
+### Spirit of Light
+
+At a high level:
+
+- get a list of checks which could be hinted as SpoL
+- convert this list to a list of hint zones
+- randomly sort the hint zone list
+- select zones from the front of the list until you reach the desired number or you run through the entire list
+- for each selected zone, randomly select a SpoL check in that zone, then create a hint for that check
+
+Determining which checks can be hinted as SpoL:
+
+- Iterate through the spheres.
+  For each check in the spheres, add it to a list of potential SpoL checks if the following are all true:
+  - Does not contain an "invalidSpolItem"
+  - check is not already covered by Always hints
+  - check's hint zone is not Agitha if the AgithaRewards hint is on
+- Iterate through the new list of potential SpoL checks:
+  - For each check, replace its contents with a green rupee.
+    If the seed is still beatable when that check's reward is replaced with a green rupee, that check cannot be hinted SpoL.
+- return the new list of checks which are definitely required
+
+The "invalidSpolItems" list is static:
+
+- Poe Souls
+- Hidden Skill
+- Fused Shadows and Mirror Shards
+- All Big Keys, Small Keys, Dungeon Maps, Compasses, Cheese, and Pumpkin
+
+### Barren
+
+A zone cannot be hinted barren if any of the following are true:
+
+- it is already hinted SpoL
+- it is Death Mountain
+- it is Agitha if the AgithaRewards hint is on
+- it is an unrequired dungeon when the "Unrequired Dungeons Are Barren" setting is on
+- 100% of the checks in the zone are excluded or vanilla
+
+Creating the list of potential barren zones:
+
+- Filter the list of zones which pass the above checks, the randomly sort the filtered list.
+- Iterate through the list, selecting zones which pass the following:
+  - none of the checks in that zone have "preventBarrenItems" as their reward
+- We stop iterating through the list once the desired number of hints is reach or the list is exhausted (whichever happens first).
+
+Calculating "preventBarrenItems":
+
+- These items always prevent barren:
+  - Progressive_Sword
+  - Boomerang
+  - Lantern
+  - Slingshot
+  - Progressive_Fishing_Rod
+  - Iron_Boots
+  - Progressive_Bow
+  - Filled_Bomb_Bag
+  - Progressive_Clawshot
+  - Aurus_Memo
+  - Spinner
+  - Ball_and_Chain
+  - Progressive_Dominion_Rod
+- For all singleCheckItems (golden bugs and Ashei's Sketch):
+  - Add the bug or Sketch to the preventBarrenItems if the reward for the item is not excluded.
+- Add all items which show up in spheres
+- Remove Hidden Skills, Poe Souls, Mirror Shards, and Fused Shadows
+- If the BigKey setting is not Anywhere or AnyDungeon, remove all big keys.
+- If the SmallKey setting is not Anywhere or AnyDungeon, remove all small keys.
+
+### Sometimes
+
+- Generate a list of potential checks based on settings.
+  - For example, the Death Sword check can only be hinted if "Unrequired Dungeons are Barren" is off or if Arbiter's Grounds is a required dungeon.
+- Iterate through the checks and split them into 2 lists:
+  - One list is for checks in zones already covered by SpoL and Barren hints.
+  - the other checks go in the other list
+- Randomly sort each list
+- Concat the 2 lists, putting the list of checks not in zones covered by SpoL and Barren first.
+- Starting at the front of the list, create a hint for each check until we reach the desired number of hints or run out of entries in the list.
+
+## Full list of checks
+
+```
+{
+  "Ordon": [
+    "Herding Goats Reward",
+    "Links Basement Chest",
+    "Ordon Cat Rescue",
+    "Ordon Ranch Grotto Lantern Chest",
+    "Ordon Shield",
+    "Ordon Sword",
+    "Sera Shop Slingshot",
+    "Uli Cradle Delivery",
+    "Wooden Sword Chest",
+    "Wrestling With Bo"
+  ],
+  "Greater Sacred Grove Area": [
+    "Lost Woods Boulder Poe",
+    "Lost Woods Lantern Chest",
+    "Lost Woods Waterfall Poe",
+    "Sacred Grove Baba Serpent Grotto Chest",
+    "Sacred Grove Female Snail",
+    "Sacred Grove Male Snail",
+    "Sacred Grove Master Sword Poe",
+    "Sacred Grove Past Owl Statue Chest",
+    "Sacred Grove Spinner Chest",
+    "Sacred Grove Temple of Time Owl Statue Poe"
+  ],
+  "Faron Field": [
+    "Faron Field Bridge Chest",
+    "Faron Field Corner Grotto Left Chest",
+    "Faron Field Corner Grotto Rear Chest",
+    "Faron Field Corner Grotto Right Chest",
+    "Faron Field Female Beetle",
+    "Faron Field Male Beetle",
+    "Faron Field Poe",
+    "Faron Field Tree Heart Piece"
+  ],
+  "Faron Woods": [
+    "Coro Bottle",
+    "Faron Mist Cave Lantern Chest",
+    "Faron Mist Cave Open Chest",
+    "Faron Mist North Chest",
+    "Faron Mist Poe",
+    "Faron Mist South Chest",
+    "Faron Mist Stump Chest",
+    "Faron Woods Owl Statue Chest",
+    "Faron Woods Owl Statue Sky Character",
+    "North Faron Woods Deku Baba Chest",
+    "South Faron Cave Chest"
+  ],
+  "Kakariko Gorge": [
+    "Eldin Lantern Cave First Chest",
+    "Eldin Lantern Cave Lantern Chest",
+    "Eldin Lantern Cave Poe",
+    "Eldin Lantern Cave Second Chest",
+    "Kakariko Gorge Double Clawshot Chest",
+    "Kakariko Gorge Female Pill Bug",
+    "Kakariko Gorge Male Pill Bug",
+    "Kakariko Gorge Owl Statue Chest",
+    "Kakariko Gorge Owl Statue Sky Character",
+    "Kakariko Gorge Poe",
+    "Kakariko Gorge Spire Heart Piece"
+  ],
+  "Kakariko Village": [
+    "Barnes Bomb Bag",
+    "Eldin Spring Underwater Chest",
+    "Goron Springwater Rush",
+    "Ilia Memory Reward",
+    "Kakariko Inn Chest",
+    "Kakariko Village Bomb Rock Spire Heart Piece",
+    "Kakariko Village Bomb Shop Poe",
+    "Kakariko Village Female Ant",
+    "Kakariko Village Malo Mart Hawkeye",
+    "Kakariko Village Malo Mart Hylian Shield",
+    "Kakariko Village Watchtower Poe",
+    "Kakariko Watchtower Alcove Chest",
+    "Kakariko Watchtower Chest",
+    "Renados Letter",
+    "Talo Sharpshooting"
+  ],
+  "Kakariko Graveyard": [
+    "Gift From Ralis",
+    "Kakariko Graveyard Grave Poe",
+    "Kakariko Graveyard Lantern Chest",
+    "Kakariko Graveyard Male Ant",
+    "Kakariko Graveyard Open Poe",
+    "Rutelas Blessing"
+  ],
+  "Eldin Field": [
+    "Bridge of Eldin Male Phasmid",
+    "Bridge of Eldin Owl Statue Chest",
+    "Bridge of Eldin Owl Statue Sky Character",
+    "Eldin Field Bomb Rock Chest",
+    "Eldin Field Bomskit Grotto Lantern Chest",
+    "Eldin Field Bomskit Grotto Left Chest",
+    "Eldin Field Female Grasshopper",
+    "Eldin Field Male Grasshopper",
+    "Eldin Field Water Bomb Fish Grotto Chest"
+  ],
+  "North of Eldin Bridge": [
+    "Bridge of Eldin Female Phasmid",
+    "Eldin Field Stalfos Grotto Left Small Chest",
+    "Eldin Field Stalfos Grotto Right Small Chest",
+    "Eldin Field Stalfos Grotto Stalfos Chest",
+    "Eldin Stockcave Lantern Chest",
+    "Eldin Stockcave Lowest Chest",
+    "Eldin Stockcave Upper Chest"
+  ],
+  "Death Mountain": ["Death Mountain Alcove Chest", "Death Mountain Trail Poe"],
+  "Hidden Village": [
+    "Cats Hide and Seek Minigame",
+    "Hidden Village Poe",
+    "Ilia Charm",
+    "Skybook From Impaz"
+  ],
+  "Lanayru Field": [
+    "Lanayru Field Behind Gate Underwater Chest",
+    "Lanayru Field Bridge Poe",
+    "Lanayru Field Female Stag Beetle",
+    "Lanayru Field Male Stag Beetle",
+    "Lanayru Field Poe Grotto Left Poe",
+    "Lanayru Field Poe Grotto Right Poe",
+    "Lanayru Field Skulltula Grotto Chest",
+    "Lanayru Field Spinner Track Chest",
+    "Lanayru Ice Block Puzzle Cave Chest"
+  ],
+  "Outside Castle Town": [
+    "East Castle Town Bridge Poe",
+    "Hyrule Field Amphitheater Owl Statue Chest",
+    "Hyrule Field Amphitheater Owl Statue Sky Character",
+    "Hyrule Field Amphitheater Poe",
+    "Outside South Castle Town Double Clawshot Chasm Chest",
+    "Outside South Castle Town Female Ladybug",
+    "Outside South Castle Town Fountain Chest",
+    "Outside South Castle Town Male Ladybug",
+    "Outside South Castle Town Poe",
+    "Outside South Castle Town Tektite Grotto Chest",
+    "Outside South Castle Town Tightrope Chest",
+    "West Hyrule Field Female Butterfly",
+    "West Hyrule Field Helmasaur Grotto Chest",
+    "West Hyrule Field Male Butterfly",
+    "Wooden Statue"
+  ],
+  "Castle Town": [
+    "Castle Town Malo Mart Magic Armor",
+    "Charlo Donation Blessing",
+    "Doctors Office Balcony Chest",
+    "Jovani 20 Poe Soul Reward",
+    "Jovani 60 Poe Soul Reward",
+    "Jovani House Poe",
+    "STAR Prize 1",
+    "STAR Prize 2",
+    "Telma Invoice"
+  ],
+  "Agitha": [
+    "Agitha Female Ant Reward",
+    "Agitha Female Beetle Reward",
+    "Agitha Female Butterfly Reward",
+    "Agitha Female Dayfly Reward",
+    "Agitha Female Dragonfly Reward",
+    "Agitha Female Grasshopper Reward",
+    "Agitha Female Ladybug Reward",
+    "Agitha Female Mantis Reward",
+    "Agitha Female Phasmid Reward",
+    "Agitha Female Pill Bug Reward",
+    "Agitha Female Snail Reward",
+    "Agitha Female Stag Beetle Reward",
+    "Agitha Male Ant Reward",
+    "Agitha Male Beetle Reward",
+    "Agitha Male Butterfly Reward",
+    "Agitha Male Dayfly Reward",
+    "Agitha Male Dragonfly Reward",
+    "Agitha Male Grasshopper Reward",
+    "Agitha Male Ladybug Reward",
+    "Agitha Male Mantis Reward",
+    "Agitha Male Phasmid Reward",
+    "Agitha Male Pill Bug Reward",
+    "Agitha Male Snail Reward",
+    "Agitha Male Stag Beetle Reward"
+  ],
+  "Great Bridge of Hylia": [
+    "Lake Hylia Bridge Bubble Grotto Chest",
+    "Lake Hylia Bridge Cliff Chest",
+    "Lake Hylia Bridge Cliff Poe",
+    "Lake Hylia Bridge Female Mantis",
+    "Lake Hylia Bridge Male Mantis",
+    "Lake Hylia Bridge Owl Statue Chest",
+    "Lake Hylia Bridge Owl Statue Sky Character",
+    "Lake Hylia Bridge Vines Chest"
+  ],
+  "Lake Hylia": [
+    "Auru Gift To Fyer",
+    "Flight By Fowl Fifth Platform Chest",
+    "Flight By Fowl Fourth Platform Chest",
+    "Flight By Fowl Ledge Poe",
+    "Flight By Fowl Second Platform Chest",
+    "Flight By Fowl Third Platform Chest",
+    "Flight By Fowl Top Platform Reward",
+    "Isle of Riches Poe",
+    "Lake Hylia Alcove Poe",
+    "Lake Hylia Dock Poe",
+    "Lake Hylia Shell Blade Grotto Chest",
+    "Lake Hylia Tower Poe",
+    "Lake Hylia Underwater Chest",
+    "Lake Hylia Water Toadpoli Grotto Chest",
+    "Outside Lanayru Spring Left Statue Chest",
+    "Outside Lanayru Spring Right Statue Chest",
+    "Plumm Fruit Balloon Minigame"
+  ],
+  "Lake Hylia Cave": [
+    "Lake Lantern Cave Eighth Chest",
+    "Lake Lantern Cave Eleventh Chest",
+    "Lake Lantern Cave End Lantern Chest",
+    "Lake Lantern Cave Fifth Chest",
+    "Lake Lantern Cave Final Poe",
+    "Lake Lantern Cave First Chest",
+    "Lake Lantern Cave First Poe",
+    "Lake Lantern Cave Fourteenth Chest",
+    "Lake Lantern Cave Fourth Chest",
+    "Lake Lantern Cave Ninth Chest",
+    "Lake Lantern Cave Second Chest",
+    "Lake Lantern Cave Second Poe",
+    "Lake Lantern Cave Seventh Chest",
+    "Lake Lantern Cave Sixth Chest",
+    "Lake Lantern Cave Tenth Chest",
+    "Lake Lantern Cave Third Chest",
+    "Lake Lantern Cave Thirteenth Chest",
+    "Lake Lantern Cave Twelfth Chest"
+  ],
+  "Lanayru Spring": [
+    "Lanayru Spring Back Room Lantern Chest",
+    "Lanayru Spring Back Room Left Chest",
+    "Lanayru Spring Back Room Right Chest",
+    "Lanayru Spring East Double Clawshot Chest",
+    "Lanayru Spring Underwater Left Chest",
+    "Lanayru Spring Underwater Right Chest",
+    "Lanayru Spring West Double Clawshot Chest"
+  ],
+  "Zora's Domain": [
+    "Zoras Domain Chest Behind Waterfall",
+    "Zoras Domain Chest By Mother and Child Isles",
+    "Zoras Domain Extinguish All Torches Chest",
+    "Zoras Domain Light All Torches Chest",
+    "Zoras Domain Male Dragonfly",
+    "Zoras Domain Mother and Child Isle Poe",
+    "Zoras Domain Underwater Goron",
+    "Zoras Domain Waterfall Poe"
+  ],
+  "Upper Zora's River": [
+    "Fishing Hole Bottle",
+    "Fishing Hole Heart Piece",
+    "Iza Helping Hand",
+    "Iza Raging Rapids Minigame",
+    "Upper Zoras River Female Dragonfly",
+    "Upper Zoras River Poe"
+  ],
+  "Upper Gerudo Desert": [
+    "Gerudo Desert East Canyon Chest",
+    "Gerudo Desert East Poe",
+    "Gerudo Desert Female Dayfly",
+    "Gerudo Desert Lone Small Chest",
+    "Gerudo Desert Male Dayfly",
+    "Gerudo Desert Owl Statue Chest",
+    "Gerudo Desert Owl Statue Sky Character",
+    "Gerudo Desert Peahat Ledge Chest",
+    "Gerudo Desert Poe Above Cave of Ordeals",
+    "Gerudo Desert Skulltula Grotto Chest",
+    "Gerudo Desert South Chest Behind Wooden Gates",
+    "Gerudo Desert West Canyon Chest"
+  ],
+  "Lower Desert to Arbiter's": [
+    "Bulblin Camp First Chest Under Tower At Entrance",
+    "Bulblin Camp Poe",
+    "Bulblin Camp Roasted Boar",
+    "Bulblin Camp Small Chest in Back of Camp",
+    "Bulblin Guard Key",
+    "Gerudo Desert Campfire East Chest",
+    "Gerudo Desert Campfire North Chest",
+    "Gerudo Desert Campfire West Chest",
+    "Gerudo Desert North Peahat Poe",
+    "Gerudo Desert North Small Chest Before Bulblin Camp",
+    "Gerudo Desert Northeast Chest Behind Gates",
+    "Gerudo Desert Northwest Chest Behind Gates",
+    "Gerudo Desert Rock Grotto First Poe",
+    "Gerudo Desert Rock Grotto Lantern Chest",
+    "Gerudo Desert Rock Grotto Second Poe",
+    "Outside Arbiters Grounds Lantern Chest",
+    "Outside Arbiters Grounds Poe",
+    "Outside Bulblin Camp Poe"
+  ],
+  "Snowpeak": [
+    "Ashei Sketch",
+    "Snowboard Racing Prize",
+    "Snowpeak Above Freezard Grotto Poe",
+    "Snowpeak Blizzard Poe",
+    "Snowpeak Cave Ice Lantern Chest",
+    "Snowpeak Cave Ice Poe",
+    "Snowpeak Freezard Grotto Chest",
+    "Snowpeak Icy Summit Poe",
+    "Snowpeak Poe Among Trees"
+  ],
+  "Hero's Spirit": [
+    "Faron Woods Golden Wolf",
+    "Gerudo Desert Golden Wolf",
+    "Kakariko Graveyard Golden Wolf",
+    "North Castle Town Golden Wolf",
+    "Ordon Spring Golden Wolf",
+    "Outside South Castle Town Golden Wolf",
+    "West Hyrule Field Golden Wolf"
+  ],
+  "Cave of Ordeals": [
+    "Cave of Ordeals Floor 17 Poe",
+    "Cave of Ordeals Floor 33 Poe",
+    "Cave of Ordeals Floor 44 Poe",
+    "Cave of Ordeals Great Fairy Reward"
+  ],
+  "Forest Temple": [
+    "Forest Temple Big Baba Key",
+    "Forest Temple Big Key Chest",
+    "Forest Temple Central Chest Behind Stairs",
+    "Forest Temple Central Chest Hanging From Web",
+    "Forest Temple Central North Chest",
+    "Forest Temple Diababa Heart Container",
+    "Forest Temple Dungeon Reward",
+    "Forest Temple East Tile Worm Chest",
+    "Forest Temple East Water Cave Chest",
+    "Forest Temple Entrance Vines Chest",
+    "Forest Temple Gale Boomerang",
+    "Forest Temple North Deku Like Chest",
+    "Forest Temple Second Monkey Under Bridge Chest",
+    "Forest Temple Totem Pole Chest",
+    "Forest Temple West Deku Like Chest",
+    "Forest Temple West Tile Worm Chest Behind Stairs",
+    "Forest Temple West Tile Worm Room Vines Chest",
+    "Forest Temple Windless Bridge Chest"
+  ],
+  "Goron Mines": [
+    "Goron Mines After Crystal Switch Room Magnet Wall Chest",
+    "Goron Mines Beamos Room Chest",
+    "Goron Mines Chest Before Dangoro",
+    "Goron Mines Crystal Switch Room Small Chest",
+    "Goron Mines Crystal Switch Room Underwater Chest",
+    "Goron Mines Dangoro Chest",
+    "Goron Mines Dungeon Reward",
+    "Goron Mines Entrance Chest",
+    "Goron Mines Fyrus Heart Container",
+    "Goron Mines Gor Amato Chest",
+    "Goron Mines Gor Amato Key Shard",
+    "Goron Mines Gor Amato Small Chest",
+    "Goron Mines Gor Ebizo Chest",
+    "Goron Mines Gor Ebizo Key Shard",
+    "Goron Mines Gor Liggs Chest",
+    "Goron Mines Gor Liggs Key Shard",
+    "Goron Mines Magnet Maze Chest",
+    "Goron Mines Main Magnet Room Bottom Chest",
+    "Goron Mines Main Magnet Room Top Chest",
+    "Goron Mines Outside Beamos Chest",
+    "Goron Mines Outside Clawshot Chest",
+    "Goron Mines Outside Underwater Chest"
+  ],
+  "Lakebed Temple": [
+    "Lakebed Temple Before Deku Toad Alcove Chest",
+    "Lakebed Temple Before Deku Toad Underwater Left Chest",
+    "Lakebed Temple Before Deku Toad Underwater Right Chest",
+    "Lakebed Temple Big Key Chest",
+    "Lakebed Temple Central Room Chest",
+    "Lakebed Temple Central Room Small Chest",
+    "Lakebed Temple Central Room Spire Chest",
+    "Lakebed Temple Chandelier Chest",
+    "Lakebed Temple Deku Toad Chest",
+    "Lakebed Temple Dungeon Reward",
+    "Lakebed Temple East Lower Waterwheel Bridge Chest",
+    "Lakebed Temple East Lower Waterwheel Stalactite Chest",
+    "Lakebed Temple East Second Floor Southeast Chest",
+    "Lakebed Temple East Second Floor Southwest Chest",
+    "Lakebed Temple East Water Supply Clawshot Chest",
+    "Lakebed Temple East Water Supply Small Chest",
+    "Lakebed Temple Lobby Left Chest",
+    "Lakebed Temple Lobby Rear Chest",
+    "Lakebed Temple Morpheel Heart Container",
+    "Lakebed Temple Stalactite Room Chest",
+    "Lakebed Temple Underwater Maze Small Chest",
+    "Lakebed Temple West Lower Small Chest",
+    "Lakebed Temple West Second Floor Central Small Chest",
+    "Lakebed Temple West Second Floor Northeast Chest",
+    "Lakebed Temple West Second Floor Southeast Chest",
+    "Lakebed Temple West Second Floor Southwest Underwater Chest",
+    "Lakebed Temple West Water Supply Chest",
+    "Lakebed Temple West Water Supply Small Chest"
+  ],
+  "Arbiter's Grounds": [
+    "Arbiters Grounds Big Key Chest",
+    "Arbiters Grounds Death Sword Chest",
+    "Arbiters Grounds East Lower Turnable Redead Chest",
+    "Arbiters Grounds East Turning Room Poe",
+    "Arbiters Grounds East Upper Turnable Chest",
+    "Arbiters Grounds East Upper Turnable Redead Chest",
+    "Arbiters Grounds Entrance Chest",
+    "Arbiters Grounds Ghoul Rat Room Chest",
+    "Arbiters Grounds Hidden Wall Poe",
+    "Arbiters Grounds North Turning Room Chest",
+    "Arbiters Grounds Spinner Room First Small Chest",
+    "Arbiters Grounds Spinner Room Lower Central Small Chest",
+    "Arbiters Grounds Spinner Room Lower North Chest",
+    "Arbiters Grounds Spinner Room Second Small Chest",
+    "Arbiters Grounds Spinner Room Stalfos Alcove Chest",
+    "Arbiters Grounds Stallord Heart Container",
+    "Arbiters Grounds Torch Room East Chest",
+    "Arbiters Grounds Torch Room Poe",
+    "Arbiters Grounds Torch Room West Chest",
+    "Arbiters Grounds West Chandelier Chest",
+    "Arbiters Grounds West Poe",
+    "Arbiters Grounds West Small Chest Behind Block",
+    "Arbiters Grounds West Stalfos Northeast Chest",
+    "Arbiters Grounds West Stalfos West Chest"
+  ],
+  "Snowpeak Ruins": [
+    "Snowpeak Ruins Ball and Chain",
+    "Snowpeak Ruins Blizzeta Heart Container",
+    "Snowpeak Ruins Broken Floor Chest",
+    "Snowpeak Ruins Chapel Chest",
+    "Snowpeak Ruins Chest After Darkhammer",
+    "Snowpeak Ruins Courtyard Central Chest",
+    "Snowpeak Ruins Dungeon Reward",
+    "Snowpeak Ruins East Courtyard Buried Chest",
+    "Snowpeak Ruins East Courtyard Chest",
+    "Snowpeak Ruins Ice Room Poe",
+    "Snowpeak Ruins Lobby Armor Poe",
+    "Snowpeak Ruins Lobby Chandelier Chest",
+    "Snowpeak Ruins Lobby East Armor Chest",
+    "Snowpeak Ruins Lobby Poe",
+    "Snowpeak Ruins Lobby West Armor Chest",
+    "Snowpeak Ruins Mansion Map",
+    "Snowpeak Ruins Northeast Chandelier Chest",
+    "Snowpeak Ruins Ordon Pumpkin Chest",
+    "Snowpeak Ruins West Cannon Room Central Chest",
+    "Snowpeak Ruins West Cannon Room Corner Chest",
+    "Snowpeak Ruins West Courtyard Buried Chest",
+    "Snowpeak Ruins Wooden Beam Central Chest",
+    "Snowpeak Ruins Wooden Beam Chandelier Chest",
+    "Snowpeak Ruins Wooden Beam Northwest Chest"
+  ],
+  "Temple of Time": [
+    "Temple of Time Armogohma Heart Container",
+    "Temple of Time Armos Antechamber East Chest",
+    "Temple of Time Armos Antechamber North Chest",
+    "Temple of Time Armos Antechamber Statue Chest",
+    "Temple of Time Big Key Chest",
+    "Temple of Time Chest Before Darknut",
+    "Temple of Time Darknut Chest",
+    "Temple of Time Dungeon Reward",
+    "Temple of Time First Staircase Armos Chest",
+    "Temple of Time First Staircase Gohma Gate Chest",
+    "Temple of Time First Staircase Window Chest",
+    "Temple of Time Floor Switch Puzzle Room Upper Chest",
+    "Temple of Time Gilloutine Chest",
+    "Temple of Time Lobby Lantern Chest",
+    "Temple of Time Moving Wall Beamos Room Chest",
+    "Temple of Time Moving Wall Dinalfos Room Chest",
+    "Temple of Time Poe Above Scales",
+    "Temple of Time Poe Behind Gate",
+    "Temple of Time Scales Gohma Chest",
+    "Temple of Time Scales Upper Chest"
+  ],
+  "City in the Sky": [
+    "City in The Sky Aeralfos Chest",
+    "City in The Sky Argorok Heart Container",
+    "City in The Sky Baba Tower Alcove Chest",
+    "City in The Sky Baba Tower Narrow Ledge Chest",
+    "City in The Sky Baba Tower Top Small Chest",
+    "City in The Sky Big Key Chest",
+    "City in The Sky Central Outside Ledge Chest",
+    "City in The Sky Central Outside Poe Island Chest",
+    "City in The Sky Chest Behind North Fan",
+    "City in The Sky Chest Below Big Key Chest",
+    "City in The Sky Dungeon Reward",
+    "City in The Sky East First Wing Chest After Fans",
+    "City in The Sky East Tile Worm Small Chest",
+    "City in The Sky East Wing After Dinalfos Alcove Chest",
+    "City in The Sky East Wing After Dinalfos Ledge Chest",
+    "City in The Sky East Wing Lower Level Chest",
+    "City in The Sky Garden Island Poe",
+    "City in The Sky Poe Above Central Fan",
+    "City in The Sky Underwater East Chest",
+    "City in The Sky Underwater West Chest",
+    "City in The Sky West Garden Corner Chest",
+    "City in The Sky West Garden Ledge Chest",
+    "City in The Sky West Garden Lone Island Chest",
+    "City in The Sky West Garden Lower Chest",
+    "City in The Sky West Wing Baba Balcony Chest",
+    "City in The Sky West Wing First Chest",
+    "City in The Sky West Wing Narrow Ledge Chest",
+    "City in The Sky West Wing Tile Worm Chest"
+  ],
+  "Palace of Twilight": [
+    "Palace of Twilight Big Key Chest",
+    "Palace of Twilight Central First Room Chest",
+    "Palace of Twilight Central Outdoor Chest",
+    "Palace of Twilight Central Tower Chest",
+    "Palace of Twilight Collect Both Sols",
+    "Palace of Twilight East Wing First Room East Alcove",
+    "Palace of Twilight East Wing First Room North Small Chest",
+    "Palace of Twilight East Wing First Room West Alcove",
+    "Palace of Twilight East Wing First Room Zant Head Chest",
+    "Palace of Twilight East Wing Second Room Northeast Chest",
+    "Palace of Twilight East Wing Second Room Northwest Chest",
+    "Palace of Twilight East Wing Second Room Southeast Chest",
+    "Palace of Twilight East Wing Second Room Southwest Chest",
+    "Palace of Twilight West Wing Chest Behind Wall of Darkness",
+    "Palace of Twilight West Wing First Room Central Chest",
+    "Palace of Twilight West Wing Second Room Central Chest",
+    "Palace of Twilight West Wing Second Room Lower South Chest",
+    "Palace of Twilight West Wing Second Room Southeast Chest",
+    "Palace of Twilight Zant Heart Container"
+  ],
+  "Hyrule Castle": [
+    "Hyrule Castle Big Key Chest",
+    "Hyrule Castle East Wing Balcony Chest",
+    "Hyrule Castle East Wing Boomerang Puzzle Chest",
+    "Hyrule Castle Graveyard Grave Switch Room Back Left Chest",
+    "Hyrule Castle Graveyard Grave Switch Room Front Left Chest",
+    "Hyrule Castle Graveyard Grave Switch Room Right Chest",
+    "Hyrule Castle Graveyard Owl Statue Chest",
+    "Hyrule Castle King Bulblin Key",
+    "Hyrule Castle Lantern Staircase Chest",
+    "Hyrule Castle Main Hall Northeast Chest",
+    "Hyrule Castle Main Hall Northwest Chest",
+    "Hyrule Castle Main Hall Southwest Chest",
+    "Hyrule Castle Southeast Balcony Tower Chest",
+    "Hyrule Castle Treasure Room Eighth Small Chest",
+    "Hyrule Castle Treasure Room Fifth Chest",
+    "Hyrule Castle Treasure Room Fifth Small Chest",
+    "Hyrule Castle Treasure Room First Chest",
+    "Hyrule Castle Treasure Room First Small Chest",
+    "Hyrule Castle Treasure Room Fourth Chest",
+    "Hyrule Castle Treasure Room Fourth Small Chest",
+    "Hyrule Castle Treasure Room Second Chest",
+    "Hyrule Castle Treasure Room Second Small Chest",
+    "Hyrule Castle Treasure Room Seventh Small Chest",
+    "Hyrule Castle Treasure Room Sixth Small Chest",
+    "Hyrule Castle Treasure Room Third Chest",
+    "Hyrule Castle Treasure Room Third Small Chest",
+    "Hyrule Castle West Courtyard Central Small Chest",
+    "Hyrule Castle West Courtyard North Small Chest"
+  ]
+}
+
+```
