@@ -1,9 +1,104 @@
 # Experimental Rando Race Rules
 
+import Link from '@docusaurus/Link';
+
 These are the latest experimental rules for the races hosted by isaac (usually on Sunday).
 They are currently used with a fork of the generator website while Hints are being developed and refined.
 
-## Rules and Settings
+## Rules and Settings (condensed)
+
+### Main Rules
+
+- **Take note of the following!**
+  - Item Pool - **EVERYTHING**
+  - Small Keys - Keysy (all small keys doors automatically unlocked, including Snowpeak Ruins cheese and pumpkin)
+  - Big Keys - **KEYSANITY** (can be found anywhere)
+- Standard
+  - Hyrule Castle Requirements - 3 Fused Shadows
+    - Rewarded for completing 3 dungeons (one from each dungeon).
+      Check the sign outside Link's house at the start to see which 3 dungeons are required.
+  - Palace of Twilight - never required
+  - Faron Woods Logic - Open
+  - Maps and Compasses - Start With
+
+### Excluded Checks (important)
+
+- **Take note of the following exclusions!**
+  - All Hyrule Castle checks
+  - 12 Agitha checks (bugs for excluded checks not in item pool; you can't find them)
+    - Check the `AgithaRewards` hints!
+  - Poes:
+    - Sphere 0 poes (any you can logically access at the very start of the seed, 24 total)
+    - Snowboarding Poe outside Snowpeak Ruins
+  - All Desert area small chests (12 total)
+- Other exclusions:
+  - Cave of Ordeals
+  - Hidden Village
+  - Trade Quest
+  - Golden Wolves
+  - Jovani 60 Poe Soul Reward
+  - Iza "shoot the pots" minigame (Iza2)
+
+### Starting Inventory
+
+- **Take note the following!**
+  - Zora Armor
+  - 1 Progressive_Fishing_Rod
+  - Only missing 1 Sky Character
+- Standard
+  - Shadow Crystal
+  - Horse Call
+  - Gate Keys
+
+### Other
+
+- Timesavers - everything but `Increase Spinner Speed`
+- Additional Settings - everything but Trap (Foolish) Items
+- Dungeon Entrances:
+  - Goron Mines - Open
+  - Lakebed Temple requires Water Bombs to enter.
+    Clipping into the dungeon is BANNED.
+  - Arbiter's does NOT require Bulblin Camp.
+  - Snowpeak requires Reekfish scent.
+    Using map glitch to go through Snowpeak is BANNED.
+  - Temple of Time - Open
+  - City in the Sky requires you find 1 Sky Character.
+
+### Glitches/Tricks
+
+All allowed unless specifically banned.
+
+- Banned:
+  - Back in Time
+  - Big Key Skips
+  - Iza Item Manipulation
+  - Early Monkey Chain Room (entering room before Forest Temple boss without boomerang)
+  - Hyrule Castle Required Item Skips (double clawshots, boomerang, spinner)
+  - Skipping Reekfish Scent
+  - Clipping into Lakebed Temple
+
+### Hints
+
+- More info available on the <Link to="/docs/rando/hints">Hints</Link> page.
+- View the hints on the Seed page in a tab next to Shared Settings.
+- You can view the hints before the race.
+- Hint distribution:
+  - 2 Spirit of Light (zones you must visit to find a required item)
+  - 2 Barren (zones you can skip)
+  - 4 Always
+    - Tells you the exact reward for certain checks.
+    - Checks: `Goron Springwater Rush, Iza Helping Hand, Jovani 20 Poe Soul Reward, Lanayru Ice Block Puzzle Cave Chest`
+  - 4 Sometimes
+    - Tells you the exact reward for certain checks.
+  - AgithaRewards
+    - List of anything potentially useful which Agitha can give you.
+
+### Rulings
+
+- You are allowed to use Magic Armor with 0 rupees where you might use Iron Boots.
+- In Hyrule Castle, any method of hitting the switch in the room before the double Darknuts is allowed.
+
+## Rules and Settings (verbose)
 
 - Hyrule Castle will open after you beat 3 dungeons to get 3 Fused Shadows.
   Beat the last boss to finish the race.
@@ -67,7 +162,7 @@ They are currently used with a fork of the generator website while Hints are bei
       - Always hints: `Goron Springwater Rush, Iza Helping Hand, Jovani 20 Poe Soul Reward, Lanayru Ice Block Puzzle Cave Chest`
     - The AgithaRewards hint tells you all meaningful items which Agitha can give out.
       Note that there are only 12 bugs in the item pool (you can only find up to 12 bugs).
-    - For more information on Hints, please visit the Hints Page. // TODO: create page
+    - For more information on Hints, please visit the <Link to="/docs/rando/hints">Hints</Link> Page.
 - Excluded Checks
   - Cave of Ordeals, Hidden Village, the Trade Quest, Golden Wolves, Jovani 60 Poe Soul Reward, and Iza "shoot the pots" minigame are excluded.
   - Hyrule Castle is completely excluded!
@@ -105,6 +200,16 @@ They are currently used with a fork of the generator website while Hints are bei
 - Rulings
   - You are allowed to use Magic Armor with 0 rupees where you might use Iron Boots.
   - In Hyrule Castle, any method of hitting the switch in the room before the double Darknuts is allowed.
+
+## General rules
+
+- Loading quest logs which were created before the race starts is banned (other than the REL Loader quest log).
+- Playing the game ahead of the race to change values in RAM to give you an advantage is banned.
+  - For example, setting up Early Boss Flags before the race starts.
+- Using any emulator features which give a meaningful advantage over someone playing on console is banned.
+  - These include, but are not limited to, save states, custom macros, pausing execution, and advancing frames.
+- Dolphin settings should match the specifications in this pin: https://discord.com/channels/596503283124666368/737120005723914360/1043278585240223804
+- If playing on console, it is recommended to follow the setup as specified in this post: https://discord.com/channels/596503283124666368/737120005723914360/1043270665769340968
 
 ## Reasoning
 
@@ -257,13 +362,3 @@ Boss keysanity is the newest idea to be added to the rules, but I like it for th
 Goron Mines has 3 keys, but you only need Iron Boots and Bow to do 99% of that dungeon, so adding more requirements to finish it might not be bad.
 Iron Boots are a required item for Lakebed Temple and City in the Sky as well, so there is a good chance you can find Iron Boots fairly early depending on which dungeons are required.
 Bows are usually easy to find as well since there are 3 of them.
-
-## General rules
-
-- Loading quest logs which were created before the race starts is banned (other than the REL Loader quest log).
-- Playing the game ahead of the race to change values in RAM to give you an advantage is banned.
-  - For example, setting up Early Boss Flags before the race starts.
-- Using any emulator features which give a meaningful advantage over someone playing on console is banned.
-  - These include, but are not limited to, save states, custom macros, pausing execution, and advancing frames.
-- Dolphin settings should match the specifications in this pin: https://discord.com/channels/596503283124666368/737120005723914360/1043278585240223804
-- If playing on console, it is recommended to follow the setup as specified in this post: https://discord.com/channels/596503283124666368/737120005723914360/1043270665769340968
