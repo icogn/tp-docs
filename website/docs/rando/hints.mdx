@@ -306,6 +306,135 @@ Calculating "preventBarrenItems":
 - Concat the 2 lists, putting the list of checks not in zones covered by SpoL and Barren first.
 - Starting at the front of the list, create a hint for each check until we reach the desired number of hints or run out of entries in the list.
 
+## Simulated Hints
+
+### General
+
+The new `Simulate in-game hints` option helps test out ideas for in-game hints.
+
+Instead of seeing all of the hints on the seed page after generation, you will see a list of locations.
+You can only reveal the hints for each location once you fulfill its condition (which is usually standing in a specific location).
+
+:::note
+
+When you try to reveal a hint on the seed page, it will tell you the conditions and show you a picture of the location.
+You don't have to memorize all locations before the race and operate purely from memory.
+Just know that there is one Hint Spot for most Hint Zones and you should be okay.
+
+:::
+
+#### Midna
+
+Midna's hints represent the text that would display you when you talk to Midna.
+For the simulated hints, you can reveal the Midna hints as soon as the timer starts.
+
+For example, Midna might say:
+
+```
+Required dungeons:
+{Forest Temple}, {Goron Mines}, {Snowpeak Ruins}
+
+The {Spirits of Light} guide the hero chosen by the gods to {Outside Castle Town}.
+
+They say that there is {nothing} to be found in {Kakariko Graveyard}.
+```
+
+This would be three text boxes.
+The first tells you the required dungeons (which will be useful once the Random Starting Point feature has been added).
+The second text box is a SpoL hint, and the third text box is a Barren hint.
+
+#### AgithaRewards
+
+The `AgithaRewards` hint represents the text that would be on the sign outside Agitha's Castle in the game.
+For the simulated hints, you can reveal the AgithaRewards when you are standing outside Agitha's Castle.
+
+An example of Agitha's text would be:
+
+```
+Please bring the {12} golden bugs to Princess Agitha's ball.
+
+I have {GREAT happiness} to share with benefactors of the insect kingdom:
+
+{Female_Ant}, {Iron_Boots}, {Male_Grasshopper}
+```
+
+In this case, there are three text boxes.
+The first tells you how many bugs have not had their Agitha Reward excluded, meaning you will be able to trade in this many bugs.
+The second text box indicates that Agitha has interesting items.
+The third text box tells you the interesting items she can give out (this is just the `AgithaRewards` hint you see when not simulating in-game hints).
+
+If there was nothing on Agitha, you would only get the following two text boxes for example:
+
+```
+Please bring the {12} golden bugs to Princess Agitha's ball.
+
+I will share my {happiness} with benefactors of the insect kingdom.
+```
+
+There is no list of items and the happiness is not GREAT, so you can know that Agitha is not required for that seed.
+
+#### General Hint Spot
+
+A General Hint Spot represents a "sign" that would exist in the game.
+"Reading the sign" would show you two text boxes (give two different hints).
+
+_**There is one `Hint Spot` per `Hint Zone`, except for following Hint Zones**_:
+
+- Dungeons
+- Cave of Ordeals
+- Agitha
+  - Rather than a "sign" at a location which gives the basic 2 hints, the Agitha hints have special text which reveals all of the useful Agitha rewards, so the hint for this is not grouped in the General category.
+- Hero's Spirit
+  - No shared physical location in the world to put a Hint Spot for this zone
+
+---
+
+For example, in the website you would see a `Lanayru Field` row which says:
+
+```
+Lanayru Field     On middle of bridge
+```
+
+To view the hints for this location, you will stand in the given location and click `Reveal Hints` to see the hints.
+The website will display an image of the location once the popup shows so it is easier to find the correct location to stand.
+
+The text for this might be:
+
+```
+They say that there is {nothing} to be found in {North of Eldin Bridge}.
+
+They say that {Zoras Domain Light All Torches Chest} has {Arrows_10}.
+```
+
+The text that displays for all hints is meant to represent the list of text boxes you would see in the actual game once the feature gets implemented there.
+
+All of the general "sign" hint spots scattered around the world (one per Hint Zone for most zones) will have 2 different hints on them.
+
+### How hints are assigned to Hint Spots
+
+Start from the base hint distribution:
+
+For the `isaac` simulated hints, there are 3 SpoL, 3 Barren, 4 Always, 4 Sometimes, and the AgithaRewards hint is on.
+
+The first SpoL and Barren are given to the special Midna hint spot, and the AgithaRewards are given to the special AgithaRewards hint spot.
+
+The remaining hints are 2 SpoL, 2 Barren, 4 Always, and 4 Sometimes.
+
+#### Assigning hints to spots
+
+There are 23 total scattered hint spots.
+Based on settings, the Hidden Village hint spot will get junk.
+This means there are effectively 22 signs scattered around the world which have 2 hints each.
+
+So we need to assign 44 hints to signs.
+
+First we create a second copy of the above hints, so instead of 12 (2+2+4+4), we will have 24.
+
+The remaining 20 hints (44 needed - 24 we already have) will be assigned a Random hint (hint telling the contents of a randomly selected check).
+
+The hints are spread out so that you will not find a "sign" with 2 SpoL hints on it for example.
+20 of the 22 signs will display one hint which is SpoL/Barren/Always/Sometimes and one hint which is Random, and the other 2 will display 1 SpoL/Barren/Always/Sometimes hint and 1 Sometimes hint.
+
 ## Full list of checks
 
 ```
