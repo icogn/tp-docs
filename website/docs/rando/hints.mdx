@@ -34,7 +34,7 @@ For example, "Wrestling With Bo" belongs to the "Ordon" hint zone.
 - Ordona Province (1 zone)
   - Ordon
 - Faron Province (3 zones)
-  - Greater Sacred Grove Area
+  - Sacred Grove Area
     - Sacred Grove, Lost Woods, Past Area (room before the actual Temple of Time dungeon; this room has the 2 owl statues you can move)
   - Faron Field
     - Hyrule Field part which is in Faron Province
@@ -62,8 +62,8 @@ For example, "Wrestling With Bo" belongs to the "Ordon" hint zone.
   - Great Bridge of Hylia
     - This includes all checks on the bridge and those slightly north and south of it. The grotto area south of the bridge which requires you to blow up the rocks is included. The owl statues north of the bridge are included.
   - Lake Hylia
-    - Does not include the Lake Hylia Cave (long lantern cave, hype cave, whatever you want to call it). Plumm is considered a Lake Hylia check.
-  - Lake Hylia Cave
+    - Does not include the Lake Lantern Cave (long lantern cave, hype cave, whatever you want to call it). Plumm is considered a Lake Hylia check.
+  - Lake Lantern Cave
     - Hype cave. The one with a bunch of rooms which each have 2 or 3 bombable walls.
   - Lanayru Spring
     - Note the 2 chests outside the Spring belong to the Lake Hylia zone, not this one.
@@ -71,9 +71,9 @@ For example, "Wrestling With Bo" belongs to the "Ordon" hint zone.
   - Upper Zora’s River
     - Fishing Hole, outside the Fishing hole, Iza checks
 - Desert Province (3 zones)
-  - Upper Gerudo Desert
+  - Upper Desert
     - All checks in Gerudo Desert which you access before jumping down to the lower level with the campfire and the Bulblins on watch.
-  - Lower Desert to Arbiter’s
+  - Lower Desert
     - Checks in the lower desert area all the way up to the entrance of Arbiter’s Grounds.
   - Cave of Ordeals
 - Peak Province (1 zone)
@@ -107,9 +107,9 @@ Most of the hint zones are self-explanatory, but I would like to point out a few
   - Outside Castle Town (includes the west, east, and south parts)
   - Great Bridge of Hylia
 - Since the desert is so large, it has been split into two zones:
-  - Upper Gerudo Desert
+  - Upper Desert
     - The part of the desert where you land when entering from Lake Hylia
-  - Lower Desert to Arbiter's
+  - Lower Desert
     - The part of the desert after the portal area which you reach by jumping down a level.
       This includes the grotto with 2 poes, and it continues all the way up to the Arbiter's Grounds entrance.
 
@@ -142,8 +142,8 @@ Barren hints indicate a hint zone for which all of its checks contain unimportan
 :::note
 
 It is technically possible that a Barren hint zone is required, but the chance is incredibly low.
-Hidden Skills do not prevent a hint zone from being hinted barren, so it is possible for all 7 hidden skills to be in Lake Hylia Cave which is hinted Barren.
-You need at least 1 hidden skill to finish the game, so in this case you would have to visit Lake Hylia Cave despite it being hinted Barren.
+Hidden Skills do not prevent a hint zone from being hinted barren, so it is possible for all 7 hidden skills to be in Lake Lantern Cave which is hinted Barren.
+You need at least 1 hidden skill to finish the game, so in this case you would have to visit Lake Lantern Cave despite it being hinted Barren.
 Again, the chance of this is so low it might as well not exist, but I wanted to mention it.
 
 :::
@@ -313,7 +313,7 @@ Calculating "preventBarrenItems":
 The new `Simulate in-game hints` option helps test out ideas for in-game hints.
 
 Instead of seeing all of the hints on the seed page after generation, you will see a list of locations.
-You can only reveal the hints for each location once you fulfill its condition (which is usually standing in a specific location).
+You can only reveal the hints for each location once you fulfill its condition (which is usually standing in a specific place).
 
 :::note
 
@@ -396,7 +396,7 @@ Lanayru Field     On middle of bridge
 ```
 
 To view the hints for this location, you will stand in the given location and click `Reveal Hints` to see the hints.
-The website will display an image of the location once the popup shows so it is easier to find the correct location to stand.
+The website will display an image of the location on the popup so it is easier to find the correct location to stand.
 
 The text for this might be:
 
@@ -410,32 +410,55 @@ The text that displays for all hints is meant to represent the list of text boxe
 
 All of the general "sign" hint spots scattered around the world (one per Hint Zone for most zones) will have 2 different hints on them.
 
+:::note
+
+While testing simulated in-game hints in the website, it is okay to simply pass over the hint spot and reveal it later when it is more convenient to interact with the website (such as while warping somewhere).
+
+:::
+
 ### How hints are assigned to Hint Spots
 
 Start from the base hint distribution:
 
-For the `isaac` simulated hints, there are 3 SpoL, 3 Barren, 4 Always, 4 Sometimes, and the AgithaRewards hint is on.
+For the `isaac` simulated hints, there are 2 SpoL, 2 Barren, 4 Always, and the AgithaRewards hint is on.
 
 The first SpoL and Barren are given to the special Midna hint spot, and the AgithaRewards are given to the special AgithaRewards hint spot.
 
-The remaining hints are 2 SpoL, 2 Barren, 4 Always, and 4 Sometimes.
+The remaining hints are 1 SpoL, 1 Barren, and 4 Always.
 
 #### Assigning hints to spots
 
 There are 23 total scattered hint spots.
 Based on settings, the Hidden Village hint spot will get junk.
-This means there are effectively 22 signs scattered around the world which have 2 hints each.
+This means there are effectively 22 signs scattered around the world which have 2 hints each (or 1 hint if the sign is junked).
 
-So we need to assign 44 hints to signs.
+Any signs which are in hinted barren areas will get a single junk hint, which serves a few purposes:
 
-First we create a second copy of the above hints, so instead of 12 (2+2+4+4), we will have 24.
+- If you are visiting an area and the sign gives you a junk hint, you know that you should go somewhere else.
+  This helps with getting unlucky with where you decide to go early game.
+- If you know an area is hinted barren, then you have no reason to visit it.
+- It is possible to randomly come across junk hints during seeds which can be funny and catch you off guard.
 
-The remaining 20 hints (44 needed - 24 we already have) will be assigned a Random hint (hint telling the contents of a randomly selected check).
+Since there are 2 hinted barrren areas with these settings, that leaves 20 scattered hint spots, meaning we need to assign 40 hints to signs.
+The number by no means must be exactly 40 -- it just happens to be this many currently with these settings.
 
-The hints are spread out so that you will not find a "sign" with 2 SpoL hints on it for example.
-20 of the 22 signs will display one hint which is SpoL/Barren/Always/Sometimes and one hint which is Random, and the other 2 will display 1 SpoL/Barren/Always/Sometimes hint and 1 Sometimes hint.
+Assigning hints to signs:
+
+- First we create a three copies of the above hints, so instead of 6 (1 SpoL + 1 Barren + 4 Always), we will have 18.
+- The remaining 22 hints will be filled in with Sometimes hints which are added in 2 copies at a time.
+- The hints are spread out so that signs should get at most a single SpoL, Barren, or Always hint, and a sign will never have the same hint twice.
+
+:::note
+
+It is possibly for slight variations in the hints based on how things were randomly generated, but in general the above is true.
+For example, it is possible for 0 or 1 Hint Zone to be Barren in which case the hints will be different.
+Also it is possible to get a single copy of a Sometimes hint based on how the hint spots were randomized during generation, but there will almost always be 2 copies of a Sometimes hint.
+
+:::
 
 ## Full list of checks
+
+This way of splitting up the checks is for races using the `isaac` hint distribution.
 
 ```
 {
@@ -451,7 +474,7 @@ The hints are spread out so that you will not find a "sign" with 2 SpoL hints on
     "Wooden Sword Chest",
     "Wrestling With Bo"
   ],
-  "Greater Sacred Grove Area": [
+  "Sacred Grove Area": [
     "Lost Woods Boulder Poe",
     "Lost Woods Lantern Chest",
     "Lost Woods Waterfall Poe",
@@ -645,7 +668,7 @@ The hints are spread out so that you will not find a "sign" with 2 SpoL hints on
     "Outside Lanayru Spring Right Statue Chest",
     "Plumm Fruit Balloon Minigame"
   ],
-  "Lake Hylia Cave": [
+  "Lake Lantern Cave": [
     "Lake Lantern Cave Eighth Chest",
     "Lake Lantern Cave Eleventh Chest",
     "Lake Lantern Cave End Lantern Chest",
@@ -692,7 +715,7 @@ The hints are spread out so that you will not find a "sign" with 2 SpoL hints on
     "Upper Zoras River Female Dragonfly",
     "Upper Zoras River Poe"
   ],
-  "Upper Gerudo Desert": [
+  "Upper Desert": [
     "Gerudo Desert East Canyon Chest",
     "Gerudo Desert East Poe",
     "Gerudo Desert Female Dayfly",
@@ -706,7 +729,7 @@ The hints are spread out so that you will not find a "sign" with 2 SpoL hints on
     "Gerudo Desert South Chest Behind Wooden Gates",
     "Gerudo Desert West Canyon Chest"
   ],
-  "Lower Desert to Arbiter's": [
+  "Lower Desert": [
     "Bulblin Camp First Chest Under Tower At Entrance",
     "Bulblin Camp Poe",
     "Bulblin Camp Roasted Boar",
