@@ -45,10 +45,11 @@ For example, "Wrestling With Bo" belongs to the "Ordon" hint zone.
   - Kakariko Village
     - Includes Goron Springwater Rush.
   - Kakariko Graveyard
-  - Eldin Field
-    - Hyrule Field part which is in Eldin Province. Also includes the checks which are on the Bridge of Eldin (1 bug, owl statue checks)
-  - North of Eldin Bridge
-    - Includes the lava cave (stock cave), the Stalfos grotto which requires Spinner to access, and one of the bugs.
+  - S Eldin Field
+    - Hyrule Field part which is in Eldin Province. Goes up to the middle of the bridge, so includes 1 bug, and the Owl Statue chest.
+  - N Eldin Field
+    - Starts at the middle of the bridge and goes north.
+    - Includes the lava cave (stock cave), the Stalfos grotto which requires Spinner to access, one of the bugs, and the Owl sky character check.
   - Death Mountain
     - All checks on the path up to Goron Mines
   - Hidden Village
@@ -101,8 +102,8 @@ Most of the hint zones are self-explanatory, but I would like to point out a few
 - Areas which would be considered "Hyrule Field" are split into the following zones:
   - Faron Field
   - Kakariko Gorge
-  - Eldin Field (includes the checks on Eldin Bridge)
-  - North of Eldin Bridge (stalfos grotto, lava cave, and one bug)
+  - S Eldin Field (middle of the bridge and south; includes the bug on the bridge and the owl statue chest)
+  - N Eldin Field (middle of the bridge and north; owl statue sky character, stalfos grotto, lava cave, and one bug)
   - Lanayru Field (does NOT include the west part of Outside Castle Town; includes the Spinner check)
   - Outside Castle Town (includes the west, east, and south parts)
   - Great Bridge of Hylia
@@ -401,7 +402,7 @@ The website will display an image of the location on the popup so it is easier t
 The text for this might be:
 
 ```
-They say that there is {nothing} to be found in {North of Eldin Bridge}.
+They say that there is {nothing} to be found in {Kakariko Graveyard}.
 
 They say that {Zoras Domain Light All Torches Chest} has {Arrows_10}.
 ```
@@ -547,10 +548,9 @@ This way of splitting up the checks is for races using the `isaac` hint distribu
     "Kakariko Graveyard Open Poe",
     "Rutelas Blessing"
   ],
-  "Eldin Field": [
+  "S Eldin Field": [
     "Bridge of Eldin Male Phasmid",
     "Bridge of Eldin Owl Statue Chest",
-    "Bridge of Eldin Owl Statue Sky Character",
     "Eldin Field Bomb Rock Chest",
     "Eldin Field Bomskit Grotto Lantern Chest",
     "Eldin Field Bomskit Grotto Left Chest",
@@ -558,8 +558,9 @@ This way of splitting up the checks is for races using the `isaac` hint distribu
     "Eldin Field Male Grasshopper",
     "Eldin Field Water Bomb Fish Grotto Chest"
   ],
-  "North of Eldin Bridge": [
+  "N Eldin Field": [
     "Bridge of Eldin Female Phasmid",
+    "Bridge of Eldin Owl Statue Sky Character",
     "Eldin Field Stalfos Grotto Left Small Chest",
     "Eldin Field Stalfos Grotto Right Small Chest",
     "Eldin Field Stalfos Grotto Stalfos Chest",
