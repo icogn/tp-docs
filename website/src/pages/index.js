@@ -40,7 +40,7 @@ function HomepageHeader() {
               'button button--secondary button--lg',
               styles.button
             )}
-            to="/docs/rando/race-rules"
+            to="/docs/rando/experimental-race-rules"
           >
             Rando
           </Link>
