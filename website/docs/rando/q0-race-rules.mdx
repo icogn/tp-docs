@@ -1,0 +1,329 @@
+# Q0 Race Rules
+
+Obtain 3 Fused Shadows from dungeon bosses, then race to beat the last boss!
+
+:::tip
+Read the sign to the left of Link's house ladder to determine which dungeons are required.
+Any unrequired dungeons can be completely ignored (Palace of Twilight is always unrequired).
+:::
+
+## Settings
+
+- Access Options
+
+  - Hyrule Castle Requirements: Fused Shadows
+  - Palace of Twilight is excluded
+  - Faron Woods Logic: Open
+
+- Item Pool
+
+  - Everything shuffled with the following exceptions:
+    - Poe Souls are Vanilla (can ignore)
+    - 8 Agitha Rewards are included (4 male and 4 female)
+
+- Dungeon Items
+
+  - Small Keys: Own Dungeon, but they cannot appear on the boss
+  - Big Keys: Keysanity (anywhere)
+  - Maps and Compasses: Start With
+  - Fused Shadows are only rewarded for defeating required bosses
+
+- Starting Inventory
+
+  - Shadow Crystal
+  - Horse Call
+  - Gate Keys
+  - Hawkeye
+  - 2 Goron Mines Key Shards (only need to find 1 big key)
+  - 3 Hyrule Castle Small Keys (only need to find big key)
+
+- Excluded checks
+
+  - Hyrule Castle
+  - Cave of Ordeals
+  - Golden Wolves
+  - Bulblin Camp
+  - Post-dungeon checks (Hidden Village, Ilia Memory Quest, Snowboarding Race, Talo Sharpshooting & Hawkeye)
+  - 16 of 24 Agitha rewards (8 are included)
+  - Jovani 20 & 60 (can ignore poe souls)
+  - Iza 2 ("Iza Raging Rapids Minigame")
+
+- Other
+  - Timesavers
+    - Everything enabled except "Increase Spinner Speed"
+  - Additional Settings
+    - The following are on:
+      - Transform Anywhere
+      - Increase Wallet Capacity
+      - Shop Models Show The Replaced Item
+  - Dungeon Entrances with special behavior:
+    - Arbiter's Does Not Require Bulbin Camp is on
+    - City Does Not Require Filled Skybook is on
+    - Goron Mines Entrance is Open
+    - Temple of Time Entrance is Open
+
+## Bans
+
+The following general tricks are banned:
+
+- Actor Duping
+- Back in Time
+- Big Key Skips
+- Clawshot Actor Displacement (basic L-slide is fine)
+- Death through Load Zones
+- Epona Out of Bounds
+- Fanadi Wrong Warp
+- Iza Item Manipulation
+- Map Glitch
+- Moon Boots
+- Text Displacement
+- Univeral Map Delay
+
+The following location-specific tricks are banned:
+
+- Forest Temple Windless Bridge Boomerang Skips
+- Entering Lakebed Temple without Zora Armor
+- Skipping the Reekfish
+- Hyrule Castle Double Clawshot Skips
+- Hyrule Castle Spinner Skip
+- Hyrule Castle Boomerang Skip
+
+## Hints
+
+Hints are technically new to Twilight Princess Randomizer, and in-game hints are especially new.
+You will likely have an easier time understanding the hints by playing through a few seeds rather than trying to understand everything upfront.
+
+It is recommended that you read through this section one or two times then casually play through a few seeds to learn the sign locations and what hints you can expect to run into.
+Learning how to route and extract as much info as possible from each hint is a skill which cannot be perfected without playing.
+
+### Hint distribution
+
+The hint distribution is set to the "Q0" distribution.
+
+Hints can be found in-game by reading signs spread across the overworld and dungeons.
+You can find one sign per zone, and excluded zones or unrequired dungeons do not contain hints.
+
+:::note
+
+There are rare edge cases to a lot of things when it comes to hints (such as 0 barren zones meaning 0 Barren hints).
+I don't list these here since it would make it more difficult to understand, and they are (1) rare and (2) not critical to know before playing.
+Edge cases will be explained later.
+
+:::
+
+### Overworld hints
+
+Each hint sign contains 2 hints, and the 2nd hint is a Sometimes hint.
+Each hint has 2 copies except Always hints which are split across 3 signs (more on them later).
+
+Furthermore, the Ordon sign contains 3 starting hints (in addition to the normal Ordon hints):
+
+- 1 Path hint
+- 1 Barren hint
+- 1 "Interesting" hint (more on this later)
+
+The following hints can be found as the first hint on a sign:
+
+- 3 Always hints (2 checks hinted per sign; find 2 of 3 signs to get all hints)
+  - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5}. They say that {Iza Helping Hand} rewards an {Orange Rupee}."
+- 2 Path hints
+  - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
+- 3 Barren hints
+  - Ex: "They say that there is {nothing} to be found at {Sacred Grove}."
+- 4 "Interesting" hints (more on this later)
+- If needed, worthless hints to fill leftover space.
+  - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
+
+**"Interesting" Hints**
+
+"Interesting" hints can vary slightly each playthrough, though they will largely be the same each time.
+
+- MostSwordsProvince hint
+  - This tells which province contains the most swords.
+    If the number is 2, then it is possible that 2 provinces both have 2 swords.
+  - This is the only "Interesting" hint which is guaranteed to be present in all seeds.
+  - Ex: "They say that {2 swords} can be found in {Dungeons}."
+  - Ex: "They say that {3 swords} can be found in {Lanayru Province}."
+  - Ex: "They say that {1 sword} can be found in {Snowpeak Province}."
+- NumClawshotsInDungeons hint
+  - This tells how many clawshots can be found in dungeons.
+  - Ex: "They say that {0 clawshots} can be found in {Dungeons}."
+  - Ex: "They say that {1 clawshot} can be found in {Dungeons}."
+  - Ex: "They say that {2 clawshots} can be found in {Dungeons}."
+- Item hint
+  - Hints the zone if it is a non-unique item or it is in a dungeon, else hints the province.
+  - Ex: "They say that a {Dominion Rod} can be found at {Faron Woods}."
+  - Ex: "They say that the {Boomerang} can be found in {Lanayru Province}."
+  - Ex: "They say that the {Lantern} can be found at {Goron Mines}."
+- ItemToItemPath hint
+  - Indicates that you must find at least 1 copy of an item in order to logically find the 2nd item.
+  - The 2nd item is always logically required to complete the seed.
+    This implies that the first item is also logically required.
+  - Ex: "They say that {Clawshot} is on the path to {Lantern}."
+  - Ex: "They say that {Dominion Rod} is on the path to {Male Grasshopper}."
+- BarrenBugs hint
+  - Indicates that either male or female bugs can be ignored.
+  - This hint can only appear for seeds in which Agitha rewards a Major Item (preventBarren item).
+  - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
+  - Ex: "They say that trading in {male bugs} leads to {nothing}."
+- BarrenCategory hint
+  - Indicates that a group of checks are barren.
+  - TODO: PUT LINK TO RELEVANT CATEGORIES HERE
+  - Ex: "They say that there is {nothing} to be found in {Grottos}."
+  - Ex: "They say that there is {nothing} to be found at the {Lower Desert}."
+  - Ex: "They say that there is {nothing} to be found at {LLC Lantern Chests}."
+
+#### Sometimes hints
+
+The 2nd hint on an overworld sign is a Sometimes hint.
+The only exception is a sign with Always hints; these do not have Sometimes hints on them.
+
+Sometimes hints are picked from a pool of somewhat time-consuming checks, but there are a few special cases which take priority over the normal pool.
+
+- Sword Location hint
+  - There will be one Location hint for a check which rewards a Progressive_Sword which does not belong to the "MostSwordsProvince".
+  - Ex: 2 swords are in Eldin Province, 1 in Ordona Province, and 1 in Desert Province.
+    You might get a hint like "They say that {Gerudo Desert Owl Statue Chest} rewards a {sword}.".
+- Bo or Goats hint
+  - At least one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted.
+  - This is to encourage coming back for these checks later to make the start of the seed more fun.
+  - Ex: "They say that {Wrestling With Bo} rewards a {Purple Rupee}."
+- City in The Sky West Wing First Chest
+  - When CitS is a required dungeon, there is a 50% chance that this sometimes hint is included.
+  - This is to encourage doing the west wing of CitS forwards some of the time and backwards some of the time.
+  - Ex: "They say that {City in The Sky West Wing First Chest} rewards {Arrows 10}."
+- Boss Heart Container checks
+  - Whenever a boss heart container which is not the dungeon reward (so not Stallord) contains a Major Item (preventBarren item), there is a 50% chance that it is hinted.
+  - This is because these can lead to some really exciting hints.
+  - Ex: "They say that {Goron Mines Fyrus Heart Container} rewards {Lantern}."
+
+The rest of the sometimes hints come from a pool.
+A decent number of these hints are lantern checks which are off by themselves in order to lessen the impact of finding Lantern late into the seed.
+Others are checks which are slow or inconvenient such as "STAR Prize 2", "Death Mountain Alcove Chest", and "Ordon Cat Rescue".
+
+TODO: LIST THE EXACT POOL ON THE LINKED PAGE
+
+### Special hints
+
+#### Agitha hint
+
+- The Agitha sign is located right outside of Agitha's Castle, and it hints all Major Items (preventBarren items) which are rewarded from Agitha.
+  - The only exception is that bugs which Agitha gives you are never listed even if they would be considered Major Items because this can make the hint harder to read.
+    Thus, it is important that you trade in any bug which you receive from Agitha.
+- In the event that Agitha rewards no Major Items, her hint sign will indicate this.
+  Otherwise it will indicate which items she can reward.
+  - Ex: "Spinner"
+  - Ex: "Bow, Bow, Sword"
+  - Ex: "Nothing major."
+
+:::warning
+It is important that you trade in any bug which you receive from Agitha.
+:::
+
+#### Big key hints
+
+Since Big Keysanity is on and big keys can be nearly anywhere, each dungeon's hint sign indicates where you can find its big key.
+
+If the big key is in a dungeon or it is the Hyrule Castle Big Key, then the exact zone of the key is hinted. Otherwise the province of the key is hinted.
+
+- Ex: "They say that the {Forest Temple Big Key} can be found in {Eldin Province}."
+- Ex: "They say that the {City in the Sky Big Key} can be found in {Temple of Time}."
+- Ex: "They say that the {Hyrule Castle Big Key} can be found in {Zora's Domain}."
+
+Big Keysanity adds more items to find and gives you some direction and mini-goals to achieve.
+You will likely find some of the big keys randomly as well.
+You may want to dip a dungeon early to get its hint, or you may want to see if you get lucky without the hint.
+The choice is yours.
+
+#### BeyondThisPoint hints
+
+Certain zones have a BeyondThisPoint hint which will be one of the following:
+
+- {Nothing} beyond this point!
+  - Any checks beyond this point are barren.
+- {Something good} can be found beyond this point.
+  - There is at least one check beyond this point with a Major Item (prevents barren).
+- {Small keys} can be found beyond this point.
+  - No checks beyond this point prevent barren, but you can find small keys (small keys do not prevent barren when they are set to Own_Dungeon).
+
+You do not need to memorize where these hints are since the hints are fairly self-explananatory when you find them, but these are the places you can find them:
+
+- Lake Lantern Cave
+  - Hints the status of the 2nd half of the cave.
+- Snowpeak Sign
+  - When Snowpeak Ruins is not a required dungeon, the Snowpeak sign will hint the status of the Freezard Grotto and the Cave Ice Lantern Chest.
+- Goron Mines
+  - Hints the status of the rest of the dungeon starting at the 2nd elder room.
+- Lakebed Temple
+  - Hints the status of the west wing of the dungeon.
+- Arbiter's Grounds
+  - Hints the status of the 2nd half of the dungeon after the poe gate.
+- Temple of Time special 2nd sign
+  - Hints the status of the 2nd half of the dungeon.
+  - This is a special 2nd sign which is after the first half of the moving walls room.
+    The main ToT sign is near the start of the dungeon right before Ooccoo.
+- City in the Sky
+  - Hints the status of the east wing.
+
+### Important hint tips
+
+#### Hinted-barren zones hint themselves barren
+
+- If a zone is hinted barren, then its hint sign will always indicate that it is barren.
+  - If there are no other hints on that zone's sign, then it will use a Junk hint.
+    - Ex: "Who need mirror?"
+  - If there are other hints on that zone's sign, then it will use a Barren hint which indicates its own zone.
+    - Ex: The Arbiter's Grounds sign includes the hint "They say that there is {nothing} to be found at {Arbiter's Grounds}."
+- If a dungeon is hinted barren, it will hint itself barren in addition to the 2 Barren hints which exist on overworld signs.
+  - For overworld zones which are hinted barren, one copy of the Barren hint goes to the hinted-barren zone and the other can go to any other overworld sign.
+- An overworld zone which is hinted barren will always have a single Junk hint on its sign and nothing else.
+  The only exception is the Ordon sign since it contains starting hints.
+
+:::tip
+If you see a Junk hint, it is time to evacuate the area. You are in a barren zone!
+:::
+
+#### Always hints
+
+Signs with Always hints do not have a Sometimes hint on them.
+
+The following 5 checks are used for Always hints:
+
+```
+"Iza Helping Hand"
+"Lanayru Ice Block Puzzle Cave Chest"
+"Goron Springwater Rush"
+"Plumm Fruit Balloon Minigame"
+"Lake Hylia Shell Blade Grotto Chest"
+```
+
+Only 3 of these checks will be hinted in order to (1) minimize the signs allocated to Always hints to leave room for more exciting hints, and (2) so we don't want to have to read a huge number of hints on each Always sign.
+
+For example, let's imagine we have 3 checks which are hinted: A, B, and C.<br/>
+These will be split across 3 signs (`[A,B][C,A][B,C]`) with each sign having 2 Location hints.
+
+_Priority_
+
+The checks are grouped according to how useful the item they reward is:
+
+- hard-required (high priority)
+- optional Major Item / preventBarren item (middle priority)
+- unimportant item (low priority)
+
+We then pick the 3 highest priority checks and use those as A, B, and C.
+
+_Edge Cases_
+
+Though incredibly rare, it is possible that more than 3 of the Always checks are hard-required.
+In the event that more than 3 Always checks are required, we will also pick a D (if 4 are required) and E (if all 5 are required).
+
+These are split across 3 signs as follows:
+
+- `[A,B,C][D,A,B][C,D]` for 4 checks
+- `[A,B,C,D][E,A,B][C,D,E]` for 5 checks
+
+You can recognize this if you find a sign which has at least 3 Location hints for Always checks on it.
+
+:::note
+IMPORTANT: you only ever need to find 2 of 3 Always signs to know all of the Always hints.
+:::
