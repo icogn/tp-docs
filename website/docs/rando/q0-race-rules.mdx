@@ -101,7 +101,7 @@ Learning how to route and extract as much info as possible from each hint is a s
 The hint distribution is set to the "Q0" distribution.
 
 Hints can be found in-game by reading signs spread across the overworld and dungeons.
-You can find one sign per zone, and excluded zones or unrequired dungeons do not contain hints.
+You can find one sign per zone, and excluded zones and unrequired dungeons do not contain hints.
 
 :::note
 
@@ -122,7 +122,7 @@ Furthermore, the Ordon sign contains 3 starting hints (in addition to the normal
 - 1 Barren hint
 - 1 "Interesting" hint (more on this later)
 
-The following hints can be found as the first hint on a sign:
+The following can be found as the first hint on a sign:
 
 - 3 Always hints (2 checks hinted per sign; find 2 of 3 signs to get all hints)
   - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5}. They say that {Iza Helping Hand} rewards an {Orange Rupee}."
@@ -170,7 +170,7 @@ The following hints can be found as the first hint on a sign:
   - Indicates that a group of checks are barren.
   - TODO: PUT LINK TO RELEVANT CATEGORIES HERE
   - Ex: "They say that there is {nothing} to be found in {Grottos}."
-  - Ex: "They say that there is {nothing} to be found at the {Lower Desert}."
+  - Ex: "They say that there is {nothing} to be found at {Lower Desert}."
   - Ex: "They say that there is {nothing} to be found at {LLC Lantern Chests}."
 
 #### Sometimes hints
@@ -193,9 +193,9 @@ Sometimes hints are picked from a pool of somewhat time-consuming checks, but th
   - This is to encourage doing the west wing of CitS forwards some of the time and backwards some of the time.
   - Ex: "They say that {City in The Sky West Wing First Chest} rewards {Arrows 10}."
 - Boss Heart Container checks
-  - Whenever a boss heart container which is not the dungeon reward (so not Stallord) contains a Major Item (preventBarren item), there is a 50% chance that it is hinted.
-  - This is because these can lead to some really exciting hints.
-  - Ex: "They say that {Goron Mines Fyrus Heart Container} rewards {Lantern}."
+  - Whenever a boss heart container contains a Major Item (preventBarren item), there is a 50% chance that it is hinted.
+  - This can lead to some really exciting hints.
+  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} rewards {Boomerang}."
 
 The rest of the sometimes hints come from a pool.
 A decent number of these hints are lantern checks which are off by themselves in order to lessen the impact of finding Lantern late into the seed.
@@ -227,8 +227,8 @@ Since Big Keysanity is on and big keys can be nearly anywhere, each dungeon's hi
 If the big key is in a dungeon or it is the Hyrule Castle Big Key, then the exact zone of the key is hinted. Otherwise the province of the key is hinted.
 
 - Ex: "They say that the {Forest Temple Big Key} can be found in {Eldin Province}."
-- Ex: "They say that the {City in the Sky Big Key} can be found in {Temple of Time}."
-- Ex: "They say that the {Hyrule Castle Big Key} can be found in {Zora's Domain}."
+- Ex: "They say that the {City in the Sky Big Key} can be found at {Temple of Time}."
+- Ex: "They say that the {Hyrule Castle Big Key} can be found at {Zora's Domain}."
 
 Big Keysanity adds more items to find and gives you some direction and mini-goals to achieve.
 You will likely find some of the big keys randomly as well.
@@ -244,7 +244,7 @@ Certain zones have a BeyondThisPoint hint which will be one of the following:
 - {Something good} can be found beyond this point.
   - There is at least one check beyond this point with a Major Item (prevents barren).
 - {Small keys} can be found beyond this point.
-  - No checks beyond this point prevent barren, but you can find small keys (small keys do not prevent barren when they are set to Own_Dungeon).
+  - No checks beyond this point prevent barren, but you can find small keys (small keys do not prevent barren when they are set to Own Dungeon).
 
 You do not need to memorize where these hints are since the hints are fairly self-explananatory when you find them, but these are the places you can find them:
 
@@ -257,13 +257,16 @@ You do not need to memorize where these hints are since the hints are fairly sel
 - Lakebed Temple
   - Hints the status of the west wing of the dungeon.
 - Arbiter's Grounds
-  - Hints the status of the 2nd half of the dungeon after the poe gate.
+  - Hints the status of the checks beyond the poe gate.
 - Temple of Time special 2nd sign
   - Hints the status of the 2nd half of the dungeon.
   - This is a special 2nd sign which is after the first half of the moving walls room.
     The main ToT sign is near the start of the dungeon right before Ooccoo.
 - City in the Sky
   - Hints the status of the east wing.
+
+These add some variety to long (completely/mostly) linear sections or help with time-consuming checks.
+For example, it is better to skip the 2nd half of LLC some of the time rather than do the exact same thing every single seed.
 
 ### Important hint tips
 
@@ -301,6 +304,11 @@ Only 3 of these checks will be hinted in order to (1) minimize the signs allocat
 
 For example, let's imagine we have 3 checks which are hinted: A, B, and C.<br/>
 These will be split across 3 signs (`[A,B][C,A][B,C]`) with each sign having 2 Location hints.
+This might look like:
+
+1. "They say that {Iza Helping Hand} rewards {Bombs 10}. They say that {Plumm Fruit Balloon Minigame} rewards {Silver Rupee}."
+1. "They say that {Lake Hylia Shell Blade Grotto Chest} rewards {Dominion Rod}. They say that {Iza Helping Hand} rewards {Bombs 10}."
+1. "They say that {Plumm Fruit Balloon Minigame} rewards {Silver Rupee}. They say that {Lake Hylia Shell Blade Grotto Chest} rewards {Dominion Rod}."
 
 _Priority_
 
@@ -310,7 +318,7 @@ The checks are grouped according to how useful the item they reward is:
 - optional Major Item / preventBarren item (middle priority)
 - unimportant item (low priority)
 
-We then pick the 3 highest priority checks and use those as A, B, and C.
+We then pick the 3 highest priority checks and use those as A, B, and C (order is randomized).
 
 _Edge Cases_
 
