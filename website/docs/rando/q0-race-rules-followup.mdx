@@ -2,6 +2,10 @@
 
 import Link from '@docusaurus/Link';
 
+:::note
+You are not required to read this page to start playing with the Q0 ruleset.
+:::
+
 This page goes over more advanced hint applications as well as the reasoning behind the ruleset.<br/>
 You should read <Link to="/docs/rando/q0-race-rules">Q0 Race Rules</Link> before reading this page.
 
@@ -16,23 +20,40 @@ beating 3 dungeons to get Hyrule Castle access, leaving out Palace of Twilight, 
 
 I will skip talking about these things which everyone already agrees on.
 
+### Design philosophy
+
+- Seed times should not be too long.
+  It should be feasible for people to hold impromptu races on weeknights.
+  If seeds are lengthy for the best players, then seeds will be unreasonably lengthy for brand new players, and this harms the growth of the racing scene.
+- It should be easy for new players to start racing, but we don't need to sacrifice depth or the skill ceiling to do this.
+- Seeds should have a good amount of variability so that each seed is a unique experience.
+- There should be many viable ways to approach a seed, and there should be room for player expression and creativity.
+  Optimal play should involve players to reacting to new information rather than executing on a single best approach.
+  Players should not be synced for the first 15 minutes.
+  Options should be left open for the player so that they have the freedom to make decisions that differ from other players.
+- Players should ideally have a plan most of the time, and we should reduce how much of the seed that players spend "in a casino".
+- Go-mode should be short so that players do not have to spend much time "going through the motions".
+  Seeds are more exciting to play and watch when things are still up in the air.
+
 ### Starting items
 
 #### Hawkeye
 
 The Hawkeye is basically the equivalent of the Wind Waker's Telescope.
-It somewhat surprisingly can be used in several different places to save time, and this list of places will only get larger as people experiment with the item.
+It somewhat surprisingly can be used in several places to save time, and there is plenty of room for people experiment with the item.
 It will only get more useful once Chest Appearance Matches Contents is implemented.
 
 #### Two Goron Mines Key Shards
 
-This makes it to where to you only need to find 1 Goron Mines big key like all of the other dungeons.
-If you need to find 3 big keys for Goron Mines, then it is basically always the last dungeon you complete.
+This makes it so that you need to find 1 Goron Mines big key like all of the other dungeons.
+When you have to find 3 big keys for Goron Mines, it is basically always the last dungeon you complete.
 
 #### Three Hyrule Castle Small Keys
 
-This effectively enables Small Keysy for Hyrule Castle only.<br/>
+This effectively enables Small Keysy for Hyrule Castle.
+We do this because having to search for keys in Hyrule Castle every seed quickly becomes a chore.
 We still want to find the Hyrule Castle Big Key (which you can think of like Light Arrows in OoT).
+Like the Light Arrows, you can get a hint on where to find the big key once you have access to the end of the game (for TP, once you can enter Hyrule Castle).
 
 ### Excluded checks
 
@@ -46,11 +67,47 @@ We still want to find the Hyrule Castle Big Key (which you can think of like Lig
 
 ### Fast spinner
 
+Fast spinner is not turned on because it makes optimal play pretty dumb.
+If you think it does not have that much of an impact, then you are not abusing it enough.
+Epona-like speeds in almost every room in the game is incredibly strong.
+
+I would potentially enable it if we were able to limit it to the following areas:
+
+- areas where you can already ride Epona
+- Gerudo Desert.
+  This area is kind of a slog, so having it be different some of the time is welcome.
+- possibly Lake Hylia if people wanted it since launching out from Falbi is funny.
+  Other than that, I don't agree with it in Lake Hylia though.
+
+It is possible that it might still be too strong with those changes, but an option to limit it to those areas would make me consider it.
+
+As an aside, I think some people might think Epona invalidates Fast Spinner, but in reality skipping having to call Epona is significant.
+Calling Epona is only better over distances which are likely longer than you would ever go in a race without warping.
+
 ### Dungeon entrances
 
 ### Big keysanity
 
 ### No small keys on bosses
+
+When small keys are set to Own Dungeon, you should never be forced to beat a dungeon's boss to get a small key to access the rest of the dungeon.
+When this happens, you get warped out of the dungeon and then you have to reenter and retread a bunch of ground which is not enjoyable.
+For example, if the last small key is on Fyrus, then it is impossible to full clear the dungeon without reentering it after you beat it.
+Preventing small keys on bosses prevents this from happening.
+
+Another benefit is that the main Temple of Time dungeon is always locked behind Lantern (even with Big Keysanity).
+This makes it easy to understand when the dungeon opens up to you, and it also reduces the number of checks which can contain the Lantern.
+This is good since the Lantern is (to quote someone) "a bit of a problem item".
+There are a huge number of checks which are hard-locked behind Lantern, and a lot of them are one-off checks in zones that you might otherwise clear in a single pass.
+The large number of isolated Lantern checks makes finding it late into a seed pretty painful, so reducing the chance of this happening is a good thing.
+
+It also makes counting keys easier and more useful.
+If small keys are never on the boss, then you can say "I have X checks left on the dungeon map and I am missing X keys, therefore all remaining checks are keys and I can safely skip them".
+When you have to factor the boss heart container into this, it not only becomes more confusing, but it is also less likely that you will be able to make this play.
+
+In my opinion, no small keys on bosses is more intuitive, helpful, and enjoyable, and I am of the opinion that it should be the default behavior.
+
+_(I realize that there are some situations where it is not possible to full clear a dungeon before beating the boss, but small keys should not be designed to make this more likely. For example, Clawshot on Fyrus Heart Container and 2nd Clawshot is locked behind the first. It is therefore not possible to do the Goron Mines clawshot check before beating the dungeon.)_
 
 ### Bans
 
