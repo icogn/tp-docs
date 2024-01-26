@@ -55,6 +55,51 @@ We do this because having to search for keys in Hyrule Castle every seed quickly
 We still want to find the Hyrule Castle Big Key (which you can think of like Light Arrows in OoT).
 Like the Light Arrows, you can get a hint on where to find the big key once you have access to the end of the game (for TP, once you can enter Hyrule Castle).
 
+### Vanilla poes
+
+Regarding why you do not randomize overworld Poes:
+
+- We already have a really big sphere0, and we do not need to make it bigger.
+  When you have a giant sphere0, you are more likely to find all of your items early and then spend most of the seed finding nothing which is not fun.
+  The impact of an additional 24 sphere0 checks is significant.
+- The first 45 minutes of the seed are mostly set to nighttime.
+  This means there is no music playing for a good chunk of every seed.
+- It seems like people do not enjoy randomly finding poe souls.
+
+What about randomizing dungeon poes?<br/>
+I am not entirely opposed to it, but it has a few downsides:
+
+- Poes are not marked on dungeon maps, so it is easy for players to forget them (especially new players, but I have had experienced players forget them as well).
+  - This also makes key counting more difficult.
+- Here is how I think it changes dungeons:
+  - Arbiter's Grounds
+    - Definitely worse.
+      It makes the first half of Arbiter's Grounds incredibly linear.
+      Poe 1 Skip is now only worth doing if you are in go-mode.
+      It also asks nothing in terms of routing.
+  - Snowpeak Ruins
+    - Impossible to make this dungeon bad.
+      Having a reason to go to the icy room is cool.
+      Killing the open poe in the first room has another purpose now (the first being that it is annoying).
+      The armor poe doesn't really affect anything except that it is easy to forget.
+  - Temple of Time
+    - The first poe seems like it might get left behind if you don't have Dominion Rod (need to learn a trick to never leave it behind).
+    - The second poe does not change anything.
+      Maybe slightly better since it buffs percentages, but I think I am the only one who pays attention to that stuff.
+  - City in the Sky
+    - The poe above the central room doesn't really change anything other than removing a potential timesave for doing the LJA to the middle without killing it.
+    - The 2nd poe makes the extremely slow room even more difficult to route.
+      Now people have to learn to route this room when you factor in the time it takes to defeat the poe.
+      Now people have to know how to route this room with the poe and without the poe, forwards and backwards, with boomerang and without boomerang.
+      It is not easy at all.
+    - CitS already has a ton of checks and it does not need the help.
+
+Generally speaking, I am not confident that dungeon poes will become standard, and I do not want to ask people to learn how to route in non-standard checks.
+This just makes it less likely that people will join races using this ruleset.
+I personally would like French players to join these races as well, and that doesn't happen by making things more difficult for no real reason.
+
+The lack of obvious upsides while having several downsides does not give much reason to enable dungeon poes.
+
 ### Excluded checks
 
 #### Bulblin Camp
@@ -63,6 +108,24 @@ Like the Light Arrows, you can get a hint on where to find the big key once you 
 
 #### Jovani
 
+Jovani 60 should obviously be excluded, so then it becomes a question of Jovani 20.
+
+I am not a fan of Jovani 20 for a few reasons:
+
+- With vanilla overworld poes, there are already 24 poes in sphere0, so Jovani 20 is basically a sphere 0 check.
+- When you factor in the raw time it takes to defeat and collect 20 poes, it would be the worst check in the game (worse than Iza 1).
+  - it would have to be an Always hint, and we already have plenty of bad Always checks.
+- Including Jovani 20 means new players have to learn a bunch of poe locations which makes the barrier to entry higher.
+  And for what?
+  Collecting 20 vanilla sphere0 poes is not particularly enjoyable.
+  - Vanilla gold skulltulas in OoT work better:
+    - They are much faster to collect, and many can be collected from a distance.
+    - A lot of them actually have logic to them, and you collect some of them in different ways.
+    - I am pretty sure they don't have 50 of them in sphere0.
+
+I think Jovani does not need to be revisited until we can set custom reward thresholds (of much lower than 20).
+Even then I worry that it might negatively impact early game routing options.
+
 ### Agitha
 
 ### Fast spinner
@@ -70,19 +133,23 @@ Like the Light Arrows, you can get a hint on where to find the big key once you 
 Fast spinner is not turned on because it makes optimal play pretty dumb.
 If you think it does not have that much of an impact, then you are not abusing it enough.
 Epona-like speeds in almost every room in the game is incredibly strong.
+Imagine what speedruns would look like if they had access to our Fast Spinner implementation.
+It completely changes the game.
 
 I would potentially enable it if we were able to limit it to the following areas:
 
 - areas where you can already ride Epona
 - Gerudo Desert.
-  This area is kind of a slog, so having it be different some of the time is welcome.
-- possibly Lake Hylia if people wanted it since launching out from Falbi is funny.
+  This area is kind of a slog, so having it be different/faster some of the time is welcome.
+- (only if people really wanted it) possibly Lake Hylia since launching out from Falbi is funny.
   Other than that, I don't agree with it in Lake Hylia though.
 
 It is possible that it might still be too strong with those changes, but an option to limit it to those areas would make me consider it.
 
-As an aside, I think some people might think Epona invalidates Fast Spinner, but in reality skipping having to call Epona is significant.
+Some people might think Epona invalidates Fast Spinner, but in reality skipping having to call Epona is significant.
 Calling Epona is only better over distances which are likely longer than you would ever go in a race without warping.
+
+It is okay to do a race with this on every once in a while, but what it turns the game into gets old fast if you are seriously trying to win.
 
 ### Unlock map regions
 
@@ -127,7 +194,8 @@ Enter Big Keysanity:
   Some people may like to dip dungeons early while others may prefer to wait and hope they find the big key on their own.
 - Hints in dungeons (including big key hints) give more of a reason to dip dungeons early.
   I think a seed is more fun when it is a mixture of dungeons and overworld, and the big key hints can make it less appealing to save all dungeons for the end.
-- Having a big key in its own dungeon becomes a somewhat interesting occurrence ("hey, I've seen this one") rather than a constant.
+- Big Keysanity adds more variability between seeds.
+  - Having a big key in its own dungeon becomes a somewhat interesting occurrence ("hey, I've seen this one") rather than a constant.
 - TP does not actually have that many important items that the player has to find (especially compared to OoT), and Big Keysanity helps with this.
 - Whenever you see a big key in the world, there is some excitement to figure out which one it is.
 - Randomly finding a big key you need is nice.
