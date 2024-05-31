@@ -40,7 +40,7 @@ function HomepageHeader() {
               'button button--secondary button--lg',
               styles.button
             )}
-            to="/docs/rando/q0-race-rules"
+            to="/docs/rando/blossom-race-rules"
           >
             Rando
           </Link>
