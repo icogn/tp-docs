@@ -156,8 +156,8 @@ Here is a general outline of how you might approach a seed:
 - The next priority is completing sphere0 checks and gathering hints.
   - Do not forget that you can warp to different provinces from the start.
   - You may want to prioritize going to a zone which was hinted as Path by a starting hint.
-  - While you are still determining the other 2 zones which are hinted barren (3 total barren-hinted zones; 1 of the 3 is a starting hint), checking the hint sign in a zone should be one of the first things you do there.
-    A zone's sign will _ALWAYS ALWAYS ALWAYS_ indicate whether or not that zone is hinted barren.
+  - While you are still determining the other 2 zones which are hinted barren (3 total hinted-barren zones; 1 of the 3 is a starting hint), checking the hint sign in a zone should be one of the first things you do there.
+    A zone's sign will _ALWAYS ALWAYS ALWAYS_ indicate whether or not that zone is hinted barren (even for dungeons).
   - Note that if you get a Sometimes hint for a check in Zone A, then you know that Zone A is not hinted barren.
     You can potentially use this to decide where to go next.
 - As part of your sphere0 routing, you may want to gather 4 poe souls.
@@ -214,15 +214,15 @@ For normal Overworld signs, the following can be found as the first hint on the 
   - Note that Path hints with BigKeysanity are generated as if you start with all big keys.
     See the linked videos for the explanation.
 - 3 Barren hints
-  - Ex: "They say that there is {nothing} to be found at {Sacred Grove}."
+  - Ex: "They say that there is nothing to be found at {Lake Hylia}."
 - 3 "major / first layer" hints (more on this later)
 - If needed, Item hints for junk items fill leftover space.
   - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
 
 **Always hints**
 
-- 5 Always hints (2 checks hinted per sign; find 3 or 4 of 5 signs to get all hints)
-  - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5}. They say that {Iza Helping Hand} rewards an {Orange Rupee}."
+- 5 Always hints (2 checks hinted per sign; find at least 3 and at most 4 of the 5 signs to get all hints)
+  - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5} (not required). They say that {Iza Helping Hand} rewards an {orange Rupee} (not required)."
 
 Note that there is no "2nd layer hint" after the 2 Always hints on a sign.
 
@@ -241,7 +241,7 @@ You should expect to see these every seed:
   - Ex: "They say that {1 sword} can be found in {Peak Province}."
 - ItemToItemPath hint
   - Indicates that you must find at least 1 copy of an item in order to logically find the 2nd item.
-  - The 2nd item is always logically required to complete the seed.
+  - The 2nd item is always a unique (one findable copy) item which is logically required to complete the seed.
     This implies that the first item is also logically required.
   - The Items referenced by this hint are never rewards for checks targeted by other hints.
     See the linked videos for more details.
@@ -251,11 +251,11 @@ You should expect to see these every seed:
 You should expect to see 2 of the following 3 hint types every seed:
 
 - TradeGroup hint
+  - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
   - Indicates that either male or female bugs can be ignored.
   - This hint can only appear for seeds in which Agitha is not skippable.
   - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
     This is because some of the bugs which leads to nothing will likely be in barren zones.
-  - Ex: "They say that bring {male bugs} to Agitha leads to nothing."
 - Item hint
   - This hint is specifically set up to only ever direct toward checks with a "Required" CheckStatus, and this is indicated in the hint text as well.
   - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
@@ -287,17 +287,17 @@ Sometimes hints are picked from a pool of somewhat time-consuming checks, but th
 - Bo or Goats hint
   - Exactly one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted.
   - This is to encourage coming back for these checks later to make the start of the seed more fun.
-  - Ex: "They say that {Wrestling With Bo} rewards a {Purple Rupee}."
+  - Ex: "They say that {Wrestling With Bo} rewards a {purple Rupee}."
 - City in The Sky West Wing First Chest
-  - When CitS is a required dungeon, there is a 50% chance that this sometimes hint is included.
+  - When CitS is a required dungeon, there is a 50% chance that this Sometimes hint is included.
   - This is to encourage doing the west wing of CitS forwards some of the time and backwards some of the time.
   - Ex: "They say that {City in The Sky West Wing First Chest} rewards {Arrows 10}."
 - Boss Heart Container Woth hints
   - Whenever a boss heart container has a "Required" CheckStatus, there is a 50% chance that it is hinted (max 1 per seed).
-  - This is meant to be an "oh snap" moment.
+  - This is meant to be an "oh snap" moment that only shows up very rarely.
   - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} is on the way of the hero."
 
-The rest of the sometimes hints come from a pool.
+The rest of the Sometimes hints come from a pool.
 A decent number of these hints are lantern checks which are off by themselves in order to lessen the impact of finding Lantern late into the seed.
 Others are checks which are slow or inconvenient such as "STAR Prize 2" and "Ordon Cat Rescue".
 
@@ -318,7 +318,7 @@ Others are checks which are slow or inconvenient such as "STAR Prize 2" and "Ord
 Since Big Keysanity is on and big keys can be nearly anywhere, each dungeon's hint sign indicates where you can find its big key.
 
 Normally you will get an Item hint for the zone containing the big key.
-When the big key is on a trade reward, you will instead get a TradeChain hint toward the check that starts the chain ending the big key.
+When the big key is on a trade reward, you will instead get a TradeChain hint toward the check that starts the chain ending in the big key.
 
 - Ex: "They say that the {Forest Temple Big Key} can be found in {North Eldin}."
 - Ex: "They say that the {♀ grasshopper} in {Lanayru Field} leads to the {City in the Sky big key}."
@@ -327,7 +327,8 @@ When the big key is on a trade reward, you will instead get a TradeChain hint to
 Big Keysanity adds more items to find and gives you some direction and mini-goals to achieve.
 You will likely find some of the big keys randomly as well.
 You may want to dip a dungeon early to get its hint, or you may want to see if you get lucky without the hint.
-The choice is yours.
+The choice is yours!
+For an in-depth explanation for why this ruleset uses BigKeysanity, please see the Detailed Ruleset Explanation Video linked at the top.
 
 #### BeyondThisPoint hints
 
@@ -336,7 +337,7 @@ Certain zones have a BeyondThisPoint hint which will be one of the following:
 - {Nothing} beyond this point!
   - Any checks beyond this point are barren.
 - {Something good} can be found beyond this point.
-  - There is at least Good check beyond this point.
+  - There is at least one Good check beyond this point.
 
 You do not need to memorize where these hints are since the hints are fairly self-explananatory when you find them, but these are the places you can find them:
 
@@ -364,7 +365,7 @@ For example, it is better to skip the 2nd half of LLC some of the time rather th
 
 #### Hinted-barren zones hint themselves barren
 
-- If a zone is hinted barren, then its hint sign will always indicate that it is barren.
+- If a zone is hinted barren, then its hint sign will ALWAYS indicate that it is barren (even for dungeons).
   - If there are no other hints on that zone's sign, then it will use a Junk hint.
     - Ex: "Who need mirror? (barren zone)"
   - If there are other hints on that zone's sign, then it will use a Barren hint which indicates its own zone.
