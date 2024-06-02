@@ -128,144 +128,201 @@ The following location-specific tricks are banned:
 ## Hints
 
 Hints are technically new to Twilight Princess Randomizer, and in-game hints are especially new.
-You will likely have an easier time understanding the hints by playing through a few seeds rather than trying to understand everything upfront.
+Additionally there are some new capabilities with the TPR Hint System which <span style={{"text-decoration": "underline"}}>do not exist in other Zelda Randomizers</span>.
+Therefore it will take a little time to really develop an understanding, even if you are already familiar with hints in other Zelda Randomizers.
 
-It is recommended that you read through this section one or two times then casually play through a few seeds to learn the sign locations and what hints you can expect to run into.
-Learning how to route and extract as much info as possible from each hint is a skill which cannot be perfected without playing.
+Remember that learning how to route and extract as much info as possible from each hint is a skill which cannot be perfected on your first playthrough.
+You will likely have an easier time understanding the hints by playing through a few seeds.
+It is not recommended that you attempt to develop a perfect understanding before playing.
 
-### Hint distribution
+It is recommended that you watch/skim the <Link to="https://www.youtube.com/watch?v=2Ihj2hD4ElM&list=PLSyD19UZrem_r1Xmgb0Pu7dk_1v80X_HY&index=1">Hint System Introduction Video</Link> (2x speed recommended) to learn where all of the hint signs are located.
+Then you should casually play through a few seeds to get a better feel for things.
 
-The hint distribution is set to the "Q0" distribution.
+To understand almost everything there is to know about this ruleset and hint distribution (including a deep dive into the guiding principles), please see the <Link to="https://www.youtube.com/watch?v=-WfROEovmZ0&list=PLSyD19UZrem_r1Xmgb0Pu7dk_1v80X_HY&index=2">Detailed Ruleset Explanation Video</Link>.
+
+The linked videos are also part of a playlist where I (Isaac) play through some seeds with these settings, so you may want to watch through those to get a better understanding of what these seeds look like from the perspective of an experienced player.
+
+## Approaching a seed
+
+Here is a general outline of how you might approach a seed:
+
+- Check the Ordon sign in front of you to get your starting hints.
+  - This sign will ALWAYS indicate whether or not Ordon is hinted barren.
+  - If a zone's sign does not have a hint indicating "my zone is barren", then that zone is NOT hinted barren.
+    This is an absolute that applies to ALL zones!
+    - If a sign has a Junk hint such as "Go on, lad. Open the chest. (barren zone)", then it is telling you the zone you are currently in is hinted barren, and you should evacuate the area!
+  - If you are clearing Ordon right away, you should hold off on doing Bo or Goats since exactly one of these is guaranteed to be a Sometimes hint.
+- Check the required dungeons on Link's house sign.
+- The next priority is completing sphere0 checks and gathering hints.
+  - Do not forget that you can warp to different provinces from the start.
+  - You may want to prioritize going to a zone which was hinted as Path by a starting hint.
+  - While you are still determining the other 2 zones which are hinted barren (3 total barren-hinted zones; 1 of the 3 is a starting hint), checking the hint sign in a zone should be one of the first things you do there.
+    A zone's sign will _ALWAYS ALWAYS ALWAYS_ indicate whether or not that zone is hinted barren.
+  - Note that if you get a Sometimes hint for a check in Zone A, then you know that Zone A is not hinted barren.
+    You can potentially use this to decide where to go next.
+- As part of your sphere0 routing, you may want to gather 4 poe souls.
+  You will need to find 5 poe souls for the Jovani reward, but 1 is always right next to Jovani.
+  However, if Castle Town is hinted barren then the Jovani reward is junk.
+  - Jovani's reward is NOT hinted since you only need to find a few poe souls.
+- If you find a hint related to bugs, then you know that Agitha is not barren.
+  At some point you will want to go check the Agitha hint which tells all Good items she rewards.
+  (Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.)
+- You will likely find some of the Big Keys you need randomly.
+  To help with the ones you don't find, every dungeon's sign will hint the area containing its Big Key (including Hyrule Castle).
+
+Everything else should be mostly self-explanatory.
+Good luck!
+
+## Hint distribution
+
+:::tip
+You are probably ready to try a seed out just from reading the "Approaching a seed" section.
+You can always come back to this section later.
+
+On the other hand, for an in-depth explanation of absolutely everything you would ever need to know, please see the videos linked at the top of the document.
+:::
+
+The hint distribution is set to the "Blossom" distribution.
 
 Hints can be found in-game by reading signs spread across the overworld and dungeons.
 You can find one sign per zone, and excluded zones and unrequired dungeons do not contain hints.
+Also the sign outside Agitha's Castle has the AgithaRewards hint.
 
 :::note
 
-There are rare edge cases to a lot of things when it comes to hints (such as 0 barren zones meaning 0 Barren hints).
+There are rare edge cases to almost everything when it comes to hints (such as 0 barren zones meaning 0 Barren hints).
 I don't list these here since it would make it more difficult to understand, and they are (1) rare and (2) not critical to know before playing.
 
 :::
 
-### Overworld hints
+### Overworld signs
 
-Each hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint appears on 2 different signs.<br/>
+In general, each Overworld hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint appears on 2 different signs.
 Signs with Always hints do not have Sometimes hints; they contain 2 Location hints for Always checks instead.
 
-Furthermore, the Ordon sign contains 3 starting hints (in addition to the normal Ordon hints):
+Furthermore, the Ordon sign is a special "starting hints" sign which contains your 4 starting hints:
 
-- 1 Path hint
 - 1 Barren hint
-- 1 "Interesting" hint (more on this later)
+- 1 Path hint
+- 1 "major / first layer" hint
+- 1 "minor / second layer" hint
 
-The following can be found as the first hint on a sign:
+For normal Overworld signs, the following can be found as the first hint on the sign:
 
-- 3 Always hints (2 checks hinted per sign; find 2 of 3 signs to get all hints)
-  - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5}. They say that {Iza Helping Hand} rewards an {Orange Rupee}."
 - 2 Path hints
   - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
+  - Note that Path hints with BigKeysanity are generated as if you start with all big keys.
+    See the linked videos for the explanation.
 - 3 Barren hints
   - Ex: "They say that there is {nothing} to be found at {Sacred Grove}."
-- 4 "Interesting" hints (more on this later)
-- If needed, worthless hints to fill leftover space.
+- 3 "major / first layer" hints (more on this later)
+- If needed, Item hints for junk items fill leftover space.
   - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
 
-**"Interesting" Hints**
+**Always hints**
 
-"Interesting" hints can vary slightly each playthrough, though they will largely be the same each time.
+- 5 Always hints (2 checks hinted per sign; find 3 or 4 of 5 signs to get all hints)
+  - Ex: "They say that {Goron Springwater Rush} rewards {Bombs 5}. They say that {Iza Helping Hand} rewards an {Orange Rupee}."
+
+Note that there is no "2nd layer hint" after the 2 Always hints on a sign.
+
+**"Major / First Layer" Hints**
+
+The first hint on the sign is the stronger hint.
+The second hint is usually just a Sometimes hint.
+
+You should expect to see these every seed:
 
 - MostSwordsProvince hint
   - This tells which province contains the most swords.
     If the number is 2, then it is possible that 2 provinces both have 2 swords.
-  - This is the only "Interesting" hint which is guaranteed to be present in all seeds.
   - Ex: "They say that {2 swords} can be found in {Dungeons}."
   - Ex: "They say that {3 swords} can be found in {Lanayru Province}."
-  - Ex: "They say that {1 sword} can be found in {Snowpeak Province}."
-- NumClawshotsInDungeons hint
-  - This tells how many clawshots can be found in dungeons.
-  - Ex: "They say that {0 clawshots} can be found in {Dungeons}."
-  - Ex: "They say that {1 clawshot} can be found in {Dungeons}."
-  - Ex: "They say that {2 clawshots} can be found in {Dungeons}."
-- Item hint
-  - Hints the zone if it is a non-unique item or it is in a dungeon, else hints the province.
-  - Ex: "They say that a {Dominion Rod} can be found at {Faron Woods}."
-  - Ex: "They say that the {Boomerang} can be found in {Lanayru Province}."
-  - Ex: "They say that the {Lantern} can be found at {Goron Mines}."
+  - Ex: "They say that {1 sword} can be found in {Peak Province}."
 - ItemToItemPath hint
   - Indicates that you must find at least 1 copy of an item in order to logically find the 2nd item.
   - The 2nd item is always logically required to complete the seed.
     This implies that the first item is also logically required.
-  - Ex: "They say that {Clawshot} is on the path to {Lantern}."
-  - Ex: "They say that {Dominion Rod} is on the path to {Male Grasshopper}."
-- BarrenBugs hint
+  - The Items referenced by this hint are never rewards for checks targeted by other hints.
+    See the linked videos for more details.
+  - Ex: "They say that a {Clawshot} is on the path to the {Lantern}."
+  - Ex: "They say that a {Dominion Rod} is on the path to the {Male Grasshopper}."
+
+You should expect to see 2 of the following 3 hint types every seed:
+
+- TradeGroup hint
   - Indicates that either male or female bugs can be ignored.
-  - This hint can only appear for seeds in which Agitha rewards a Major Item (preventBarren item).
+  - This hint can only appear for seeds in which Agitha is not skippable.
   - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
     This is because some of the bugs which leads to nothing will likely be in barren zones.
-  - Ex: "They say that trading in {male bugs} leads to {nothing}."
+  - Ex: "They say that bring {male bugs} to Agitha leads to nothing."
+- Item hint
+  - This hint is specifically set up to only ever direct toward checks with a "Required" CheckStatus, and this is indicated in the hint text as well.
+  - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
+  - Ex: "They say that the {Gale Boomerang} (required) can be found in {Lanayru Province}."
+  - Ex: "They say that the {Lantern} (required) can be found in {Goron Mines}."
 - BarrenCategory hint
   - Indicates that a group of checks are barren.
-  - TODO: PUT LINK TO RELEVANT CATEGORIES HERE
-  - Ex: "They say that there is {nothing} to be found in {Grottos}."
-  - Ex: "They say that there is {nothing} to be found at {Lower Desert}."
-  - Ex: "They say that there is {nothing} to be found at {LLC Lantern Chests}."
+  - For a full explanation of the HintCategories, please see the Detailed Ruleset Explanation Video at the top of the document.
+  - Ex: "They say that there is nothing to be found in {Grottos}."
+  - Ex: "They say that there is nothing to be found in the {Lower Desert}."
+  - Ex: "They say that there is nothing to be found in the {Lake Lantern Cave lantern chests}."
 
-#### Sometimes hints
+#### Second Layer / Sometimes hints
 
-The 2nd hint on an overworld sign is a Sometimes hint.
-The only exception is a sign with Always hints; these do not have Sometimes hints on them.
+The 2nd hint on an Overworld sign is usually a Sometimes hint.
+
+Some Overworld signs do not have 2nd layer hint placed on them:
+
+- a sign with Always hints
+- a sign belonging to a hinted-barren zone
+  - Note that there is no reason to go to an Overworld zone once you already know that it is hinted barren.
 
 Sometimes hints are picked from a pool of somewhat time-consuming checks, but there are a few special cases which take priority over the normal pool.
 
-- Sword Location hint
-  - There will be one Location hint for a check which rewards a Progressive_Sword which does not belong to the "MostSwordsProvince".
+- Sword Item hint
+  - There will be one Item hint for a check which rewards a Progressive_Sword which does not belong to the "MostSwordsProvince".
   - Ex: 2 swords are in Eldin Province, 1 in Ordona Province, and 1 in Desert Province.
-    You might get a hint like "They say that {Gerudo Desert Owl Statue Chest} rewards a {Sword}.".
+    You might get a hint like "They say that a {sword} can be found in the {Gerudo Desert}.".
 - Bo or Goats hint
-  - At least one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted.
+  - Exactly one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted.
   - This is to encourage coming back for these checks later to make the start of the seed more fun.
   - Ex: "They say that {Wrestling With Bo} rewards a {Purple Rupee}."
 - City in The Sky West Wing First Chest
   - When CitS is a required dungeon, there is a 50% chance that this sometimes hint is included.
   - This is to encourage doing the west wing of CitS forwards some of the time and backwards some of the time.
   - Ex: "They say that {City in The Sky West Wing First Chest} rewards {Arrows 10}."
-- Boss Heart Container checks
-  - Whenever a boss heart container contains a Major Item (preventBarren item), there is a 50% chance that it is hinted.
-  - This can lead to some really exciting hints.
-  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} rewards {Boomerang}."
+- Boss Heart Container Woth hints
+  - Whenever a boss heart container has a "Required" CheckStatus, there is a 50% chance that it is hinted (max 1 per seed).
+  - This is meant to be an "oh snap" moment.
+  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} is on the way of the hero."
 
 The rest of the sometimes hints come from a pool.
 A decent number of these hints are lantern checks which are off by themselves in order to lessen the impact of finding Lantern late into the seed.
-Others are checks which are slow or inconvenient such as "STAR Prize 2", "Death Mountain Alcove Chest", and "Ordon Cat Rescue".
-
-TODO: LIST THE EXACT POOL ON THE LINKED PAGE
+Others are checks which are slow or inconvenient such as "STAR Prize 2" and "Ordon Cat Rescue".
 
 ### Special hints
 
-#### Agitha hint
+#### AgithaRewards hint
 
-- The Agitha sign is located right outside of Agitha's Castle, and it hints all Major Items (preventBarren items) which are rewarded from Agitha.
-  - The only exception is that bugs which Agitha gives you are never listed even if they would be considered Major Items because this can make the hint harder to read.
-    Thus, it is important that you trade in any bug which you receive from Agitha.
-- In the event that Agitha rewards no Major Items, her hint sign will indicate this.
+- The Agitha sign is located right outside of Agitha's Castle, and it hints all Good items which are rewarded from Agitha.
+  - The only exception is that bugs which Agitha gives you are never listed even if they would be considered Good because this can make the hint harder to read.
+    Thus, it is important that you trade in any bug which you receive from Agitha (unless you already know that gender of bug leads to nothing).
+- In the event that Agitha rewards no Good items, her hint sign will indicate this.
   Otherwise it will indicate which items she can reward.
   - Ex: "Spinner"
   - Ex: "Bow, Bow, Sword"
-  - Ex: "Nothing major."
-
-:::warning
-It is important that you trade in any bug which you receive from Agitha.
-:::
 
 #### Big key hints
 
 Since Big Keysanity is on and big keys can be nearly anywhere, each dungeon's hint sign indicates where you can find its big key.
 
-If the big key is in a dungeon or it is the Hyrule Castle Big Key, then the exact zone of the key is hinted. Otherwise the province of the key is hinted.
+Normally you will get an Item hint for the zone containing the big key.
+When the big key is on a trade reward, you will instead get a TradeChain hint toward the check that starts the chain ending the big key.
 
-- Ex: "They say that the {Forest Temple Big Key} can be found in {Eldin Province}."
-- Ex: "They say that the {City in the Sky Big Key} can be found at {Temple of Time}."
-- Ex: "They say that the {Hyrule Castle Big Key} can be found at {Zora's Domain}."
+- Ex: "They say that the {Forest Temple Big Key} can be found in {North Eldin}."
+- Ex: "They say that the {♀ grasshopper} in {Lanayru Field} leads to the {City in the Sky big key}."
+- Ex: "They say that the {Hyrule Castle Big Key} can be found at {Lake Hylia}."
 
 Big Keysanity adds more items to find and gives you some direction and mini-goals to achieve.
 You will likely find some of the big keys randomly as well.
@@ -279,9 +336,7 @@ Certain zones have a BeyondThisPoint hint which will be one of the following:
 - {Nothing} beyond this point!
   - Any checks beyond this point are barren.
 - {Something good} can be found beyond this point.
-  - There is at least one check beyond this point with a Major Item (prevents barren).
-- {Small keys} can be found beyond this point.
-  - No checks beyond this point prevent barren, but you can find small keys (small keys do not prevent barren when they are set to Own Dungeon).
+  - There is at least Good check beyond this point.
 
 You do not need to memorize where these hints are since the hints are fairly self-explananatory when you find them, but these are the places you can find them:
 
@@ -311,98 +366,13 @@ For example, it is better to skip the 2nd half of LLC some of the time rather th
 
 - If a zone is hinted barren, then its hint sign will always indicate that it is barren.
   - If there are no other hints on that zone's sign, then it will use a Junk hint.
-    - Ex: "Who need mirror?"
+    - Ex: "Who need mirror? (barren zone)"
   - If there are other hints on that zone's sign, then it will use a Barren hint which indicates its own zone.
-    - Ex: The Arbiter's Grounds sign includes the hint "They say that there is {nothing} to be found at {Arbiter's Grounds}."
+    - Ex: The Arbiter's Grounds sign includes the hint "They say that there is nothing to be found at {Arbiter's Grounds}."
 - If a dungeon is hinted barren, it will hint itself barren in addition to the 2 Barren hints which exist on overworld signs.
   - For overworld zones which are hinted barren, one copy of the Barren hint goes to the hinted-barren zone and the other can go to any other overworld sign.
-- An overworld zone which is hinted barren will always have a single Junk hint on its sign and nothing else.
-  The only exception is the Ordon sign since it contains starting hints.
+- There is no reason to visit an Overworld zone once you already know it is hinted barren.
 
 :::tip
 If you see a Junk hint, it is time to evacuate the area. You are in a barren zone!
-:::
-
-#### Always hints
-
-Signs with Always hints do not have a Sometimes hint on them.
-
-The following 5 checks are used for Always hints:
-
-```
-"Iza Helping Hand"
-"Lanayru Ice Block Puzzle Cave Chest"
-"Goron Springwater Rush"
-"Plumm Fruit Balloon Minigame"
-"Lake Hylia Shell Blade Grotto Chest"
-```
-
-Only 3 of these checks will be hinted in order to (1) minimize the signs allocated to Always hints to leave room for more exciting hints, and (2) so we don't want to have to read a huge number of hints on each Always sign.
-
-For example, let's imagine we have 3 checks which are hinted: A, B, and C.<br/>
-These will be split across 3 signs (`[A,B][C,A][B,C]`) with each sign having 2 Location hints.
-This might look like:
-
-1. "They say that {Iza Helping Hand} rewards {Bombs 10}. They say that {Plumm Fruit Balloon Minigame} rewards {Silver Rupee}."
-1. "They say that {Lake Hylia Shell Blade Grotto Chest} rewards {Dominion Rod}. They say that {Iza Helping Hand} rewards {Bombs 10}."
-1. "They say that {Plumm Fruit Balloon Minigame} rewards {Silver Rupee}. They say that {Lake Hylia Shell Blade Grotto Chest} rewards {Dominion Rod}."
-
-_Priority_
-
-The checks are grouped according to how useful the item they reward is:
-
-- hard-required (high priority)
-- optional Major Item / preventBarren item (middle priority)
-- unimportant item (low priority)
-
-We then pick the 3 highest priority checks and use those as A, B, and C (order is randomized).
-
-_Edge Cases_
-
-Though incredibly rare, it is possible that more than 3 of the Always checks are hard-required.
-In the event that more than 3 Always checks are required, we will also pick a D (if 4 are required) and E (if all 5 are required).
-
-These are split across 3 signs as follows:
-
-- `[A,B,C][D,A,B][C,D]` for 4 checks
-- `[A,B,C,D][E,A,B][C,D,E]` for 5 checks
-
-You can recognize this if you find a sign which has at least 3 Location hints for Always checks on it.
-
-:::note
-IMPORTANT: you only ever need to find 2 of 3 Always signs to know all of the Always hints.
-:::
-
-## Approaching a seed
-
-Here is a general outline of how you might approach a seed:
-
-- Check the required dungeons.
-- Check the Ordon sign next to where you start to get the starting hints + Ordon hints.
-  - This sign will always indicate whether or not Ordon is barren.
-    If it is not barren and you decide to do it immediately, you may want to hold off on doing Bo or Goats since at least one of these will be a Sometimes hint.
-- The next priority is completing sphere0 checks and gathering hints.
-  - You may want to prioritize going to a zone which was hinted as Path by a starting hint.
-  - While you are still determining which zones are hinted barren (4 total), checking the hint sign in a zone should be one of the first things you do there.
-    The sign will always indicate whether or not that area is hinted barren
-    - **A junk hint means the area is hinted barren.**
-  - Note that if you get a Sometimes hint for a check in Zone A, then you know that Zone A is not hinted barren.
-- As part of your sphere0 routing, you may want to gather 4 poe souls.
-  You will need to find 5 poe souls for the Jovani reward, but 1 is always right next to Jovani.
-  However, if Castle Town is hinted barren then the Jovani reward is junk.
-- If you find a hint relating to bugs, then you know that Agitha is not barren.
-  At some point you will want to go check the Agitha hint which tells all Major Items she rewards.
-  (Agitha is her own zone. She is NOT part of the Castle Town zone.)
-- You will likely find some of the Big Keys you need randomly.
-  To help with the ones you don't find, every dungeon's sign will hint the area containing its Big Key.
-
-Everything else should be mostly self-explanatory.
-Good luck!
-
----
-
-:::info
-
-For more tips and design explanations, see the <Link to="/docs/rando/q0-race-rules-followup">follow-up page</Link>.
-
 :::
