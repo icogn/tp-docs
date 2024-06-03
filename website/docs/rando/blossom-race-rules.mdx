@@ -264,9 +264,11 @@ You should expect to see 2 of the following 3 hint types every seed:
   - Indicates that either male or female bugs can be ignored.
   - This hint can only appear for seeds in which Agitha is not skippable.
   - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
-    This is because some of the bugs which leads to nothing will likely be in barren zones.
+    This is because some of the bugs which lead to nothing will likely be in barren zones.
 - Item hint
   - This hint is specifically set up to only ever direct toward checks with a "Required" CheckStatus, and this is indicated in the hint text as well.
+  - The hinted area is a Province for unique items and a Zone for items with multiple copies.
+    However if the Province is 'Dungeons', then it will hint the exact dungeon.
   - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
   - Ex: "They say that the {Gale Boomerang} (required) can be found in {Lanayru Province}."
   - Ex: "They say that the {Lantern} (required) can be found in {Goron Mines}."
@@ -287,7 +289,7 @@ Some Overworld signs do not have 2nd layer hint placed on them:
 - a sign belonging to a hinted-barren zone
   - Note that there is no reason to go to an Overworld zone once you already know that it is hinted barren.
 
-Sometimes hints are picked from a pool of somewhat time-consuming checks, but there are a few special cases which take priority over the normal pool.
+Sometimes hints are picked from a pool of somewhat time-consuming or inconvenient checks, but there are a few special cases which take priority over the normal pool.
 
 - Sword Item hint
   - There will be one Item hint for a check which rewards a Progressive_Sword which does not belong to the "MostSwordsProvince".
