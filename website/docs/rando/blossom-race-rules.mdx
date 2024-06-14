@@ -7,11 +7,11 @@ import CopyTextComp from '@local/CopyTextComp';
 
 #### Settings String
 
-<CopyTextComp text="5s22f2kPS_-CfeJ8HaX7cJny-NoZKQZNIwNIwNIwN0u70u70u70u70u70u70u71_qwFLTZK7KfcWO0-pphmuHTHbBADknYf_AxydhLmUoxaTnKnI8b6WSbx66LYROE-5GjUYcccP9CNGx20M_b6WAXscqPUjs-vQmnEsYA5D8S-Xl-" />
+<CopyTextComp text="5sQ2h2kPC_-CfeJ8HaX7cJny-NoZKQZKmwNIwNIwNIu70u70u70u70u70u70u70uF-dHwhiQWwbCq307sUTU72BgCfPHjsCLFvNVazQk3sNSZkAcAH4eq3alOmoiJR1tmg5hqKqqp99Yw7OG2tyeq1KEqsZBrkttBM69sqHGff3dqD_m" />
 
 - <a
     target="_blank"
-    href="/spoilerLogs/Tpr--GothicDarkhammer_pHt--SpoilerLog-nxroOCC1UPw.json"
+    href="/spoilerLogs/Tpr--PositiveEpona_wsr--SpoilerLog-ogiovoAb3oh.json"
     download
   >
     Download Sample Spoiler Log
@@ -22,6 +22,13 @@ import CopyTextComp from '@local/CopyTextComp';
 - <Link to="https://www.youtube.com/watch?v=-WfROEovmZ0&list=PLSyD19UZrem_r1Xmgb0Pu7dk_1v80X_HY&index=2">
     Detailed Ruleset Explanation Video
   </Link>
+
+## Recent changes
+
+- Big keys changed from Anywhere to OwnDungeon
+  - Still start with 2 of 3 Goron Mines key shards
+- Start with Hyrule Castle big key
+- Hint distribution adjustments (see later in this document for details)
 
 ## Settings
 
@@ -36,7 +43,7 @@ import CopyTextComp from '@local/CopyTextComp';
 
   - All boxes checked
   - Note: the following are shuffled, but the source checks are excluded:
-    - Hidden Skills
+    - Hidden Skills (Golden Wolves)
     - Shop Items
   - Poes are Vanilla
   - 8 Agitha rewards are included (4 male and 4 female)
@@ -45,7 +52,7 @@ import CopyTextComp from '@local/CopyTextComp';
 - Dungeon Items
 
   - Small Keys: Own Dungeon, but never on bosses
-  - Big Keys: Keysanity (anywhere)
+  - Big Keys: Own Dungeon
   - Maps and Compasses: Start With
 
 - Starting Inventory
@@ -57,7 +64,8 @@ import CopyTextComp from '@local/CopyTextComp';
   - Dungeons:
     - 6 Progressive Sky Books (missing 1 sky char)
     - 2 Goron Mines Key Shards (only need to find 1 big key)
-    - 3 Hyrule Castle Small Keys (only need to find big key)
+    - 3 Hyrule Castle Small Keys
+    - Hyrule Castle Big Key
   - For your convenience:
     - Horse Call
     - Hawkeye
@@ -141,8 +149,7 @@ It is recommended that you watch/skim the <Link to="https://www.youtube.com/watc
 Then you should casually play through a few seeds to get a better feel for things.
 
 To understand almost everything there is to know about this ruleset and hint distribution (including a deep dive into the guiding principles), please see the <Link to="https://www.youtube.com/watch?v=-WfROEovmZ0&list=PLSyD19UZrem_r1Xmgb0Pu7dk_1v80X_HY&index=2">Detailed Ruleset Explanation Video</Link>.
-
-The linked videos are also part of a playlist where I (Isaac) play through some seeds with these settings, so you may want to watch through those to get a better understanding of what these seeds look like from the perspective of an experienced player.
+Note that there have been slight changes to the ruleset since that video was recorded, so it will not be 100% accurate. However, the vast majority of it still applies (including the guiding principles which is arguably the most important part).
 
 ## Approaching a seed
 
@@ -167,13 +174,11 @@ Here is a general outline of how you might approach a seed:
   You will need to find 5 poe souls for the Jovani reward, but 1 is always right next to Jovani.
   However, if Castle Town is hinted barren then the Jovani reward is junk.
   - Jovani's reward is NOT hinted since you only need to find a few poe souls.
-- If you find a hint such as "bringing male/female bugs to Agitha leads to nothing", then you know that Agitha is not barren.
+- If you find a hint such as "bringing male/female bugs to Agitha leads to nothing", then you know that Agitha is not skippable.
   At some point you will want to go check the sign outside Agitha's Castle to see all Good items she rewards.
   (Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.)
   - She may still have Good items even if you do not see this hint!
     You should always check at some point (early or late is up to you).
-- You will likely find some of the Big Keys you need randomly.
-  To help with the ones you don't find, every dungeon's sign will hint the area containing its Big Key (including Hyrule Castle).
 - Don't forget that these are excluded: Shop Items, Bulblin Camp, Death Mountain
 
 Everything else should be mostly self-explanatory.
@@ -191,8 +196,9 @@ On the other hand, for an in-depth explanation of absolutely everything you woul
 The hint distribution is set to the "Blossom" distribution.
 
 Hints can be found in-game by reading signs spread across the overworld and dungeons.
-You can find one sign per zone, and excluded zones and unrequired dungeons do not contain hints.
-Also the sign outside Agitha's Castle has the AgithaRewards hint.
+You can find one sign per zone (Temple of Time has 2), and excluded zones and unrequired dungeons do not contain hints.
+The sign outside Agitha's Castle has the AgithaRewards hint.
+Jovani's 60 souls reward is excluded, and the 20 souls reward is unhinted.
 
 :::note
 
@@ -209,21 +215,31 @@ Signs with Always hints do not have Sometimes hints; they contain 2 Location hin
 Furthermore, the Ordon sign is a special "starting hints" sign which contains your 4 starting hints:
 
 - 1 Barren hint
+- 1 ItemToItemPath hint
 - 1 Path hint
-- 1 "major / first layer" hint
 - 1 "minor / second layer" hint
+
+Note that the starting hints do not have additional copies since you are expected to always read this sign at the start of the seed.
 
 For normal Overworld signs, the following can be found as the first hint on the sign:
 
-- 2 Path hints
-  - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
-  - Note that Path hints with BigKeysanity are generated as if you start with all big keys.
-    See the linked videos for the explanation.
-- 2 Barren hints
+- 2 Barren Zone hints
+  - Note that a maximum of 1 dungeon can be hinted barren.
   - Ex: "They say that there is nothing to be found at {Lake Hylia}."
-- 3 "major / first layer" hints (more on this later)
-- If needed, Item hints for junk items fill leftover space.
+- 1 Path hint
+  - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
+- 1 MostSwordsProvince hint
+- 1 Required Item hint
+- 1 Basic Item hint
+- Either 1 Barren Category hint or 1 Barren Bug Gender hint
+- If needed, Filler hints fill any leftover space.
   - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
+
+:::note
+
+Signs belonging to excluded zones get Filler hints, so there is no reason to visit an excluded zone to read the hint sign. For example, there is no reason to read the sign in Hidden Village or Death Mountain.
+
+:::
 
 **Always hints**
 
@@ -246,11 +262,13 @@ Always Checks:
 The first hint on the sign is the stronger hint.
 The second hint is usually just a Sometimes hint.
 
-You should expect to see these every seed:
+Here are some of the hint types you will see:
 
 - MostSwordsProvince hint
   - This tells which province contains the most swords.
     If the number is 2, then it is possible that 2 provinces both have 2 swords.
+    If the number is 1, then each sword is in a different province.
+    - Remember that all Dungeons belong to the "Dungeons" province.
   - Ex: "They say that {2 swords} can be found in {Dungeons}."
   - Ex: "They say that {3 swords} can be found in {Lanayru Province}."
   - Ex: "They say that {1 sword} can be found in {Peak Province}."
@@ -262,28 +280,32 @@ You should expect to see these every seed:
     See the linked videos for more details.
   - Ex: "They say that a {Clawshot} is on the path to the {Lantern}."
   - Ex: "They say that a {Dominion Rod} is on the path to the {Male Grasshopper}."
-
-You should expect to see 2 of the following 3 hint types every seed:
-
-- TradeGroup hint
-  - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
-  - Indicates that either male or female bugs can be ignored.
-  - This hint can only appear for seeds in which Agitha is not skippable.
-  - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
-    This is because some of the bugs which lead to nothing will likely be in barren zones.
-- Item hint
+- Required Item hint
   - This hint is specifically set up to only ever direct toward checks with a "Required" CheckStatus, and this is indicated in the hint text as well.
   - The hinted area is a Province for unique items and a Zone for items with multiple copies.
     However if the Province is 'Dungeons', then it will hint the exact dungeon.
   - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
   - Ex: "They say that the {Gale Boomerang} (required) can be found in {Lanayru Province}."
   - Ex: "They say that the {Lantern} (required) can be found in {Goron Mines}."
+- Basic Item hint
+  - This hint is for one of the following items: Bomb Bag, Bow, or Fishing Rod.
+  - The item is not guaranteed to be required, and the hint text never indicates if that specific item is required.
+  - There is a slight preference for hinting fishing rods when they are required (such as seeds with Snowpeak Ruins), but the item hinted by this hint is NOT guaranteed to be required.
+  - This hint is intentionally not as strong as some of the other hints for balance purposes.
+  - Ex: "They say that a {bow} can be found in the {Gerudo Desert}."
+  - Ex: "They say that a {fishing rod} can be found in {Faron Woods}."
+- TradeGroup (barren bug gender) hint
+  - Indicates that either male or female bugs can be ignored.
+  - This hint can only appear for seeds in which Agitha is not skippable.
+  - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
+    This is because some of the bugs which lead to nothing will likely be in barren zones.
+  - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
 - BarrenCategory hint
   - Indicates that a group of checks are barren.
-  - For a full explanation of the HintCategories, please see the Detailed Ruleset Explanation Video at the top of the document.
+  - For a full list of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
   - Ex: "They say that there is nothing to be found in {Grottos}."
   - Ex: "They say that there is nothing to be found in the {Lower Desert}."
-  - Ex: "They say that there is nothing to be found in the {Lake Lantern Cave lantern chests}."
+  - Ex: "They say that there is nothing to be found in the {2 lantern chests in Lake Lantern Cave}."
 
 #### Second Layer / Sometimes hints
 
@@ -302,7 +324,7 @@ Sometimes hints are picked from a pool of somewhat time-consuming or inconvenien
   - Ex: 2 swords are in Eldin Province, 1 in Ordona Province, and 1 in Desert Province.
     You might get a hint like "They say that a {sword} can be found in the {Gerudo Desert}.".
 - Bo or Goats hint
-  - Exactly one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted (unless Ordon is hinted barren).
+  - Exactly one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted (unless Ordon is hinted barren, etc.).
   - This is to encourage coming back for these checks later to make the start of the seed more fun.
   - Ex: "They say that {Wrestling With Bo} rewards a {purple Rupee}."
 - City in The Sky West Wing First Chest
@@ -330,33 +352,28 @@ Others are checks which are slow or inconvenient such as "STAR Prize 2" and "Ord
   - Ex: "Spinner"
   - Ex: "Bow, Bow, Sword"
 
-#### Big key hints
-
-Since Big Keysanity is on and big keys can be nearly anywhere, each dungeon's hint sign indicates where you can find its big key.
-
-Normally you will get an Item hint for the zone containing the big key.
-When the big key is on a trade reward, you will instead get a TradeChain hint toward the check that starts the chain ending in the big key.
-
-- Ex: "They say that the {Forest Temple Big Key} can be found in {North Eldin}."
-- Ex: "They say that the {♀ grasshopper} in {Lanayru Field} leads to the {City in the Sky big key}."
-- Ex: "They say that the {Hyrule Castle Big Key} can be found at {Lake Hylia}."
-
-Big Keysanity adds more items to find and gives you some direction and mini-goals to achieve.
-You will likely find some of the big keys randomly as well.
-You may want to dip a dungeon early to get its hint, or you may want to see if you get lucky without the hint.
-The choice is yours!
-For an in-depth explanation for why this ruleset uses BigKeysanity, please see the Detailed Ruleset Explanation Video linked at the top.
-
 #### BeyondThisPoint hints
 
 Certain zones have a BeyondThisPoint hint which will be one of the following:
 
 - {Nothing} beyond this point!
   - Any checks beyond this point are barren.
-- {Something good} can be found beyond this point.
+- {Something good} beyond this point!
   - There is at least one Good check beyond this point.
+    Note that there can be multiple!
 
-You do not need to memorize where these hints are since the hints are fairly self-explananatory when you find them, but these are the places you can find them:
+Since big keys are set to OwnDungeon, for dungeon signs with a BeyondThisPoint hint, the text will also indicate whether or not the big key is beyond this point:
+
+- {Something good} and {big keys} beyond this point!
+  - There is at least 1 Good check, and there is also at least 1 big key.
+- {Something good} beyond this point, but there are {no big keys}.
+  - There is at least 1 Good check, but there are no big keys.
+- Only {big keys} beyond this point!
+  - There are no Good checks, but at least 1 big key is beyond this point.
+- {Nothing} beyond this point!
+  - There are no Good checks and no big keys beyond this point.
+
+These are the places you can find them:
 
 - Lake Lantern Cave
   - Hints the status of the 2nd half of the cave.
@@ -376,7 +393,56 @@ You do not need to memorize where these hints are since the hints are fairly sel
   - Hints the status of the east wing.
 
 These add some variety to long (completely/mostly) linear sections or help with time-consuming checks.
-For example, it is better to skip the 2nd half of LLC some of the time rather than do the exact same thing every single seed.
+For example, it is better to skip the 2nd half of LLC some of the time rather than to do the exact same thing every single seed.
+
+### Dungeon hints
+
+All dungeons other than Forest Temple and Snowpeak Ruins have a BeyondThisPoint hint.
+To help balance this, Forest Temple and Snowpeak Ruins each get a special hint placed on their sign.
+
+- Forest Temple
+  - The hint sign will always indicate the reward for defeating the miniboss.
+- Snowpeak Ruins
+  - The hint sign will indicate the reward for 1 of 3 inconvenient 2nd floor checks:
+    - "Snowpeak Ruins Chapel Chest"
+    - "Snowpeak Ruins Lobby Chandelier Chest"
+    - "Snowpeak Ruins Northeast Chandelier Chest"
+  - This hint has a slight preference for hinting checks which are Good or Required.
+
+Additionally, Temple of Time gets an extra hint to make it more enjoyable:
+
+- Temple of Time
+  - The hint sign at the start of the dungeon will always indicate the reward for defeating the miniboss.
+  - This hint is placed on the sign even if the BeyondThisPoint hint indicates there is nothing in the 2nd half of the dungeon.
+
+This main purpose of this hint is to help with clearing ToT when it is hinted barren or you are already in go-mode, though it is never not convenient.
+
+- If the Darknut has the big key, then you know up front.
+  - This makes it easier to mentally cope compared to full clearing the entire dungeon with no info.
+  - Additionally, since you know where the big key is, you can rush to the top as soon as you find all of your small keys.
+- If the Darknut does not have the big key:
+  - You know the 3rd small key is not needed.
+    You use the 1st at the very start, so you really only need to find 1 more key (the 2nd or 3rd key).
+  - You should full clear until you get to where you can either go to the Armos Antechamber room or go to the BeyondThisPoint sign.
+  - If you found a key and can go to the BeyondThisPoint sign, it will tell you whether you can skip the Armos Antechamber room or you can skip the checks beyond the sign.
+  - Regardless of what happens, you will never be in a go-mode scenario where you are just full clearing the dungeon with no plan and hoping the seed decided to be nice.
+    This should make this dungeon significantly more enjoyable!
+
+#### Other Dungeon hints
+
+Each dungeon (other than hinted-barren dungeons) will also get one of the following hints on its sign:
+
+- Number of Boomerangs in Dungeons
+- Number of Clawshots in Dungeons
+
+Remember that NumItemInArea hints do not direct toward checks, so these hints are generated even if there is already a hint directing toward the check which rewards the boomerang (for example: "Gale Boomerang (required) is in Lanayru Province").
+
+These hints essentially tell you if you should be looking in the Overworld or in Dungeons for boomerangs or clawshots.
+These can help with endgame casinos or influence routing decisions earlier into the seed.
+For some seeds they might help a lot, and for others they might not be necessary, and that is perfectly okay.
+
+You will randomly get 2 of one hint and 1 of the other.
+However, if a dungeon is hinted barren, then you will get exactly 1 of each (the hinted-barren dungeon does not get one of these hints).
 
 ### Important hint tips
 
