@@ -14,11 +14,11 @@ You will be able to use the main dev generator once these changes are merged lat
 
 #### Settings String
 
-<CopyTextComp text="5sQ2h2kPC_-CfeJ8HaX7cJny-NoZKQZKmwNIwNIwNIu70u70u70u70u70u70u70uF-dHwhiQWwbCq307sUTU72BgCfPHjsCLFvNVazQk3sNSZkAcAH4eq3alOmoiJR1tmg5hqKqqp99Yw7OG2tyeq1KEqsZBrkttBM69sqHGff3dqD_m" />
+<CopyTextComp text="5sQ362kPC_-CfeJ8HaX7cJny-NoYqQZKQc7IwNIwNIwN0u70u70u70u70u70u70u71_qwFLTZK61gbCq2Z80-pphmuHTHbBADknYf_AxydhLmUoxaTnKnI8b6WSbx66LYROE-5GjUYcccP9CNGx20M_b6WAXscqPUjs-umKvfKLWdIa4eJUDhKdJMGxBM69sqHGff3dqD_m" />
 
 - <a
     target="_blank"
-    href="/spoilerLogs/Tpr--PositiveEpona_wsr--SpoilerLog-ogiovoAb3oh.json"
+    href="/spoilerLogs/Tpr--CriticalMalver_DJ5--SpoilerLog-3iraMNuTg3h.json"
     download
   >
     Download Sample Spoiler Log
@@ -32,9 +32,13 @@ You will be able to use the main dev generator once these changes are merged lat
 
 ## Recent changes
 
-- Big keys changed from Anywhere to OwnDungeon
-  - Still start with 2 of 3 Goron Mines key shards
-- Start with Hyrule Castle big key
+- Lake Lantern Cave excluded
+- Agitha rewards reduced from 8 to 6
+- Keys:
+  - Big keys changed from Anywhere to OwnDungeon
+    - Still start with 2 of 3 Goron Mines key shards
+  - Start with Hyrule Castle big key
+  - Start with City in the Sky small key
 - Hint distribution adjustments (see later in this document for details)
 
 ## Settings
@@ -53,8 +57,8 @@ You will be able to use the main dev generator once these changes are merged lat
     - Hidden Skills (Golden Wolves)
     - Shop Items
   - Poes are Vanilla
-  - 8 Agitha rewards are included (4 male and 4 female)
-    - The 16 bugs which have their rewards excluded are removed from the item pool.
+  - 6 Agitha rewards are included (3 male and 3 female)
+    - The 18 bugs which have their rewards excluded are removed from the item pool.
 
 - Dungeon Items
 
@@ -71,16 +75,18 @@ You will be able to use the main dev generator once these changes are merged lat
   - Dungeons:
     - 6 Progressive Sky Books (missing 1 sky char)
     - 2 Goron Mines Key Shards (only need to find 1 big key)
+    - City in the Sky Small Key
     - 3 Hyrule Castle Small Keys
     - Hyrule Castle Big Key
   - For your convenience:
     - Horse Call
     - Hawkeye
-    - Giant Bomb Bag
+    - Giant Bomb Bags
 
 - Excluded checks
 
   - Hyrule Castle
+  - Lake Lantern Cave
   - Bulblin Camp
   - Cave of Ordeals
   - Death Mountain Alcove Chest
@@ -90,7 +96,7 @@ You will be able to use the main dev generator once these changes are merged lat
   - As mentioned in "Item Pool":
     - Golden Wolves
     - Shop Items
-    - 16 of 24 Agitha rewards (8 are included)
+    - 18 of 24 Agitha rewards (6 are included)
 
 - Other
   - Timesavers
@@ -186,7 +192,7 @@ Here is a general outline of how you might approach a seed:
   (Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.)
   - She may still have Good items even if you do not see this hint!
     You should always check at some point (early or late is up to you).
-- Don't forget that these are excluded: Shop Items, Bulblin Camp, Death Mountain
+- Don't forget that these are excluded: Shop Items, Bulblin Camp, Death Mountain, Lake Lantern Cave
 
 Everything else should be mostly self-explanatory.
 Good luck!
@@ -216,31 +222,37 @@ I don't list these here since it would make it more difficult to understand, and
 
 ### Overworld signs
 
-In general, each Overworld hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint appears on 2 different signs.
+In general, each Overworld hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint has multiple copies.
 Signs with Always hints do not have Sometimes hints; they contain 2 Location hints for Always checks instead.
 
 Furthermore, the Ordon sign is a special "starting hints" sign which contains your 4 starting hints:
 
-- 1 Barren hint
+- 1 Barren Zone hint
 - 1 ItemToItemPath hint
-- 1 Path hint
-- 1 "minor / second layer" hint
+- 1 MostSwordsProvince hint
+- 1 Miscellaneous hint (a few different possibilities)
+  - Barren category, Barren bug gender, Boss Heart Container WotH, Required Item, Basic Item (fallback)
 
 Note that the starting hints do not have additional copies since you are expected to always read this sign at the start of the seed.
 
 For normal Overworld signs, the following can be found as the first hint on the sign:
 
 - 2 Barren Zone hints
-  - Note that a maximum of 1 dungeon can be hinted barren.
+  - <span style={{ 'text-decoration': 'underline' }}>
+      Note that we will prioritize hinting a barren dungeon whenever possible!
+    </span>
+  - Note that a maximum of 1 dungeon can be hinted barren, and it is possible for this hint to be placed on the Ordon sign (as long as Ordon itself is not hinted barren in which case the Ordon sign would hint Ordon as barren).
   - Ex: "They say that there is nothing to be found at {Lake Hylia}."
-- 1 Path hint
+  - Ex: "They say that there is nothing to be found in the {Forest Temple}."
+- 2 Path hints
   - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
-- 1 MostSwordsProvince hint
-- 1 Required Item hint
-- 1 Basic Item hint
-- Either 1 Barren Category hint or 1 Barren Bug Gender hint
 - If needed, Filler hints fill any leftover space.
   - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
+
+The Barren Zone hints and Path hints will have 3 copies.
+A Zone hinting itself as barren with a Junk hint counts as one of the 3 copies.
+A dungeon hinting itself as barren is a special 4th copy.
+Always hints on the other hand only have 2 copies each.
 
 :::note
 
@@ -292,19 +304,19 @@ Here are some of the hint types you will see:
   - The hinted area is a Province for unique items and a Zone for items with multiple copies.
     However if the Province is 'Dungeons', then it will hint the exact dungeon.
   - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
-  - Ex: "They say that the {Gale Boomerang} (required) can be found in {Lanayru Province}."
-  - Ex: "They say that the {Lantern} (required) can be found in {Goron Mines}."
+  - Ex: "They say that the {slingshot} (required) can be found in {Lanayru Province}."
+  - Ex: "They say that {Ashei's Sketch} (required) can be found in {Goron Mines}."
 - Basic Item hint
-  - This hint is for one of the following items: Bomb Bag, Bow, or Fishing Rod.
+  - This is a backup hint that you will only see if other Miscellaneous hints were not possible to generate.
+  - This hint is for either a Bow or a Fishing Rod.
   - The item is not guaranteed to be required, and the hint text never indicates if that specific item is required.
-  - There is a slight preference for hinting fishing rods when they are required (such as seeds with Snowpeak Ruins), but the item hinted by this hint is NOT guaranteed to be required.
-  - This hint is intentionally not as strong as some of the other hints for balance purposes.
+    The item text will also be green (for Good) rather than blue (for Required).
   - Ex: "They say that a {bow} can be found in the {Gerudo Desert}."
   - Ex: "They say that a {fishing rod} can be found in {Faron Woods}."
-- TradeGroup (barren bug gender) hint
+- BarrenBugGender (TradeGroup) hint
   - Indicates that either male or female bugs can be ignored.
   - This hint can only appear for seeds in which Agitha is not skippable.
-  - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 8 bugs.
+  - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 6 bugs.
     This is because some of the bugs which lead to nothing will likely be in barren zones.
   - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
 - BarrenCategory hint
@@ -312,7 +324,11 @@ Here are some of the hint types you will see:
   - For a full list of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
   - Ex: "They say that there is nothing to be found in {Grottos}."
   - Ex: "They say that there is nothing to be found in the {Lower Desert}."
-  - Ex: "They say that there is nothing to be found in the {2 lantern chests in Lake Lantern Cave}."
+  - Ex: "They say that there is nothing to be found behind {Owl Statues}."
+- Boss Heart Container WotH hints
+  - Whenever a boss heart container has a "Required" CheckStatus, it might get hinted as the starting Miscellaneous hint.
+  - This is meant to be an "oh snap" moment that only shows up very rarely.
+  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} is on the way of the hero."
 
 #### Second Layer / Sometimes hints
 
@@ -326,10 +342,6 @@ Some Overworld signs do not have 2nd layer hint placed on them:
 
 Sometimes hints are picked from a pool of somewhat time-consuming or inconvenient checks, but there are a few special cases which take priority over the normal pool.
 
-- Sword Item hint
-  - There will be one Item hint for a check which rewards a Progressive_Sword which does not belong to the "MostSwordsProvince".
-  - Ex: 2 swords are in Eldin Province, 1 in Ordona Province, and 1 in Desert Province.
-    You might get a hint like "They say that a {sword} can be found in the {Gerudo Desert}.".
 - Bo or Goats hint
   - Exactly one of "Wrestling With Bo" or "Herding Goats Reward" will always be hinted (unless Ordon is hinted barren, etc.).
   - This is to encourage coming back for these checks later to make the start of the seed more fun.
@@ -338,10 +350,6 @@ Sometimes hints are picked from a pool of somewhat time-consuming or inconvenien
   - When CitS is a required dungeon, there is a 50% chance that this Sometimes hint is included.
   - This is to encourage doing the west wing of CitS forwards some of the time and backwards some of the time.
   - Ex: "They say that {City in The Sky West Wing First Chest} rewards {Arrows 10}."
-- Boss Heart Container WotH hints
-  - Whenever a boss heart container has a "Required" CheckStatus, there is a 50% chance that it is hinted (max 1 per seed).
-  - This is meant to be an "oh snap" moment that only shows up very rarely.
-  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} is on the way of the hero."
 
 The rest of the Sometimes hints come from a pool.
 A decent number of these hints are lantern checks which are off by themselves in order to lessen the impact of finding Lantern late into the seed.
@@ -414,7 +422,11 @@ To help balance this, Forest Temple and Snowpeak Ruins each get a special hint p
     - "Snowpeak Ruins Chapel Chest"
     - "Snowpeak Ruins Lobby Chandelier Chest"
     - "Snowpeak Ruins Northeast Chandelier Chest"
-  - This hint has a slight preference for hinting checks which are Good or Required.
+  - <span style={{ 'text-decoration': 'underline' }}>
+      This hint will always hint the bedroom key if it is in one of these 3
+      checks.
+    </span>
+  - Otherwise, this hint has a slight preference for hinting checks which are Good or Required.
 
 Additionally, Temple of Time gets an extra hint to make it more enjoyable:
 
@@ -467,3 +479,15 @@ However, if a dungeon is hinted barren, then you will get exactly 1 of each (the
 :::tip
 If you see a Junk hint, it is time to evacuate the area. You are in a barren zone!
 :::
+
+#### Other tips
+
+- If it is possible to hint a dungeon as barren, then we will (max 1).
+  - Therefore, if your 3 Barren Zone hints do not include a dungeon, then none of the dungeons are barren.
+    This does not imply that they all have hard-required items such as the Boomerang or Spinner though.
+    They might simply have a bomb bag, etc.
+- The SPR hint will prioritize hinting the bedroom key if possible.
+  If it does not, then you know the bedroom key is not any of these checks:
+  - "Snowpeak Ruins Chapel Chest"
+  - "Snowpeak Ruins Lobby Chandelier Chest"
+  - "Snowpeak Ruins Northeast Chandelier Chest"
