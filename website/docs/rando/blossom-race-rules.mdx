@@ -18,7 +18,7 @@ You will be able to use the main dev generator once these changes are merged lat
 
 - <a
     target="_blank"
-    href="/spoilerLogs/Tpr--PlatinumDangoro_96u--SpoilerLog-P303SC-uEKc.json"
+    href="/spoilerLogs/Tpr--NotableLuda_5LN--SpoilerLog-HEpczB1KOhb.json"
     download
   >
     Download Sample Spoiler Log
@@ -195,9 +195,7 @@ Here is a general outline of how you might approach a seed:
   (Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.)
   - She may still have Good items even if you do not see this hint!
     You should always check at some point (early or late is up to you).
-- We prioritize hinting barren dungeons (no limit).
-  If you know all 3 barren zones, then you know exactly which dungeons we were able to hint barren.
-  If we did not hint a dungeon as barren, then we were not able to, and it probably has something good in it.
+- We prioritize hinting barren dungeons (limit 1).
 - Don't forget that these are excluded: Shop Items, Bug source checks, Bulblin Camp, Death Mountain, Lake Lantern Cave
 
 Everything else should be mostly self-explanatory.
@@ -231,13 +229,11 @@ I don't list these here since it would make it more difficult to understand, and
 In general, each Overworld hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint has multiple copies.
 Signs with Always hints do not have Sometimes hints; they contain 2 Location hints for Always checks instead.
 
-Furthermore, the Ordon sign is a special "starting hints" sign which contains your 3 starting hints:
+Furthermore, the Ordon sign is a special "starting hints" sign which contains your 2 starting hints:
 
 - 1 Barren Zone hint
-- 1 ItemToItemPath hint
-  - In very rare cases, this hint might not be able to generate.
 - 1 Miscellaneous hint (a few different possibilities)
-  - Barren category, Barren bug gender, Boss Heart Container WotH, Required Item, NumBoomerangsInDungeons
+  - Barren category (upper or lower desert), hint related to bugs, Number or Boomerangs or Clawshots in Dungeons, Sometimes hint
 
 Note that the starting hints do not have additional copies since you are expected to always read this sign at the start of the seed.
 
@@ -246,21 +242,24 @@ For normal Overworld signs, the following can be found as the first hint on the 
 - 2 Barren Zone hints
   - <span style={{ 'text-decoration': 'underline' }}>
       Note that we will prioritize hinting barren dungeons whenever possible!
-      (no limit)
+      (limit 1)
     </span>
-  - If you find all 3 barren zone hints, then you know that any dungeons which were not hinted barren could not be hinted barren.
+  - If you find all 3 barren zone hints and no dungeons are hinted, then you know that none of the dungeons are barren.
   - Ex: "They say that there is nothing to be found at {Lake Hylia}."
   - Ex: "They say that there is nothing to be found in the {Forest Temple}."
+- 1 ItemToItemPath hint
+  - Ex: "They say that a {Clawshot} is on the path to the {Spinner}."
+  - In very rare cases, this hint might not be able to generate.
+    You will have extra Filler hints in that case.
 - 2 Path hints
   - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
-- 1 MostSwordsProvince hint
 - If needed, Filler hints fill any leftover space.
   - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
 
 The Barren Zone hints have 3 copies, and everything else is 2 copies.
 A Zone hinting itself as barren with a Junk hint counts as one of the 3 copies.
 A dungeon hinting itself as barren is a special 4th copy.
-Always hints on the other hand only have 2 copies each.
+Always hints only have 2 copies each.
 
 :::note
 
@@ -291,20 +290,12 @@ The second hint is usually just a Sometimes hint.
 
 Here are some of the hint types you will see:
 
-- MostSwordsProvince hint
-  - This tells which province contains the most swords.
-    If the number is 2, then it is possible that 2 provinces both have 2 swords.
-    If the number is 1, then each sword is in a different province.
-    - Remember that all Dungeons belong to the "Dungeons" province.
-  - Ex: "They say that {2 swords} can be found in {Dungeons}."
-  - Ex: "They say that {3 swords} can be found in {Lanayru Province}."
-  - Ex: "They say that {1 sword} can be found in {Peak Province}."
-- NumBoomerangsInDungeons hint
-  - This tells whether or not the Gale Boomerang is in the Overworld or a Dungeon.
-  - Note that this does NOT direct toward the boomerang check.
+- NumItemInDungeons hint
+  - This tells how many of an item (Gale Boomerang or Clawshots) can be found in Dungeons.
+  - Note that this does NOT direct toward any checks.
     It just states a fact without pointing toward anything.
   - Ex: "They say that {0 Gale Boomerangs} can be found in {Dungeons}."
-  - Ex: "They say that {1 Gale Boomerang} can be found in a {Dungeon}."
+  - Ex: "They say that {1 Clawshot} can be found in a {Dungeon}."
 - ItemToItemPath hint
   - Indicates that you must find at least 1 copy of an item in order to logically find the 2nd item.
   - The 2nd item is always a unique (one findable copy) item which is logically required to complete the seed.
@@ -313,29 +304,26 @@ Here are some of the hint types you will see:
     See the linked videos for more details.
   - Ex: "They say that a {Clawshot} is on the path to the {Lantern}."
   - Ex: "They say that a {Dominion Rod} is on the path to the {Male Grasshopper}."
-- Required Item hint
-  - This hint is specifically set up to only ever direct toward checks with a "Required" CheckStatus, and this is indicated in the hint text as well.
-  - The hinted area is a Province for unique items and a Zone for items with multiple copies.
-    However if the Province is 'Dungeons', then it will hint the exact dungeon.
-  - Ex: "They say that a {Dominion Rod} (required) can be found in {Faron Woods}."
-  - Ex: "They say that the {slingshot} (required) can be found in {Lanayru Province}."
-  - Ex: "They say that {Ashei's Sketch} (required) can be found in {Goron Mines}."
 - BarrenBugGender (TradeGroup) hint
   - Indicates that either male or female bugs can be ignored.
-  - This hint can only appear for seeds in which Agitha is not skippable.
+  - This hint can show up even if Agitha is skippable.
   - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 6 bugs.
     This is because some of the bugs which lead to nothing will likely be in barren zones.
   - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
+- BugChain (TradeChain) hint
+  - Indicates that a bug in a province leads to an item.
+  - This hint can show up even if Agitha is skippable.
+  - Ex: "They say that a {bug} in {Faron Province} leads to a {fishing rod}."
+  - Ex: "They say that a {bug} in a {Dungeon} leads to a {sword}."
 - BarrenCategory hint
   - Indicates that a group of checks are barren.
+  - The ONLY categories that can be hinted are "upper desert" and "lower desert".
   - For a full list of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
-  - Ex: "They say that there is nothing to be found in {Grottos}."
-  - Ex: "They say that there is nothing to be found in the {Lower Desert}."
-  - Ex: "They say that there is nothing to be found behind {Owl Statues}."
-- Boss Heart Container WotH hints
-  - Whenever a boss heart container has a "Required" CheckStatus, there is a small chance that it gets hinted as the starting Miscellaneous hint.
-  - This is meant to be an "oh snap" moment that only shows up very rarely.
-  - Ex: "They say that {Snowpeak Ruins Blizzeta Heart Container} is on the way of the hero."
+  - Ex: "They say that there is nothing to be found in the {lower desert}."
+  - Ex: "They say that there is nothing to be found in the {upper desert}."
+- Sometimes hint
+  - Indicates the contents of a check.
+  - EX: "They say that the reward for {Kakariko Gorge Double Clawshot Chest} is an {orange Rupee}."
 
 #### Second Layer / Sometimes hints
 
@@ -458,17 +446,19 @@ This main purpose of this hint is to help with clearing ToT when it is hinted ba
 
 Each dungeon (other than hinted-barren dungeons) will also get one of the following hints on its sign:
 
+- MostSwordsProvince hint
+  - This tells which province contains the most swords.
+    If the number is 2, then it is possible that 2 provinces both have 2 swords.
+    If the number is 1, then each sword is in a different province.
+    - Remember that all Dungeons belong to the "Dungeons" province.
+  - Ex: "They say that {2 swords} can be found in {Dungeons}."
+  - Ex: "They say that {3 swords} can be found in {Lanayru Province}."
+  - Ex: "They say that {1 sword} can be found in {Peak Province}."
 - Auxiliary sword hint (1 copy)
   - Hints a zone with a Sword which does not belong to the MostSwordsProvince.
-- Number of Clawshots in Dungeons (fills out the remaining dungeon signs)
 
-Remember that NumItemInArea hints do not direct toward checks, so the Clawshot hints are generated even if there is already a hint directing toward a check which rewards a Clawshot.
-
-These can help with endgame casinos or influence routing decisions earlier into the seed.
-For some seeds they might help a lot, and for others they might not be necessary, and that is perfectly okay.
-
-If a dungeon is hinted barren, then it does not get one of these hints.
-If all 3 were hinted barren, then none of these hints would be created.
+If no dungeons are hinted barren, then there are 2 copies of the MostSwordsProvince hint and 1 of the Auxiliary sword hint.
+If a dungeon is hinted barren, then there is 1 copy of each hint (the hinted-barren dungeon hints itself as barren instead).
 
 ### Important hint tips
 
@@ -479,7 +469,7 @@ If all 3 were hinted barren, then none of these hints would be created.
     - Ex: "Who need mirror? (barren zone)"
   - If there are other hints on that zone's sign, then it will use a Barren hint which indicates its own zone.
     - Ex: The Arbiter's Grounds sign includes the hint "They say that there is nothing to be found at {Arbiter's Grounds}."
-- If a dungeon is hinted barren, it will hint itself barren in addition to the 2 Barren hints which exist on overworld signs.
+- If a dungeon is hinted barren, it will hint itself barren in addition to the 3 Barren hints which exist on overworld signs.
   - For overworld zones which are hinted barren, one copy of the Barren hint goes to the hinted-barren zone and the other can go to any other overworld sign.
 - There is no reason to visit an Overworld zone once you already know it is hinted barren.
 
@@ -491,7 +481,7 @@ If you see a Junk hint, it is time to evacuate the area. You are in a barren zon
 
 - If it is possible to hint a dungeon as barren, then we will (max 1).
   - Therefore, if your 3 Barren Zone hints do not include a dungeon, then none of the dungeons are barren.
-    This does not imply that they all have hard-required items such as the Boomerang or Spinner though.
+    This does not imply that they all have required items such as the Boomerang or Spinner though.
     They might simply have a bomb bag, etc.
 - The SPR hint will prioritize hinting the bedroom key if possible.
   If it does not, then you know the bedroom key is not any of these checks:
