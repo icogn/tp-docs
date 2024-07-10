@@ -224,6 +224,16 @@ I don't list these here since it would make it more difficult to understand, and
 
 :::
 
+### Summary
+
+- 3 Barren zones (prioritizes barren dungeons, max 1 barren dungeon hint)
+- 3 Path hints (1 ItemToItemPath and 2 Path to Boss)
+- 1 Miscellaneous starting hint
+- 5 Always hints
+- 5 Sometimes hints (2nd hint on a sign)
+- 2 Sword hints (found on dungeon signs)
+- BeyondThisPoint hints, dungeon hints, and AgithaRewards hint
+
 ### Overworld signs
 
 In general, each Overworld hint sign contains 2 hints (with the 2nd hint being a Sometimes hint), and each hint has multiple copies.
@@ -253,10 +263,8 @@ For normal Overworld signs, the following can be found as the first hint on the 
     You will have extra Filler hints in that case.
 - 2 Path hints
   - Ex: "They say that {Eldin Field} is on the path to {Morpheel}."
-- If needed, Filler hints fill any leftover space.
-  - Ex: "They say that a {Red Rupee} can be found at {Kakariko Graveyard}."
 
-The Barren Zone hints have 3 copies, and everything else is 2 copies.
+The Barren Zone hints have 3 copies, and everything else is 2 copies (note that the ItemToItemPath hints and Path hints may get extra copies to fill out any leftover signs).
 A Zone hinting itself as barren with a Junk hint counts as one of the 3 copies.
 A dungeon hinting itself as barren is a special 4th copy.
 Always hints only have 2 copies each.
@@ -317,7 +325,7 @@ Here are some of the hint types you will see:
   - Ex: "They say that a {bug} in a {Dungeon} leads to a {sword}."
 - BarrenCategory hint
   - Indicates that a group of checks are barren.
-  - The ONLY categories that can be hinted are "upper desert" and "lower desert".
+  - The ONLY categories that can be hinted are "purple mist", "upper desert", and "lower desert".
   - For a full list of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
   - Ex: "They say that there is nothing to be found in the {lower desert}."
   - Ex: "They say that there is nothing to be found in the {upper desert}."
@@ -327,7 +335,9 @@ Here are some of the hint types you will see:
 
 #### Second Layer / Sometimes hints
 
-The 2nd hint on an Overworld sign is usually a Sometimes hint.
+The 2nd hint on an Overworld sign is a Sometimes hint.
+There are 5 different hints at 2 copies each.
+Note that some hints might get extra copies to fill out any leftover signs.
 
 Some Overworld signs do not have 2nd layer hint placed on them:
 
