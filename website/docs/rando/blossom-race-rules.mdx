@@ -190,12 +190,10 @@ Here is a general outline of how you might approach a seed:
   You will need to find 5 poe souls for the Jovani reward, but 1 is always right next to Jovani.
   However, if Castle Town is hinted barren then the Jovani reward is junk.
   - Jovani's reward is NOT hinted since you only need to find a few poe souls.
-- If you find a hint such as "bringing male/female bugs to Agitha leads to nothing", then you know that Agitha is not skippable.
-  At some point you will want to go check the sign outside Agitha's Castle to see all Good items she rewards.
-  (Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.)
-  - She may still have Good items even if you do not see this hint!
-    You should always check at some point (early or late is up to you).
+- At some point you will want to go check the sign outside Agitha's Castle to see all Good items she rewards.
+  - Agitha is her own zone. She is NOT part of the Castle Town zone. However, she IS part of Lanayru Province.
 - We prioritize hinting barren dungeons (limit 1).
+  - If no dungeons are hinted barren, then all of the dungeons have at least 1 check preventing barren.
 - Don't forget that these are excluded: Shop Items, Bug source checks, Bulblin Camp, Death Mountain, Lake Lantern Cave
 
 Everything else should be mostly self-explanatory.
@@ -243,7 +241,7 @@ Furthermore, the Ordon sign is a special "starting hints" sign which contains yo
 
 - 1 Barren Zone hint
 - 1 Miscellaneous hint (a few different possibilities)
-  - Barren category (upper or lower desert), hint related to bugs, Number or Boomerangs or Clawshots in Dungeons, Sometimes hint
+  - Barren category (purple mist, upper desert, or lower desert), barren bug gender (male or female), or number or Boomerangs or Clawshots in Dungeons
 
 Note that the starting hints do not have additional copies since you are expected to always read this sign at the start of the seed.
 
@@ -296,14 +294,8 @@ Always Checks:
 The first hint on the sign is the stronger hint.
 The second hint is usually just a Sometimes hint.
 
-Here are some of the hint types you will see:
+ItemToItemPath hint explanation:
 
-- NumItemInDungeons hint
-  - This tells how many of an item (Gale Boomerang or Clawshots) can be found in Dungeons.
-  - Note that this does NOT direct toward any checks.
-    It just states a fact without pointing toward anything.
-  - Ex: "They say that {0 Gale Boomerangs} can be found in {Dungeons}."
-  - Ex: "They say that {1 Clawshot} can be found in a {Dungeon}."
 - ItemToItemPath hint
   - Indicates that you must find at least 1 copy of an item in order to logically find the 2nd item.
   - The 2nd item is always a unique (one findable copy) item which is logically required to complete the seed.
@@ -312,26 +304,27 @@ Here are some of the hint types you will see:
     See the linked videos for more details.
   - Ex: "They say that a {Clawshot} is on the path to the {Lantern}."
   - Ex: "They say that a {Dominion Rod} is on the path to the {Male Grasshopper}."
+
+Here are the options for the Misc Starting hint (2nd hint on Ordon sign):
+
+- NumItemInDungeons hint
+  - This tells how many of an item (Gale Boomerang or Clawshots) can be found in Dungeons.
+  - Note that this does NOT direct toward any checks.
+    It just states a fact without pointing toward anything.
+  - Ex: "They say that {0 Gale Boomerangs} can be found in {Dungeons}."
+  - Ex: "They say that {1 Clawshot} can be found in a {Dungeon}."
 - BarrenBugGender (TradeGroup) hint
   - Indicates that either male or female bugs can be ignored.
   - This hint can show up even if Agitha is skippable.
   - Note that bugs only prevent barren if they lead to an item which prevents barren, so it is unlikely you will find all 6 bugs.
     This is because some of the bugs which lead to nothing will likely be in barren zones.
   - Ex: "They say that bringing {male bugs} to Agitha leads to nothing."
-- BugChain (TradeChain) hint
-  - Indicates that a bug in a province leads to an item.
-  - This hint can show up even if Agitha is skippable.
-  - Ex: "They say that a {bug} in {Faron Province} leads to a {fishing rod}."
-  - Ex: "They say that a {bug} in a {Dungeon} leads to a {sword}."
 - BarrenCategory hint
   - Indicates that a group of checks are barren.
   - The ONLY categories that can be hinted are "purple mist", "upper desert", and "lower desert".
-  - For a full list of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
+  - For an explanation of Check Categories, please see the <Link to="https://wiki.tprandomizer.com/index.php?title=Hints#Check_Categories">TPR Hints Wiki Page</Link>.
   - Ex: "They say that there is nothing to be found in the {lower desert}."
   - Ex: "They say that there is nothing to be found in the {upper desert}."
-- Sometimes hint
-  - Indicates the contents of a check.
-  - EX: "They say that the reward for {Kakariko Gorge Double Clawshot Chest} is an {orange Rupee}."
 
 #### Second Layer / Sometimes hints
 
